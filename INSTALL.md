@@ -61,6 +61,18 @@ Use **Connect this site** for additional sites. **Pause control** blocks new com
 
 Only connect AI clients you trust. Browser results, selected files or desktop information may reach the AI provider configured in that client. Read the packaged `PRIVACY.md` before enabling control.
 
+## First read-only check
+
+After connecting your AI client, open an ordinary public page and enable that site in ToolBraid. Ask your assistant: **“Read this page's title and summarize its visible text. Do not click or submit anything.”** Confirm that the result refers to the intended page before trying actions that change anything.
+
+## Troubleshooting
+
+- **The extension will not load:** select the extracted `extension` folder containing `manifest.json`, not the ZIP or its parent folder. Keep it on disk. An organization-managed browser may prohibit unpacked extensions.
+- **The companion is not connected:** confirm that `Install.cmd` completed for the browser you are using and that your AI client uses the generated `mcp-client.json`. The extension and companion must come from the same release. Restart the client connection after changing its configuration.
+- **Tools are paused or a page is unavailable:** open the side panel, read the disclosure and enable the intended site. Grant browser site access; use **Connect this site** for another origin. Do not bypass browser or organization restrictions.
+- **Advanced tools are unavailable:** those tools require the separate optional advanced-tools permission. Ordinary page tools do not require that permission.
+- **Still stuck:** use the [Feedback form](https://toolbraid.pages.dev/feedback/). Include the release version, browser and exact error, but remove tokens, personal paths and private page content. Do not attach your full configuration or browser profile.
+
 ## Update
 
 Updates are manual. Close the browser connection, extract the new full package and rerun its installer. Replace the files in the permanently loaded `extension` folder with the matching new extension files, then click **Reload** on its browser extensions page. Merely extracting a new ZIP elsewhere does not update the extension already loaded by the browser. Preserve the manifest's supplied public key so its unpacked ID stays consistent. The companion installer preserves its existing authentication token and local data; it does not download future updates.

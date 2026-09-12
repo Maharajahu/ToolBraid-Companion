@@ -1,46 +1,116 @@
-# ToolBraid — Official Releases
+<p align="center"><img src="assets/toolbraid.svg" width="88" height="88" alt="ToolBraid logo"></p>
 
-Connect your AI client to the browser pages you choose, with visible controls for site access and pausing new commands.
+<h1 align="center">ToolBraid</h1>
 
-This is Maharajahu's public distribution repository for ToolBraid. It contains installation documentation and release downloads, not the private development repository or its history.
+<p align="center"><strong>Browser and Windows tools for your AI assistant.</strong></p>
+<p align="center">Read pages. Work with forms. Connect your assistant to the tools you choose.</p>
 
-[Website](https://toolbraid.pages.dev/) · [Releases](https://github.com/Maharajahu/toolbraid-releases/releases) · [Installation guide](INSTALL.md)
+<p align="center">
+  <a href="https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.2.0-rc.1"><img src="https://img.shields.io/badge/release-0.2.0_RC1-ffd278" alt="Release 0.2.0 RC1"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-77e7f4" alt="Apache License 2.0"></a>
+  <a href="INSTALL.md"><img src="https://img.shields.io/badge/platform-Windows_x64-303743" alt="Windows x64"></a>
+  <a href="#browser-support"><img src="https://img.shields.io/badge/Chrome-manual_install-77e7f4" alt="Chrome manual installation"></a>
+  <a href="#browser-support"><img src="https://img.shields.io/badge/Edge-store_pending-ffd278" alt="Edge store publication pending"></a>
+</p>
 
-## Distribution channels
+<p align="center">
+  <a href="https://toolbraid.pages.dev/"><strong>Website</strong></a> ·
+  <a href="#what-is-toolbraid">What it does</a> ·
+  <a href="#see-the-interface">Screenshots</a> ·
+  <a href="INSTALL.md">Install</a> ·
+  <a href="RELEASE-NOTES.md">Release notes</a> ·
+  <a href="https://toolbraid.pages.dev/feedback/">Feedback form</a>
+</p>
 
-| Browser | Distribution |
+<p align="center">Built by <a href="https://github.com/Maharajahu">Maharajahu</a> · Free to download · Bring your own AI client</p>
+<p align="center">
+  <a href="https://x.com/dandumt23"><img src="https://img.shields.io/badge/Follow-%40dandumt23-111111?style=for-the-badge&amp;logo=x&amp;logoColor=white" alt="Follow @dandumt23 on X"></a>
+  <a href="https://buymeacoffee.com/dumitrescup"><img src="https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?style=for-the-badge&amp;logo=buymeacoffee&amp;logoColor=000000" alt="Buy me a coffee — optional support"></a>
+</p>
+
+<p align="center"><img src="assets/toolbraid-cover.png" width="1100" alt="ToolBraid: From intent to evidence. Cyan and pink strands connect across a dark background."></p>
+
+## What is ToolBraid?
+
+ToolBraid connects an **MCP-compatible AI client** to your browser and Windows computer. A browser extension works with a local Windows companion so your assistant can read permitted pages, navigate tabs, fill fields and perform browser actions. The companion also exposes local file, desktop and job tools.
+
+**It is a tool connection, not an AI model or a chatbot.** Your chosen AI client provides the reasoning and receives the results. An ordinary chatbot website does not gain ToolBraid access just because the extension is installed.
+
+### What can you use it for?
+
+| You ask your assistant to… | ToolBraid provides… |
 | --- | --- |
-| Microsoft Edge | Microsoft Edge Add-ons is the planned store channel. The listing is not published yet. |
-| Google Chrome | Download from GitHub Releases and install manually with Developer mode → Load unpacked. No Chrome Web Store release is planned. |
+| Summarize a page or compare information across open tabs | Page text, links and tab-navigation tools. Your AI writes the summary. |
+| Work through a form on a site you allow | Field inspection, filling and browser actions, including submission. |
+| Work with selected local files or a Windows application | Companion file tools and desktop accessibility controls. Availability depends on the application and granted access. |
 
-GitHub Releases is the official download source. Chrome downloads are not one-click store installations and do not receive automatic extension updates. Early testers can also use the unpacked package in Edge while its store listing is being prepared.
+These are example workflows, not a promise that every website or application is supported. Packaged X actions include Post, Reply, Like, Repost and Quote; automated checks use an **offline X fixture**, not a certified live account.
 
-## Current release
+## See the interface
 
-The initial public package is **0.2.0 release candidate**. It is not Microsoft-approved or a completed stable launch. See the [release notes](RELEASE-NOTES.md) for completed checks and outstanding validation.
+<p align="center">
+  <img src="assets/sidepanel-paused.png" width="300" alt="Actual ToolBraid side panel: control starts paused and site access must be enabled.">
+  <img src="assets/x-direct-control.png" width="300" alt="Actual ToolBraid action controls on an offline X test fixture.">
+</p>
 
-Download assets from a release's **Assets** section:
+Actual release-candidate screenshots: **paused before opt-in** (left), **available X tools on a local test page** (right). The colorful banner is the original editorial artwork from the ToolBraid X article.
 
-- `ToolBraid-0.2.0-windows-x64.zip`: complete Windows companion, bundled Node.js runtime, installer and matching extension. This is the normal download for a new installation.
-- `ToolBraid-0.2.0-extension.zip`: extension only; an existing matching Windows companion is still required.
-- `SHA256SUMS.txt`: SHA-256 checksums for the two packages.
+## Get started
 
-GitHub's automatically generated **Source code** archives contain this documentation repository, not the ToolBraid application. Do not use them as the installer.
+1. **Download the complete Windows package** from [release 0.2.0 RC1](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.2.0-rc.1). Extract it and run `Install.cmd` as your normal Windows user.
+2. **Load the matching extension** using Developer mode → Load unpacked in Chrome or Edge. Select the included `extension` folder, not the ZIP.
+3. **Connect your AI client** using the generated `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`. An optional `Configure-Codex.cmd` helper is included for Codex.
+4. **Choose a page and enable control** in the side panel. Read the disclosure and grant the site's browser permission. Start with: “Read this page's title and summarize its visible text. Do not click or submit anything.”
 
-## Requirements and control
+The [installation guide](INSTALL.md) covers exact setup, [connection troubleshooting](INSTALL.md#troubleshooting), updates and removal.
 
-- Windows x64, Chrome or Microsoft Edge, and an MCP-compatible AI client.
-- No separate Node.js installation, compiler, private source checkout or experimental WebMCP flag is required.
-- No AI model, API credit or AI subscription is included. Your chosen AI provider may have its own costs.
-- The public extension starts paused. Read its disclosure, enable the chosen site, and grant the browser permissions you accept. Pause blocks new commands, not work already dispatched.
-- The companion can expose browser content, local file operations and desktop controls to your configured AI client. Local transport does not mean a cloud AI provider receives no data.
+### Which download do I need?
 
-The ToolBraid launcher is currently unsigned. Windows may display an unknown-publisher warning. Do not disable antivirus or browser protections. Checksums identify the downloaded bytes; they are not a publisher signature.
+| Release asset | Use it for |
+| --- | --- |
+| **`ToolBraid-0.2.0-windows-x64.zip`** | **A new installation.** Companion, bundled Node.js, installer and matching extension. |
+| `ToolBraid-0.2.0-extension.zip` | Extension only; a matching installed Windows companion is still required. |
+| `SHA256SUMS.txt` | Verify the downloaded ZIP bytes. |
 
-## Privacy, support and license
+Use the release's **Assets** section. GitHub's automatic **Source code** archives contain this documentation repository, **not the application installer**.
 
-The [data-handling page](https://toolbraid.pages.dev/privacy/) and packaged `PRIVACY.md` currently describe the release candidate and are marked as drafts pending final publisher review.
+## Browser support
 
-For feedback, support or privacy questions, use the [private feedback form](https://toolbraid.pages.dev/feedback/). You can also open an issue in this repository, but issues are public. Do not include tokens, credentials, private page content or personal documents in any report.
+| Browser or client | Current status |
+| --- | --- |
+| **Microsoft Edge** | Planned official store channel. Edge Add-ons is **not published yet**; the RC can be loaded unpacked. |
+| **Google Chrome** | Official ZIP downloads with manual installation and updates. No Chrome Web Store release is planned. |
+| **Codex** | Optional MCP configuration helper is included. |
+| **Other MCP clients** | Manual configuration required. Compatibility with every client is not established. |
 
-ToolBraid is distributed under the [Apache License 2.0](LICENSE). The Windows package also contains the bundled runtime's license at `runtime/LICENSE.node.txt`.
+Windows x64 is required. No separate Node.js installation, compiler, private source checkout or experimental WebMCP flag is needed. AI accounts, subscriptions, API usage and local models are separate. **Donating is never required to use ToolBraid.**
+
+## Control and data boundaries
+
+- **Starts paused.** Read the direct-control disclosure and explicitly enable the site.
+- **Enabled means actions can execute.** Your connected AI can use available tools without another ToolBraid prompt for each action, including form submission. Your AI client may impose its own approvals.
+- **Pause blocks new commands.** It cannot undo submitted actions or guarantee that existing companion jobs stop.
+- **Local connection is not local-only AI.** Tool results go to your client. A cloud model provider may receive page content, file information or desktop results. Optional media analysis uses the endpoint you configure.
+- **Trust the connected client.** The companion exposes more than browser reads. Grant only the site, file and advanced-tool access you intend to use.
+
+Read the [data-handling page](https://toolbraid.pages.dev/privacy/) and packaged `PRIVACY.md`. The release-candidate privacy documents remain drafts pending final publisher review.
+
+## Release status
+
+**0.2.0 RC1 is a pre-release, not a stable or Microsoft-approved launch.** The [release notes](RELEASE-NOTES.md) distinguish recorded automated checks from outstanding manual validation and live-site limitations.
+
+The ToolBraid launcher is currently unsigned. Windows may show an unknown-publisher warning. Do not disable antivirus or browser protections. Checksums identify bytes; they are not a publisher signature.
+
+## Feedback and support
+
+Use the [Feedback form](https://toolbraid.pages.dev/feedback/) for a bug, an idea or a privacy question. No account is required; your reply email is optional. Messages are not published as GitHub issues. Never send passwords, tokens, private page contents or personal documents.
+
+[GitHub issues](https://github.com/Maharajahu/toolbraid-releases/issues) are also available, but **everything posted there is public**.
+
+Follow development on [X](https://x.com/dandumt23), or [buy me a coffee](https://buymeacoffee.com/dumitrescup) if you would like to support the project. Support is entirely optional.
+
+## Distribution and license
+
+This is Maharajahu's **official public release repository**: documentation, presentation assets and packaged downloads. It is not the private development checkout or its Git history. Application packages contain the runtime files needed to use ToolBraid.
+
+ToolBraid is distributed under the [Apache License 2.0](LICENSE). The Windows package also includes the bundled runtime's license at `runtime/LICENSE.node.txt`.

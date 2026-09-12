@@ -35,4 +35,4 @@ The runtime files are unchanged from that prepared build. On 12 September 2026, 
 - Windows x64 with Chrome or Edge is the current target. Chrome and unpacked Edge updates are manual.
 - No AI model, AI subscription or API credit is included. Data returned to a cloud AI client may reach its provider.
 
-Website: [toolbraid.pages.dev](https://toolbraid.pages.dev/). Feedback and support: [private feedback form](https://toolbraid.pages.dev/feedback/). Do not attach secrets or private data to support reports.
+Website: [toolbraid.pages.dev](https://toolbraid.pages.dev/). Feedback and support: [Feedback form](https://toolbraid.pages.dev/feedback/). Do not attach secrets or private data to support reports.
