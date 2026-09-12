@@ -22,6 +22,7 @@ Download from the release **Assets** section, not GitHub's automatically generat
 
 ### Documentation update — 12 September 2026
 
+- Replaced the small presentation screenshots with lossless 1440-pixel-wide captures rendered from the public UI at 125% zoom and 3× pixel density, with offline test data and explicit provenance. Enlarged website/README presentation and added full-resolution image links; preserved the original live Edge chat capture as evidence. This does not change the application or add a new live integration test.
 - Made the built-in chat explicitly optional, with separate setup paths for ChatGPT, external MCP clients and local models.
 - Added ChatGPT sign-in, model selection, page-sharing and connection troubleshooting instructions.
 - Added a Claude Code subscription-client configuration example and an LM Studio local-model/MCP guide, grounded in their official documentation. Neither pairing is claimed as end-to-end certified.

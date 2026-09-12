@@ -58,12 +58,21 @@ These are example workflows, not a promise that every website or application is 
 
 ## See the interface
 
-<p align="center">
-  <img src="assets/chat-subscription.png" width="300" alt="Actual integrated chat in Microsoft Edge, using a ChatGPT account to read a local test page.">
-  <img src="assets/x-direct-control.png" width="300" alt="Actual ToolBraid action controls on an offline X test fixture.">
-</p>
+High-resolution captures of the public 0.3.0 interface, rendered at **125% zoom and 3× pixel density (1440 pixels wide)** with offline test data. Select an image to view it at full resolution.
 
-Actual release-candidate screenshots: **subscription-backed chat in Edge reading a local test page** (left), **available X tools on a local test page** (right). The colorful banner is the original editorial artwork from the ToolBraid X article.
+### Optional agent chat
+
+<p align="center"><a href="assets/chat-subscription-hd.png"><img src="assets/chat-subscription-hd.png" width="480" alt="The released chat interface with the recorded read-only test exchange, rendered at high resolution."></a></p>
+
+The conversation repeats the recorded subscription-backed read-only test; this re-render is **not a new live account check**. [Open full-resolution chat image](assets/chat-subscription-hd.png) · [Original Edge test capture](assets/chat-subscription.png).
+
+### X community and actions
+
+<p align="center"><a href="assets/x-direct-control-hd.png"><img src="assets/x-direct-control-hd.png" width="480" alt="The released X community panel and two action controls, rendered with offline test data at high resolution."></a></p>
+
+Catch-up controls, optional quiet monitoring and two available X actions. **Offline test data; no live X actions were performed.** [Open full-resolution X image](assets/x-direct-control-hd.png).
+
+The colorful banner is the original editorial artwork from the ToolBraid X article.
 
 ## Get started
 
