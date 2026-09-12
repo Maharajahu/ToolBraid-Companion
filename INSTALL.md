@@ -51,25 +51,68 @@ The unpacked extension has a fixed ID derived from its bundled public key. An ev
 
 ## 4. Connect your AI client
 
-### Integrated chat — your ChatGPT subscription
+**The built-in chat is optional. Choose one route; you do not need to configure all three.** A ChatGPT account and Codex installation are needed only for Option A. Options B and C keep the conversation and model selection in your external client.
 
-Install a current Codex CLI or the Codex desktop app on this Windows PC. Enable ToolBraid using the steps below, then open **Your browser agent → Connection & model**. Choose **Sign in with ChatGPT** to open the official OpenAI sign-in page, or **Connect to Codex** if already signed in. The panel never asks for your password or API key. API-key-only accounts are rejected. Use your own ChatGPT account with Codex access; its usage limits apply.
+Before any route, open the ToolBraid panel on a test page, read the direct-control disclosure, tick its consent checkbox, choose **Enable on this site**, and handle the browser's site-access prompt. **Allow advanced tools** is a separate optional permission. Use **Connect this site** for additional sites. Keep the browser open and the companion connected.
 
-You can select an available Codex model or keep the account default. The advanced executable field is only needed if Codex cannot be found in PATH or its Windows desktop installation. If sign-in cannot open, run `codex login` manually and choose ChatGPT sign-in.
+### Option A: ChatGPT in the ToolBraid panel
 
-Page sharing is off by default for a chat turn. Enable **Share the selected connected page and its tools** when you want browser assistance. The run remains on that tab, even when you switch tabs. Review any mutation's exact arguments before approving. **Stop** cancels new work but does not undo an already-dispatched action. **Clear chat** removes ToolBraid's local conversation copy, not provider-side data.
+1. Install a current [Codex CLI](https://developers.openai.com/codex/cli/) or Codex desktop app on this Windows PC. ToolBraid's bundled Node.js is for its companion; it does not install Codex or include an AI subscription.
+2. Open **Your browser agent → Connection & model → Sign in with ChatGPT**. Complete the official OpenAI login in your browser using your own account with Codex access. Already signed in to Codex? Skip login and connect. Being signed in to the ChatGPT website alone is not the same as signing in to the local Codex runtime.
+3. Choose **Connect to Codex**. The panel loads the models available to your account. Choose one in **Codex model**, or leave the field blank for **Account default**. This selector is not an arbitrary provider or local-model selector.
+4. For browser assistance, select **Share the selected connected page and its tools**. It starts off; without it, chat has no ToolBraid page tools. Ask for the read-only check below and verify the actual tool activity and page title.
 
-### External MCP clients — separate from integrated chat
+This route uses your ChatGPT account's Codex allowance, not a separately billed API key. ToolBraid rejects API-key-only accounts and does not accept Claude, Gemini or other providers' logins in this panel. The official [authentication guide](https://learn.chatgpt.com/docs/auth) explains the difference between subscription and API access. Account limits and model availability still apply.
 
-The installer creates `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`. Add the MCP server configuration from that file to your chosen client.
+If sign-in cannot open, run `codex login` yourself and use ChatGPT sign-in, then reconnect. `codex login status` can help confirm the active login method. Do not paste passwords, browser cookies, login tokens or authentication files into ToolBraid or support reports. The advanced executable field is needed only when Codex is not found automatically.
 
-For Codex, `Configure-Codex.cmd` is optional. It backs up the existing configuration and updates only ToolBraid's MCP entry. Other clients are not configured automatically.
+You do **not** need `Configure-Codex.cmd`, a separate MCP entry or a model API key for this built-in route. The run stays on its selected tab. Review each mutation before approving; **Stop** cancels new work but cannot undo an action already sent. **Clear chat** removes ToolBraid's recent local conversation copy, not provider-side records.
 
-Open the ToolBraid side panel on a test page. Read the direct-control disclosure, tick its consent checkbox, choose **Enable on this site**, and handle the browser's site-access prompt. **Allow advanced tools** requests an additional optional permission. Control remains paused until enabled.
+### Option B: An external MCP client
 
-Use **Connect this site** for additional sites. **Pause control** blocks new commands and disconnects the companion; it does not undo actions already dispatched.
+Use this route to keep working in your existing assistant, including a provider-supported subscription client. Sign in and choose the model **in that client**, not in ToolBraid. A paid chatbot subscription is not automatically an API key or a license for any third-party integration. Confirm that the chosen provider/client supports your account and **local stdio MCP servers**; a cloud-only connector cannot directly launch a program on your Windows PC.
 
-Only connect AI clients you trust. Browser results, selected files or desktop information may reach the AI provider configured in that client. Read the packaged `PRIVACY.md` before enabling control.
+1. The companion installer generates `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`. Open this file locally; it contains an `mcpServers.toolbraid` entry with the installed executable and arguments.
+2. In a client that uses an `mcpServers` JSON object, merge **only the `toolbraid` entry** into that object's existing entries. Preserve other servers and the generated paths/arguments. Clients with different configuration formats need their documented equivalent. Do not copy an example from another person's PC.
+3. Reload the client's MCP connections and check that ToolBraid appears with tools available. Select your model in that client's model picker and run the read-only check below.
+
+The generated entry points to the companion's private local configuration; it is not your AI provider's login. Do not publish your installed configuration or change its paths into a public HTTP endpoint.
+
+**Codex as an external client:** `Configure-Codex.cmd` is an optional helper that backs up the existing configuration and updates only ToolBraid's MCP entry. This configures the Codex app/CLI conversation, not the extension's built-in chat. Other clients are not configured automatically.
+
+#### Example: your Claude subscription through Claude Code
+
+Install Claude Code using its [official setup and authentication instructions](https://code.claude.com/docs/en/authentication), and sign in there with an account that includes Claude Code. This is not an embedded Claude chat in ToolBraid. To register the generated local server, run the following in PowerShell on the same PC:
+
+```powershell
+$toolbraidClient = Get-Content -LiteralPath "$env:LOCALAPPDATA\ToolBraid\public\mcp-client.json" -Raw | ConvertFrom-Json
+$toolbraidServer = $toolbraidClient.mcpServers.toolbraid
+$toolbraidArguments = @('mcp', 'add', '--transport', 'stdio', '--scope', 'user', 'toolbraid', '--', $toolbraidServer.command) + @($toolbraidServer.args)
+claude @toolbraidArguments
+```
+
+This adds a user-scoped server in Claude Code; it does not log in or change your subscription. If `toolbraid` already exists, inspect the existing entry rather than adding it again. In a Claude Code session, use `/mcp` to check the connection and `/status` to check which account/billing route is active. Follow the client's [MCP documentation](https://code.claude.com/docs/en/mcp) for permission or configuration issues. Keep its approval controls enabled; do not assume it uses the extension chat's per-action approval UI.
+
+The configuration example follows the provider's documented stdio interface. A real Claude Code + ToolBraid session has **not** been certified by this release's end-to-end tests.
+
+### Option C: A local model in LM Studio
+
+This uses **LM Studio's own chat**, not the chat built into ToolBraid. No ChatGPT account, Codex login or cloud model key is required for this local-model route.
+
+1. Install current [LM Studio](https://lmstudio.ai/docs/app). Download or import a supported model that fits your RAM/VRAM and supports tool use. If it is already on disk, load it rather than downloading another copy.
+2. Select and load that model in LM Studio's chat. The model choice, context size and hardware settings belong to LM Studio; entering its model name into ToolBraid's **Codex model** field will not connect it.
+3. Open the **Program** sidebar, then **Install → Edit mcp.json**. Merge the generated `mcpServers.toolbraid` entry from `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json` into LM Studio's `mcpServers` object. Preserve existing entries. Save and enable the ToolBraid integration in the chat. See the [official MCP setup](https://lmstudio.ai/docs/app/mcp).
+4. Keep ToolBraid enabled on your test page and ask the local model to read its title. Check for a real ToolBraid tool call and the correct title, not just an answer based on the prompt. If tools are listed but not called correctly, check the model's tool-use support and context capacity.
+
+You do not need to expose LM Studio's HTTP server, enable CORS or enter a local API URL in ToolBraid for this desktop-chat/MCP route. Local model inference can stay on your PC, but visited websites and submitted browser actions still use the network. Other enabled integrations or a separately configured media/cloud endpoint can also send data out. Loading a local model is not a blanket offline or privacy guarantee.
+
+**Ollama and other local runtimes:** there is no Ollama endpoint field in ToolBraid 0.3.0's built-in chat. They need an external client that supports both that runtime's tool calling and ToolBraid's local stdio MCP server; configure the model in that client. This release does not provide or certify a one-click Ollama integration.
+
+LM Studio setup is based on its documented MCP interface. This release has **not** end-to-end certified LM Studio or every local model. Start with the read-only check; do not interpret these instructions as a new built-in provider feature.
+
+### Controls shared by all routes
+
+**Pause control** blocks new extension commands and disconnects the companion; it does not undo actions already dispatched. External MCP clients use their own approval policy plus ToolBraid's existing direct-control opt-in. The integrated chat's per-mutation approvals do not automatically apply to external clients. Only connect clients you trust; browser results, selected files and desktop information may reach their configured provider. Read `PRIVACY.md` and the [data-handling page](https://toolbraid.pages.dev/privacy/).
 
 ## First read-only check
 
@@ -82,7 +125,10 @@ After connecting your AI client, open an ordinary public page and enable that si
 ## Troubleshooting
 
 - **The extension will not load:** select the extracted `extension` folder containing `manifest.json`, not the ZIP or its parent folder. Keep it on disk. An organization-managed browser may prohibit unpacked extensions.
-- **The companion is not connected:** confirm that `Install.cmd` completed for the browser you are using and that your AI client uses the generated `mcp-client.json`. The extension and companion must come from the same release. Restart the client connection after changing its configuration.
+- **The companion is not connected:** confirm that `Install.cmd` completed for your browser and that the extension and companion come from the same release. External clients need the generated `mcp-client.json` entry; built-in chat does not. Restart the affected connection after configuration changes.
+- **Chat login, account or model error:** confirm Codex is installed and signed in through ChatGPT. Reconnect to refresh available models or leave **Codex model** blank for the account default. API-key accounts and other providers cannot be used in this built-in chat. Check account limits in Codex; ToolBraid does not bypass them.
+- **Chat answers without reading the page:** enable the intended site and select **Share the selected connected page and its tools** for built-in chat. In an external client, check that the ToolBraid server and its tools are enabled for that conversation.
+- **A local model cannot use tools:** check both the client's MCP connection and the model's tool-calling support. Model files or an Ollama server alone do not connect to ToolBraid. Use the external-client route, not the Codex model field.
 - **Tools are paused or a page is unavailable:** open the side panel, read the disclosure and enable the intended site. Grant browser site access; use **Connect this site** for another origin. Do not bypass browser or organization restrictions.
 - **Advanced tools are unavailable:** those tools require the separate optional advanced-tools permission. Ordinary page tools do not require that permission.
 - **Still stuck:** use the [Feedback form](https://toolbraid.pages.dev/feedback/). Include the release version, browser and exact error, but remove tokens, personal paths and private page content. Do not attach your full configuration or browser profile.

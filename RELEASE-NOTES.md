@@ -20,6 +20,17 @@ Download from the release **Assets** section, not GitHub's automatically generat
 
 ## Validation and limitations
 
+### Documentation update — 12 September 2026
+
+- Made the built-in chat explicitly optional, with separate setup paths for ChatGPT, external MCP clients and local models.
+- Added ChatGPT sign-in, model selection, page-sharing and connection troubleshooting instructions.
+- Added a Claude Code subscription-client configuration example and an LM Studio local-model/MCP guide, grounded in their official documentation. Neither pairing is claimed as end-to-end certified.
+- Clarified subscription versus API billing, external-client approval behavior, local inference versus network traffic, and the absence of built-in support for other providers or Ollama/LM Studio endpoints.
+- These are website and GitHub documentation changes only. Runtime version, published ZIP files, checksums and release tag are unchanged; no new provider integration is being claimed. The online setup guide is more recent than the documentation bundled inside the original ZIPs.
+- Documentation checks: responsive rendering at 320, 390, 768 and 1440 pixels; three connection guides; keyboard-operated disclosure panels; valid internal page anchors; loaded local assets; privacy and feedback routes. The PowerShell configuration example passed syntax and mocked argument-boundary checks without running Claude or changing a real client configuration. The website archive and changed documents passed the targeted sensitive-data scan.
+
+### Recorded runtime validation
+
 The complete automated suite passed **573 tests**, with **two opt-in tests skipped** and zero failures. Browser/companion integration passed in Chromium and Microsoft Edge. The Edge check also used a real ChatGPT-authenticated Codex account to execute a read-only page tool and stream the actual page title, with no API key. No real X requests or posts were made; X actions and monitoring use local intercepted fixtures.
 
 The installed Edge 152 browser does not expose the new native WebMCP consumer API. Its unavailable state and ordinary MCP fallback were verified; native discovery/execution contracts were tested against the documented API in an isolated harness. Do not interpret this as native WebMCP execution certified on Edge 152. Native site tools require a compatible browser/API and website.

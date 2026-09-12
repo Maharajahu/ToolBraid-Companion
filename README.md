@@ -18,6 +18,7 @@
   <a href="#what-is-toolbraid">What it does</a> ·
   <a href="#see-the-interface">Screenshots</a> ·
   <a href="INSTALL.md">Install</a> ·
+  <a href="#choose-your-ai">Choose your AI</a> ·
   <a href="RELEASE-NOTES.md">Release notes</a> ·
   <a href="https://toolbraid.pages.dev/feedback/">Feedback form</a>
 </p>
@@ -32,7 +33,7 @@
 
 ## What is ToolBraid?
 
-ToolBraid is a **WebMCP-enabled browser extension with integrated agent chat**, backed by a local Windows companion. Chat uses your **ChatGPT account through official Codex App Server**, with your account's Codex limits: no API key and no separately billed model API for the integrated chat. It streams responses, keeps recent conversation history locally, and can use the connected page's tools when you choose to share them.
+ToolBraid is a **WebMCP-enabled browser extension with optional integrated agent chat**, backed by a local Windows companion. The built-in chat uses your **ChatGPT account through official Codex App Server**, with your account's Codex limits: no API key and no separately billed model API for that chat. It streams responses, keeps recent conversation history locally, and can use the connected page's tools when you choose to share them. **ChatGPT and Codex are not required when you use ToolBraid only through another MCP client.**
 
 On compatible sites and browsers, ToolBraid discovers and executes **site-registered native WebMCP tools**. Existing page extraction and MCP tools work independently when the native browser API is unavailable. The companion also connects external MCP clients to browser, local-file, desktop and job tools. No model or new subscription is bundled; installing the extension does not give an unrelated chatbot website automatic browser access.
 
@@ -68,10 +69,24 @@ Actual release-candidate screenshots: **subscription-backed chat in Edge reading
 
 1. **Download the complete Windows package** from [release 0.3.0 RC1](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.0-rc.1). Extract it and run `Install.cmd` as your normal Windows user.
 2. **Load the matching extension** using Developer mode → Load unpacked in Chrome or Edge. Select the included `extension` folder, not the ZIP.
-3. **Use your ChatGPT account in the chat panel.** Install a current Codex CLI or desktop app, enable ToolBraid and choose **Sign in with ChatGPT**, then **Connect to Codex**. External MCP clients can still use the generated `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`; the optional `Configure-Codex.cmd` helper is for that separate integration.
-4. **Choose a page and enable control** in the side panel. Read the disclosure and grant the site's browser permission. Start with: “Read this page's title and summarize its visible text. Do not click or submit anything.”
+3. **Choose a page and enable control** in the side panel. Read the disclosure and grant the site's browser permission.
+4. **Choose your AI below.** Use the optional built-in ChatGPT chat, your existing MCP client, or a local model in a compatible external client. Start with: “Read this page's title and summarize its visible text. Do not click or submit anything.”
 
 The [installation guide](INSTALL.md) covers exact setup, [connection troubleshooting](INSTALL.md#troubleshooting), updates and removal.
+
+## Choose your AI
+
+| Route | Where you chat and choose a model | Account / setup | Status in 0.3.0 |
+| --- | --- | --- | --- |
+| **Optional ChatGPT chat** | ToolBraid side panel → **Connection & model** | Your own ChatGPT account with Codex access; current Codex installed on this PC. No API key. [Step-by-step setup](INSTALL.md#option-a-chatgpt-in-the-toolbraid-panel) | Real subscription-backed read-only browser check passed in Edge. |
+| **Another subscription / existing MCP client** | In that client's own chat and model selector, not ToolBraid's chat | Sign in with that provider in its supported client, then add ToolBraid's local MCP server. [External setup, including Claude Code](INSTALL.md#option-b-an-external-mcp-client) | Manual configuration. Claude Code is a documented example, not an end-to-end-certified pairing. |
+| **A model running locally** | In a local MCP-capable client such as LM Studio | Download/load a tool-capable model that fits your machine; add ToolBraid in the client's MCP settings. No ChatGPT account needed for this route. [Local model setup](INSTALL.md#option-c-a-local-model-in-lm-studio) | External-client route. LM Studio instructions are documentation-based; model/client combinations have not been end-to-end certified. |
+
+**There is no “connect any subscription” button, Ollama endpoint field or LM Studio model selector in the built-in chat.** Other providers and local models stay in their own client. A subscription does not automatically include API access or grant arbitrary third-party integrations; the provider's supported sign-in route and limits apply. [OpenAI explains subscription sign-in versus API billing](https://learn.chatgpt.com/docs/auth).
+
+For the built-in route: open **Your browser agent → Connection & model → Sign in with ChatGPT**, complete the official login, choose **Connect to Codex**, then choose an offered **Codex model** or leave **Account default**. Page sharing starts off. `Configure-Codex.cmd` and `mcp-client.json` are for the separate external-client route, not prerequisites for built-in chat.
+
+With a local model, inference can stay on your PC; browser requests, submitted actions, other enabled MCP servers and any separately configured cloud/media endpoint may still send data out. Local transport alone is not an offline/privacy guarantee. See [data handling](https://toolbraid.pages.dev/privacy/).
 
 ### Which download do I need?
 
