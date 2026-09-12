@@ -1,0 +1,2 @@
+e661221b050984ae550a965bd42c05ccd1e00e1496d50ee2b6f0c222fecf3693  ToolBraid-0.2.0-extension.zip
+3d7a6ebe181b0f92dc0a9eb5abbfd312d0cc4658f69ca22dd94261a7cca54038  ToolBraid-0.2.0-windows-x64.zip
