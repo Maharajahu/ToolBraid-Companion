@@ -1,3 +1,33 @@
+# ToolBraid 0.3.0 — WebMCP, chat and developer communities
+
+Public release candidate, 12 September 2026. Runtime version `0.3.0`; GitHub tag [`v0.3.0-rc.1`](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.0-rc.1). This is a pre-release, not a stable or Microsoft-approved launch. Edge Add-ons approval is still pending; Chrome remains a manual ZIP installation.
+
+## Downloads and update
+
+- `ToolBraid-0.3.0-windows-x64.zip` — complete Windows x64 companion, installer, bundled Node.js and matching extension. Use this for a new installation or to update both components together.
+- `ToolBraid-0.3.0-extension.zip` — extension only; requires the matching Windows companion.
+- `SHA256SUMS.txt` — SHA-256 checksums for both ZIPs.
+
+Download from the release **Assets** section, not GitHub's automatically generated Source code archives. Follow the [installation and update guide](https://github.com/Maharajahu/toolbraid-releases/blob/main/INSTALL.md). Integrated chat also requires a current Codex installation and your own ChatGPT account with Codex access; no subscription is included.
+
+## New in 0.3.0
+
+- Native WebMCP site-tool discovery and one-use, page/frame/session-bound execution handles on compatible browsers and sites.
+- Streaming agent chat inside the side panel through official Codex App Server. **ChatGPT sign-in only: no API key and no separate model API billing.** Your own account's Codex limits apply.
+- Recent local conversation history, explicit selected-page sharing, visible activity, Stop, and exact per-action approval before browser mutations. Existing external MCP direct control is unchanged.
+- Developer-focused X catch-ups: rendered replies/mentions, exact post links, reply-draft prompts and optional quiet monitoring of one dedicated tab. No automatic replies, DMs or model calls from monitoring.
+- Updated product explanation, original article artwork, Follow and optional Buy Me a Coffee links, and feedback without a public publisher email.
+
+## Validation and limitations
+
+The complete automated suite passed **573 tests**, with **two opt-in tests skipped** and zero failures. Browser/companion integration passed in Chromium and Microsoft Edge. The Edge check also used a real ChatGPT-authenticated Codex account to execute a read-only page tool and stream the actual page title, with no API key. No real X requests or posts were made; X actions and monitoring use local intercepted fixtures.
+
+The installed Edge 152 browser does not expose the new native WebMCP consumer API. Its unavailable state and ordinary MCP fallback were verified; native discovery/execution contracts were tested against the documented API in an isolated harness. Do not interpret this as native WebMCP execution certified on Edge 152. Native site tools require a compatible browser/API and website.
+
+Store-native permission dialogs, final publisher declarations and Edge store review remain manual release checks. The launcher is unsigned. Chat sign-in/model availability depends on the user's own current Codex installation and account; it is not an included subscription. The privacy documents remain drafts.
+
+---
+
 # ToolBraid 0.2.0 — initial public release candidate
 
 Official release repository: [Maharajahu/toolbraid-releases](https://github.com/Maharajahu/toolbraid-releases).

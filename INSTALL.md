@@ -1,15 +1,15 @@
 # Install ToolBraid on Windows
 
-These instructions cover the **0.2.0 release candidate**. Microsoft Edge Add-ons is the planned store channel, but no store listing or store extension ID has been issued for this release yet. Chrome uses manual unpacked installation.
+These instructions cover the **0.3.0 release candidate**. Microsoft Edge Add-ons is the planned store channel, but no store listing or store extension ID has been issued for this release yet. Chrome uses manual unpacked installation.
 
 ## 1. Download and extract
 
-Download `ToolBraid-0.2.0-windows-x64.zip` and `SHA256SUMS.txt` from the same [official release](https://github.com/Maharajahu/toolbraid-releases/releases). Use the release's Assets section, not GitHub's Source code archive.
+Download `ToolBraid-0.3.0-windows-x64.zip` and `SHA256SUMS.txt` from the same [official release](https://github.com/Maharajahu/toolbraid-releases/releases). Use the release's Assets section, not GitHub's Source code archive.
 
 You can compare the ZIP's SHA-256 hash with the matching entry in the checksum file:
 
 ```powershell
-Get-FileHash -LiteralPath '.\ToolBraid-0.2.0-windows-x64.zip' -Algorithm SHA256
+Get-FileHash -LiteralPath '.\ToolBraid-0.3.0-windows-x64.zip' -Algorithm SHA256
 ```
 
 Extract the complete ZIP into a permanent folder. Keep the `extension` subfolder in place while using an unpacked installation. No separate Node.js installation is needed.
@@ -51,6 +51,16 @@ The unpacked extension has a fixed ID derived from its bundled public key. An ev
 
 ## 4. Connect your AI client
 
+### Integrated chat — your ChatGPT subscription
+
+Install a current Codex CLI or the Codex desktop app on this Windows PC. Enable ToolBraid using the steps below, then open **Your browser agent → Connection & model**. Choose **Sign in with ChatGPT** to open the official OpenAI sign-in page, or **Connect to Codex** if already signed in. The panel never asks for your password or API key. API-key-only accounts are rejected. Use your own ChatGPT account with Codex access; its usage limits apply.
+
+You can select an available Codex model or keep the account default. The advanced executable field is only needed if Codex cannot be found in PATH or its Windows desktop installation. If sign-in cannot open, run `codex login` manually and choose ChatGPT sign-in.
+
+Page sharing is off by default for a chat turn. Enable **Share the selected connected page and its tools** when you want browser assistance. The run remains on that tab, even when you switch tabs. Review any mutation's exact arguments before approving. **Stop** cancels new work but does not undo an already-dispatched action. **Clear chat** removes ToolBraid's local conversation copy, not provider-side data.
+
+### External MCP clients — separate from integrated chat
+
 The installer creates `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`. Add the MCP server configuration from that file to your chosen client.
 
 For Codex, `Configure-Codex.cmd` is optional. It backs up the existing configuration and updates only ToolBraid's MCP entry. Other clients are not configured automatically.
@@ -62,6 +72,10 @@ Use **Connect this site** for additional sites. **Pause control** blocks new com
 Only connect AI clients you trust. Browser results, selected files or desktop information may reach the AI provider configured in that client. Read the packaged `PRIVACY.md` before enabling control.
 
 ## First read-only check
+
+In the integrated chat, share your connected test page and ask: “Use the page's read-only tool to read its title. Do not click or submit anything.” You should see activity and a streamed answer. Native WebMCP can be checked separately using **Discover native tools** on a compatible site. An unavailable result means this browser/page does not expose the native API; other browser tools remain usable.
+
+For community monitoring, open X Notifications, Mentions or a specific post conversation in a dedicated tab. Under **Your X community**, inspect it, choose an interval and start watching. Notifications are optional and have no message previews. Keep Edge and the watched tab open. Monitoring does not use a model or post replies; its local inbox only covers rendered content. Pause stops future checks.
 
 After connecting your AI client, open an ordinary public page and enable that site in ToolBraid. Ask your assistant: **“Read this page's title and summarize its visible text. Do not click or submit anything.”** Confirm that the result refers to the intended page before trying actions that change anything.
 
