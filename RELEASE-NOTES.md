@@ -22,6 +22,7 @@ Download from the release **Assets** section, not GitHub's automatically generat
 
 ### Documentation update — 12 September 2026
 
+- Paired the approved high-resolution screenshots side by side on GitHub and the website, with aligned headings, consistent framing and individual full-resolution links. Original image files are unchanged.
 - Replaced the small presentation screenshots with lossless 1440-pixel-wide captures rendered from the public UI at 125% zoom and 3× pixel density, with offline test data and explicit provenance. Enlarged website/README presentation and added full-resolution image links; preserved the original live Edge chat capture as evidence. This does not change the application or add a new live integration test.
 - Made the built-in chat explicitly optional, with separate setup paths for ChatGPT, external MCP clients and local models.
 - Added ChatGPT sign-in, model selection, page-sharing and connection troubleshooting instructions.

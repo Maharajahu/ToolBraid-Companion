@@ -60,17 +60,19 @@ These are example workflows, not a promise that every website or application is 
 
 High-resolution captures of the public 0.3.0 interface, rendered at **125% zoom and 3× pixel density (1440 pixels wide)** with offline test data. Select an image to view it at full resolution.
 
-### Optional agent chat
+<table>
+  <tr><th width="50%">Agent chat</th><th width="50%">X community</th></tr>
+  <tr>
+    <td width="50%" valign="top"><a href="assets/chat-subscription-hd.png"><img src="assets/chat-subscription-hd.png" width="480" alt="The released chat interface with the recorded read-only test exchange, rendered at high resolution."></a></td>
+    <td width="50%" valign="top"><a href="assets/x-direct-control-hd.png"><img src="assets/x-direct-control-hd.png" width="480" alt="The released X community panel and two action controls, rendered with offline test data at high resolution."></a></td>
+  </tr>
+  <tr>
+    <td valign="top">Optional subscription-backed chat beside your work.<br><a href="assets/chat-subscription-hd.png">View full-resolution chat ↗</a></td>
+    <td valign="top">Community catch-ups and browser action controls.<br><a href="assets/x-direct-control-hd.png">View full-resolution X panel ↗</a></td>
+  </tr>
+</table>
 
-<p align="center"><a href="assets/chat-subscription-hd.png"><img src="assets/chat-subscription-hd.png" width="480" alt="The released chat interface with the recorded read-only test exchange, rendered at high resolution."></a></p>
-
-The conversation repeats the recorded subscription-backed read-only test; this re-render is **not a new live account check**. [Open full-resolution chat image](assets/chat-subscription-hd.png) · [Original Edge test capture](assets/chat-subscription.png).
-
-### X community and actions
-
-<p align="center"><a href="assets/x-direct-control-hd.png"><img src="assets/x-direct-control-hd.png" width="480" alt="The released X community panel and two action controls, rendered with offline test data at high resolution."></a></p>
-
-Catch-up controls, optional quiet monitoring and two available X actions. **Offline test data; no live X actions were performed.** [Open full-resolution X image](assets/x-direct-control-hd.png).
+The chat repeats the recorded subscription-backed read-only test; this re-render is **not a new live account check**. [Original Edge test capture](assets/chat-subscription.png). The X panel uses **offline test data; no live X actions were performed**.
 
 The colorful banner is the original editorial artwork from the ToolBraid X article.
 
