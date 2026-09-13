@@ -1,15 +1,27 @@
 # Install ToolBraid on Windows
 
-These instructions cover the **0.3.0 release candidate**. Microsoft Edge Add-ons is the planned store channel, but no store listing or store extension ID has been issued for this release yet. Chrome uses manual unpacked installation.
+These instructions cover the **0.3.1 release candidate**. Microsoft Edge Add-ons is the planned extension store channel; its product identity exists but the extension is not published yet. Chrome uses manual unpacked installation.
+
+<a id="microsoft-store-companion--in-preparation"></a>
+
+## Microsoft Store companion — in certification
+
+ToolBraid Companion 0.3.1.0 was submitted on 13 September 2026 and Partner Center confirmed **In certification**, with free publication after approval. This is a separate route for the Windows companion, not an Edge Add-ons installation, and it is **not available from Microsoft Store yet**. The Store identity and actual Edge extension ID are assigned. Store-installed lifecycle testing is not claimed. An unsigned `local-validation` MSIX is a packaging check, not a trusted installer. The ZIP instructions below remain the manual route.
+
+Once the final Store package is available: install the matching extension separately, open **ToolBraid Companion**, choose **Connect browsers**, and explicitly enable a test site in the extension. **Check connection** checks runtime/configuration, MCP initialize/ping and extension status. **NOT SELECTED** means the extension answered but no page is bound; **WAITING** means no working extension connection was established. It sends no browser action or model request, hides URLs/titles and credentials, and does not test AI sign-in. The ZIP edition does not include this window.
+
+For external clients, use **Open MCP configuration**, under `%LOCALAPPDATA%\ToolBraid\store`, instead of the ZIP edition's `public` path and helper scripts below. Merge only its `toolbraid` entry. Built-in chat remains optional and needs no separate MCP entry. Do not run the ZIP installer over the Store registration unless deliberately switching companions.
+
+Close browser connections and select **Disconnect browsers** before uninstalling the Store app in Windows Settings. Previous public registrations are restored only if still owned by this companion; local connection/chat data is retained. Direct uninstall can leave a stale registration; reinstall and disconnect to restore it. Remove the extension separately. Store signing will not sign the independent ZIP/EXE.
 
 ## 1. Download and extract
 
-Download `ToolBraid-0.3.0-windows-x64.zip` and `SHA256SUMS.txt` from the same [official release](https://github.com/Maharajahu/toolbraid-releases/releases). Use the release's Assets section, not GitHub's Source code archive.
+Download `ToolBraid-0.3.1-windows-x64.zip` and `SHA256SUMS.txt` from the same [official release](https://github.com/Maharajahu/toolbraid-releases/releases). Use the release's Assets section, not GitHub's Source code archive.
 
 You can compare the ZIP's SHA-256 hash with the matching entry in the checksum file:
 
 ```powershell
-Get-FileHash -LiteralPath '.\ToolBraid-0.3.0-windows-x64.zip' -Algorithm SHA256
+Get-FileHash -LiteralPath '.\ToolBraid-0.3.1-windows-x64.zip' -Algorithm SHA256
 ```
 
 Extract the complete ZIP into a permanent folder. Keep the `extension` subfolder in place while using an unpacked installation. No separate Node.js installation is needed.
@@ -47,7 +59,7 @@ This is the [Chrome-documented unpacked installation flow](https://developer.chr
 
 The official Edge Add-ons link will be added after publication. Until then, early testers can open `edge://extensions`, enable Developer mode and load the same `extension` folder unpacked.
 
-The unpacked extension has a fixed ID derived from its bundled public key. An eventual Edge store ID may differ. Store installation will require an updated companion registration using that actual ID; the current unpacked setup must not be assumed to match it.
+The Chrome/unpacked extension ID is `gpjhdlbjfhlaeakphfognpijgmclecmn`. The assigned Edge Add-ons ID is `ailfkkdmjppafngmkobpiogoamidipcl`; it is included in the submitted Store companion's allowlist. Use the ordinary extension folder for unpacked testing, not the keyless Edge submission ZIP. Do not assume an old ZIP companion registration accepts the Store extension ID.
 
 ## 4. Connect your AI client
 
@@ -106,7 +118,7 @@ This uses **LM Studio's own chat**, not the chat built into ToolBraid. No ChatGP
 
 You do not need to expose LM Studio's HTTP server, enable CORS or enter a local API URL in ToolBraid for this desktop-chat/MCP route. Local model inference can stay on your PC, but visited websites and submitted browser actions still use the network. Other enabled integrations or a separately configured media/cloud endpoint can also send data out. Loading a local model is not a blanket offline or privacy guarantee.
 
-**Ollama and other local runtimes:** there is no Ollama endpoint field in ToolBraid 0.3.0's built-in chat. They need an external client that supports both that runtime's tool calling and ToolBraid's local stdio MCP server; configure the model in that client. This release does not provide or certify a one-click Ollama integration.
+**Ollama and other local runtimes:** there is no Ollama endpoint field in ToolBraid 0.3.1's built-in chat. They need an external client that supports both that runtime's tool calling and ToolBraid's local stdio MCP server; configure the model in that client. This release does not provide or certify a one-click Ollama integration.
 
 LM Studio setup is based on its documented MCP interface. This release has **not** end-to-end certified LM Studio or every local model. Start with the read-only check; do not interpret these instructions as a new built-in provider feature.
 

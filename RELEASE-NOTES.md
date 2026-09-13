@@ -1,3 +1,47 @@
+# ToolBraid 0.3.1 — native WebMCP compatibility and real Windows demo
+
+Public release candidate, updated 13 September 2026. Runtime version `0.3.1`; GitHub tag [`v0.3.1-rc.1`](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.1-rc.1). This is a pre-release, not a stable or Microsoft-approved launch.
+
+## Downloads
+
+The extension now includes a compact footer with optional Buy Me a Coffee support and the official GitHub project link. Both open in a separate tab; no payment form, tracking script, new permission or paid feature is added. The Windows companion MSIX already submitted to Microsoft is unchanged by this UI update. The ZIP edition includes the updated extension and documentation.
+
+- `ToolBraid-0.3.1-windows-x64.zip` — Windows x64 companion, bundled Node.js, installer and matching extension.
+- `ToolBraid-0.3.1-extension.zip` — matching extension only; requires the Windows companion.
+- `ToolBraid-Windows-real-demo-4K.mp4` — the real Windows walkthrough, without audio.
+- `SHA256SUMS.txt` — SHA-256 checksums for the two ZIPs and demo.
+
+Use the release **Assets**, not GitHub's Source code archives. See the [installation and update guide](INSTALL.md). Existing 0.3.0 release assets are not replaced.
+
+## What changed
+
+- Fixed native WebMCP interoperability with browsers that return a JSON-string input schema and require JSON-string arguments. Newer object-based contracts remain supported. Execution still uses a one-use, page/frame/session-bound handle and is not automatically retried.
+- Added regression coverage for both native contracts and an opt-in test that registers, discovers and executes a real native WebMCP page tool in Chromium 151 with its experimental WebMCP flag.
+- Added the approved real Windows demo to the website and both public repository presentations. It shows an actual model reading the live website and a public X conversation, drafting a reply without posting it, and navigating to GitHub after approval. Built-in chat is optional: the conversation can stay in an existing Codex session through MCP.
+- Added a lightweight, click-to-play 1080p website copy, a poster and a visual text description. The downloadable file is a 3840 × 2160 export of an approximately 2566 × 1452 Windows capture, with edits and reframing, not native 4K capture. Recorded UI is 0.3.0.
+- Synchronized the package's installation guide with the online ChatGPT, external MCP client and local-model instructions. Included these release notes in the companion. No new Claude, Ollama or LM Studio backend is being claimed.
+- Added a Microsoft Store companion: a native Windows connection window, separate local connection data, restorable public browser registrations and stable MCP/native-host execution aliases. Version 0.3.1.0 was submitted on 13 September 2026; Partner Center confirmed **In certification**. It is not yet approved or available for download. Store-installed lifecycle testing is not claimed.
+
+- Added **Check connection** to the Store companion: runtime/configuration checks, MCP initialize/ping and authenticated extension status, with a separate no-page state. Reports omit URLs, titles, tokens, paths and raw errors. No browser action or model request is sent; AI sign-in is not tested. This is not a new button in the ZIP edition.
+- Prepared a Store listing draft and reviewer packet covering capabilities, retention, disconnect-before-uninstall and certification gates. Added diagnostic and compiled Store-launcher tests: **16 passed**, plus isolated C# registration/ACL checks. These use a fixture extension and test-only configuration, not installed Store aliases or a live browser.
+- Added a separate `ToolBraid-0.3.1-edge-extension.zip` for Edge Add-ons after Microsoft's package validator rejected the Chrome unpacked manifest's `key`. The Edge artifact omits only that field; the Chrome archive retains its stable public key. The corrected Edge package passed Microsoft's upload validation on 13 September 2026. Upload validation is not store certification or publication.
+- Reserved the Windows application identity and obtained the actual Edge Add-ons CRX ID for the MSIX browser allowlist. Windows Companion is in certification. Edge Add-ons remains a separate, unpublished submission.
+- Corrected the Windows package after Microsoft rejected hidden helper applications. One visible companion now declares one execution-alias extension with both aliases pointing to the bundled connection launcher; the MCP configuration selects `--mcp`. Manifest checks and all 16 Store diagnostic/launcher tests pass. This avoids claiming permission to publish a headless application; restricted capabilities still need Microsoft's approval.
+
+## Validation and remaining gates
+
+The prior full automated suite passed **575 tests**, with **two opt-in tests skipped** and zero failures. The native WebMCP check used the real browser API on an isolated localhost page; it does not certify the full native extension-to-MCP pipeline or default Edge availability. The footer update passed **18 side-panel tests and 2 build tests**, plus an isolated Chromium render at 320, 400 and 760 CSS pixels, keyboard focus and separate-tab/no-opener/no-referrer checks. External destinations were intercepted for navigation tests; no payment was made.
+
+The recorded Windows demo supplies real website/X read and reply-draft evidence. **No live X post, reply, like, repost or quote was submitted.** Automated mutation coverage remains fixture-based.
+
+- Clean-install native site-access and optional-debugger grant/decline dialogs still need manual testing.
+- Claude Code is installed but signed out on the validation machine; LM Studio is not installed. Their documented setup paths are not end-to-end certified.
+- The downloadable Windows launcher is **unsigned**. The selected free signing route is Microsoft Store distribution of an MSIX after certification; that does not sign the independent ZIP/EXE. No self-signed certificate is installed or treated as publicly trusted. Checksums are not a publisher signature. Do not disable security protections.
+- Final Edge Add-ons privacy declarations, listing material and store review remain outstanding. The publisher account and actual store extension ID are now available. Chrome uses manual ZIP installation.
+- The privacy policy documents optional external support links, local retention and provider data transfers. No model, subscription or API credit is included.
+
+Website: [toolbraid.pages.dev](https://toolbraid.pages.dev/). Support: [Feedback form](https://toolbraid.pages.dev/feedback/). Do not send secrets, authentication files or private page content.
+
 # ToolBraid 0.3.0 — WebMCP, chat and developer communities
 
 Public release candidate, 12 September 2026. Runtime version `0.3.0`; GitHub tag [`v0.3.0-rc.1`](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.0-rc.1). This is a pre-release, not a stable or Microsoft-approved launch. Edge Add-ons approval is still pending; Chrome remains a manual ZIP installation.

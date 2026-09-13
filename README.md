@@ -6,7 +6,7 @@
 <p align="center">Stay connected to your community. Stay focused on building.</p>
 
 <p align="center">
-  <a href="https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.0-rc.1"><img src="https://img.shields.io/badge/release-0.3.0_RC1-ffd278" alt="Release 0.3.0 RC1"></a>
+  <a href="https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.1-rc.1"><img src="https://img.shields.io/badge/release-0.3.1_RC1-ffd278" alt="Release 0.3.1 RC1"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-77e7f4" alt="Apache License 2.0"></a>
   <a href="INSTALL.md"><img src="https://img.shields.io/badge/platform-Windows_x64-303743" alt="Windows x64"></a>
   <a href="#browser-support"><img src="https://img.shields.io/badge/Chrome-manual_install-77e7f4" alt="Chrome manual installation"></a>
@@ -16,6 +16,7 @@
 <p align="center">
   <a href="https://toolbraid.pages.dev/"><strong>Website</strong></a> ·
   <a href="#what-is-toolbraid">What it does</a> ·
+  <a href="#watch-the-real-windows-demo">Real demo</a> ·
   <a href="#see-the-interface">Screenshots</a> ·
   <a href="INSTALL.md">Install</a> ·
   <a href="#choose-your-ai">Choose your AI</a> ·
@@ -56,6 +57,16 @@ Optional quiet monitoring watches one dedicated notifications/conversation tab w
 
 These are example workflows, not a promise that every website or application is supported. Packaged X actions include Post, Reply, Like, Repost and Quote; automated checks use an **offline X fixture**, not a certified live account.
 
+## Watch the real Windows demo
+
+[![Play ToolBraid on real websites in Microsoft Edge on Windows](assets/toolbraid-demo-poster.jpg)](https://toolbraid.pages.dev/#demo)
+
+**[Watch on the website](https://toolbraid.pages.dev/#demo)** · [Download the 4K export](https://github.com/Maharajahu/toolbraid-releases/releases/download/v0.3.1-rc.1/ToolBraid-Windows-real-demo-4K.mp4)
+
+Actual model responses, a live website and public X conversation, a reply draft, and GitHub navigation after approval. No voice or live X post. Shortened waits, zooms and captions are editorial edits; the browser UI is a real Windows capture. The 4K file is an upscaled/reframed export; the website uses a lighter 1080p copy.
+
+**You do not have to use the built-in chat.** Keep talking in your existing Codex session and connect ToolBraid as an MCP server.
+
 ## See the interface
 
 High-resolution captures of the public 0.3.0 interface, rendered at **125% zoom and 3× pixel density (1440 pixels wide)** with offline test data. Select an image to view it at full resolution.
@@ -78,7 +89,7 @@ The colorful banner is the original editorial artwork from the ToolBraid X artic
 
 ## Get started
 
-1. **Download the complete Windows package** from [release 0.3.0 RC1](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.0-rc.1). Extract it and run `Install.cmd` as your normal Windows user.
+1. **Download the complete Windows package** from [release 0.3.1 RC1](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.1-rc.1). Extract it and run `Install.cmd` as your normal Windows user.
 2. **Load the matching extension** using Developer mode → Load unpacked in Chrome or Edge. Select the included `extension` folder, not the ZIP.
 3. **Choose a page and enable control** in the side panel. Read the disclosure and grant the site's browser permission.
 4. **Choose your AI below.** Use the optional built-in ChatGPT chat, your existing MCP client, or a local model in a compatible external client. Start with: “Read this page's title and summarize its visible text. Do not click or submit anything.”
@@ -87,7 +98,7 @@ The [installation guide](INSTALL.md) covers exact setup, [connection troubleshoo
 
 ## Choose your AI
 
-| Route | Where you chat and choose a model | Account / setup | Status in 0.3.0 |
+| Route | Where you chat and choose a model | Account / setup | Status in 0.3.1 |
 | --- | --- | --- | --- |
 | **Optional ChatGPT chat** | ToolBraid side panel → **Connection & model** | Your own ChatGPT account with Codex access; current Codex installed on this PC. No API key. [Step-by-step setup](INSTALL.md#option-a-chatgpt-in-the-toolbraid-panel) | Real subscription-backed read-only browser check passed in Edge. |
 | **Another subscription / existing MCP client** | In that client's own chat and model selector, not ToolBraid's chat | Sign in with that provider in its supported client, then add ToolBraid's local MCP server. [External setup, including Claude Code](INSTALL.md#option-b-an-external-mcp-client) | Manual configuration. Claude Code is a documented example, not an end-to-end-certified pairing. |
@@ -103,8 +114,8 @@ With a local model, inference can stay on your PC; browser requests, submitted a
 
 | Release asset | Use it for |
 | --- | --- |
-| **`ToolBraid-0.3.0-windows-x64.zip`** | **A new installation.** Companion, bundled Node.js, installer and matching extension. |
-| `ToolBraid-0.3.0-extension.zip` | Extension only; a matching installed Windows companion is still required. |
+| **`ToolBraid-0.3.1-windows-x64.zip`** | **A new installation.** Companion, bundled Node.js, installer and matching extension. |
+| `ToolBraid-0.3.1-extension.zip` | Extension only; a matching installed Windows companion is still required. |
 | `SHA256SUMS.txt` | Verify the downloaded ZIP bytes. |
 
 Use the release's **Assets** section. GitHub's automatic **Source code** archives contain this documentation repository, **not the application installer**.
@@ -120,6 +131,16 @@ Use the release's **Assets** section. GitHub's automatic **Source code** archive
 
 Windows x64 is required. The companion includes Node.js; no compiler or private source checkout is needed. Ordinary browser/MCP tools work without experimental flags. Native site WebMCP tools require the browser's native API; availability varies. Integrated chat requires a current Codex installation and your own ChatGPT account with Codex access. **Donating is never required to use ToolBraid.**
 
+<a id="microsoft-store-companion--in-preparation"></a>
+
+## Microsoft Store companion — in certification
+
+**Submitted on 13 September 2026:** Microsoft Partner Center confirmed **In certification** for ToolBraid Companion 0.3.1.0. Free publication is scheduled after approval. This Windows application is separate from the browser extension's **Edge Add-ons** listing. Neither submission nor upload validation means approval or a public Store download. Store-installed lifecycle testing is not claimed; local validation MSIX files are not intended for distribution.
+
+The prepared native app provides **Connect browsers**, **Disconnect browsers**, **Open MCP configuration** and **Check connection**. Diagnostics distinguish runtime/configuration, MCP handshake, extension connection and selected page without browser actions or model requests. Reports omit URLs/titles, credentials, paths and raw errors; AI sign-in is not tested. This window belongs to the upcoming Store companion, not the ZIP installer.
+
+The extension remains separate. Chat stays optional, including use from your existing Codex session. Disconnect browser registrations before uninstalling the Store app; local data is retained. Microsoft signing of a certified MSIX will not sign the independent ZIP/EXE. [Store setup and current limits](INSTALL.md#microsoft-store-companion--in-preparation).
+
 ## Control and data boundaries
 
 - **Starts paused.** Read the direct-control disclosure and explicitly enable the site.
@@ -130,15 +151,17 @@ Windows x64 is required. The companion includes Node.js; no compiler or private 
 - **Local connection is not local-only AI.** Tool results go to your client. A cloud model provider may receive page content, file information or desktop results. Optional media analysis uses the endpoint you configure.
 - **Trust the connected client.** The companion exposes more than browser reads. Grant only the site, file and advanced-tool access you intend to use.
 
-Read the [data-handling page](https://toolbraid.pages.dev/privacy/) and packaged `PRIVACY.md`. The release-candidate privacy documents remain drafts pending final publisher review.
+Read the [data-handling policy](https://toolbraid.pages.dev/privacy/) and packaged `PRIVACY.md` for local retention, provider transfers and optional external support links.
 
 ## Release status
 
-**0.3.0 RC1 is a public pre-release candidate, not a stable or Microsoft-approved launch.** The [release notes](RELEASE-NOTES.md) distinguish recorded automated checks from outstanding manual validation and live-site limitations.
+**0.3.1 RC1 is a public pre-release candidate, not a stable or Microsoft-approved launch.** The [release notes](RELEASE-NOTES.md) distinguish recorded automated checks from outstanding manual validation and live-site limitations.
 
 The ToolBraid launcher is currently unsigned. Windows may show an unknown-publisher warning. Do not disable antivirus or browser protections. Checksums identify bytes; they are not a publisher signature.
 
 ## Feedback and support
+
+The extension includes a compact footer with **Buy me a coffee** and a **GitHub icon**. Support is optional and does not unlock features. Both links open a separate tab; payment is handled by Buy Me a Coffee, not by the extension. No embedded payment form, tracking script or new browser permission is added.
 
 Use the [Feedback form](https://toolbraid.pages.dev/feedback/) for a bug, an idea or a privacy question. No account is required; your reply email is optional. Messages are not published as GitHub issues. Never send passwords, tokens, private page contents or personal documents.
 
