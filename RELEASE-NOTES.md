@@ -8,6 +8,8 @@ Release candidates are pre-releases. Dates below describe recorded changes and v
 
 Runtime **0.3.1**, release **v0.3.1-rc.1**; no version bump.
 
+Source archive snapshot: [43446d5](https://github.com/Maharajahu/ToolBraid-Companion/tree/43446d5e137e7057cc53dc64fb9c1d49d7052e03). Later checksum/documentation commits do not change that archive. [Download source](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip).
+
 - Published the public extension, companion, Store app source, regression tests and packaging scripts. Added a [build guide](docs/development.md), contribution instructions and source/build CI.
 - Added `ToolBraid-0.3.1-source.zip` alongside refreshed Windows, unpacked-extension and Edge submission ZIPs. The release's checksum file identifies the new bytes; the dedicated source ZIP is distinct from the historical tag's automatic GitHub archives.
 - **MCP discovery:** content updates no longer discard already-listed tools. An unknown exact tool name triggers one fresh lookup; stale aliases are not substituted and interrupted actions are never replayed.
