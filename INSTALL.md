@@ -1,6 +1,6 @@
 # Install ToolBraid on Windows
 
-These instructions cover the **0.3.1 release candidate**. Microsoft Edge Add-ons is the planned extension store channel; its product identity exists but the extension is not published yet. Chrome uses manual unpacked installation.
+These instructions cover the **0.3.1 release candidate**. The Edge Add-ons submission was completed on **13 September 2026**, with status **In review** confirmed in Partner Center. It is not approved or published yet. Chrome uses manual unpacked installation.
 
 <a id="microsoft-store-companion--in-preparation"></a>
 
@@ -57,9 +57,9 @@ This is the [Chrome-documented unpacked installation flow](https://developer.chr
 
 ### Microsoft Edge — store release pending
 
-The official Edge Add-ons link will be added after publication. Until then, early testers can open `edge://extensions`, enable Developer mode and load the same `extension` folder unpacked.
+The Edge extension is **in review**, separately from the Windows companion's Microsoft Store certification. The official Edge Add-ons link will be added after publication. Until then, early testers can open `edge://extensions`, enable Developer mode and load the same `extension` folder unpacked.
 
-The Chrome/unpacked extension ID is `gpjhdlbjfhlaeakphfognpijgmclecmn`. The assigned Edge Add-ons ID is `ailfkkdmjppafngmkobpiogoamidipcl`; it is included in the submitted Store companion's allowlist. Use the ordinary extension folder for unpacked testing, not the keyless Edge submission ZIP. Do not assume an old ZIP companion registration accepts the Store extension ID.
+The Chrome/unpacked extension ID is `gpjhdlbjfhlaeakphfognpijgmclecmn`. The assigned Edge Add-ons ID is `ailfkkdmjppafngmkobpiogoamidipcl`; it is included in the submitted Store companion's allowlist. Use the ordinary extension folder for unpacked testing, not `ToolBraid-0.3.1-edge-extension.zip`: that keyless archive is for **Store submission only** and can receive a different ID when loaded unpacked. Do not assume an old ZIP companion registration accepts the Store extension ID.
 
 ## 4. Connect your AI client
 

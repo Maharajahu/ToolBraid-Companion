@@ -10,7 +10,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-77e7f4" alt="Apache License 2.0"></a>
   <a href="INSTALL.md"><img src="https://img.shields.io/badge/platform-Windows_x64-303743" alt="Windows x64"></a>
   <a href="#browser-support"><img src="https://img.shields.io/badge/Chrome-manual_install-77e7f4" alt="Chrome manual installation"></a>
-  <a href="#browser-support"><img src="https://img.shields.io/badge/Edge-store_pending-ffd278" alt="Edge store publication pending"></a>
+  <a href="#browser-support"><img src="https://img.shields.io/badge/Edge-in_review-ffd278" alt="Edge Add-ons submission in review; not yet published"></a>
 </p>
 
 <p align="center">
@@ -69,21 +69,21 @@ Actual model responses, a live website and public X conversation, a reply draft,
 
 ## See the interface
 
-High-resolution captures of the public 0.3.0 interface, rendered at **125% zoom and 3× pixel density (1440 pixels wide)** with offline test data. Select an image to view it at full resolution.
+High-resolution captures of the public **0.3.1 interface**, including the optional **Buy me a coffee** and **GitHub** footer. Rendered at **125% zoom and 3× pixel density (1440 pixels wide)** with offline preview data. On a phone, select either image to read it at full resolution.
 
 <table>
   <tr><th width="50%">Agent chat</th><th width="50%">X community</th></tr>
   <tr>
-    <td width="50%" valign="top"><a href="assets/chat-subscription-hd.png"><img src="assets/chat-subscription-hd.png" width="480" alt="The released chat interface with the recorded read-only test exchange, rendered at high resolution."></a></td>
-    <td width="50%" valign="top"><a href="assets/x-direct-control-hd.png"><img src="assets/x-direct-control-hd.png" width="480" alt="The released X community panel and two action controls, rendered with offline test data at high resolution."></a></td>
+    <td width="50%" valign="top"><a href="assets/chat-subscription-hd.png"><img src="assets/chat-subscription-hd.png" width="480" alt="ToolBraid 0.3.1 chat preview with the recorded read-only exchange and optional support footer."></a></td>
+    <td width="50%" valign="top"><a href="assets/x-direct-control-hd.png"><img src="assets/x-direct-control-hd.png" width="480" alt="ToolBraid 0.3.1 X community and native WebMCP controls with the optional support footer; offline preview."></a></td>
   </tr>
   <tr>
-    <td valign="top">Optional subscription-backed chat beside your work.<br><a href="assets/chat-subscription-hd.png">View full-resolution chat ↗</a></td>
-    <td valign="top">Community catch-ups and browser action controls.<br><a href="assets/x-direct-control-hd.png">View full-resolution X panel ↗</a></td>
+    <td valign="top">Optional chat beside your work.<br><a href="assets/chat-subscription-hd.png">Enlarge chat ↗</a></td>
+    <td valign="top">Community and site tools.<br><a href="assets/x-direct-control-hd.png">Enlarge X panel ↗</a></td>
   </tr>
 </table>
 
-The chat repeats the recorded subscription-backed read-only test; this re-render is **not a new live account check**. [Original Edge test capture](assets/chat-subscription.png). The X panel uses **offline test data; no live X actions were performed**.
+The chat preview replays the previously recorded subscription-backed read-only exchange; it is **not a new live account check**. [Original Edge test capture](assets/chat-subscription.png). The community view uses **offline preview data; no live X actions were performed**. The packaged interface and controls are unchanged by these captures.
 
 The colorful banner is the original editorial artwork from the ToolBraid X article.
 
@@ -98,11 +98,25 @@ The [installation guide](INSTALL.md) covers exact setup, [connection troubleshoo
 
 ## Choose your AI
 
-| Route | Where you chat and choose a model | Account / setup | Status in 0.3.1 |
-| --- | --- | --- | --- |
-| **Optional ChatGPT chat** | ToolBraid side panel → **Connection & model** | Your own ChatGPT account with Codex access; current Codex installed on this PC. No API key. [Step-by-step setup](INSTALL.md#option-a-chatgpt-in-the-toolbraid-panel) | Real subscription-backed read-only browser check passed in Edge. |
-| **Another subscription / existing MCP client** | In that client's own chat and model selector, not ToolBraid's chat | Sign in with that provider in its supported client, then add ToolBraid's local MCP server. [External setup, including Claude Code](INSTALL.md#option-b-an-external-mcp-client) | Manual configuration. Claude Code is a documented example, not an end-to-end-certified pairing. |
-| **A model running locally** | In a local MCP-capable client such as LM Studio | Download/load a tool-capable model that fits your machine; add ToolBraid in the client's MCP settings. No ChatGPT account needed for this route. [Local model setup](INSTALL.md#option-c-a-local-model-in-lm-studio) | External-client route. LM Studio instructions are documentation-based; model/client combinations have not been end-to-end certified. |
+Choose **one** route. The built-in chat is optional.
+
+### ChatGPT in the side panel
+
+Chat beside the page using **Connection & model**. Install current Codex on this PC and sign in with your own ChatGPT account with Codex access. **No API key**; your account's Codex limits apply.
+
+[Set up ChatGPT chat →](INSTALL.md#option-a-chatgpt-in-the-toolbraid-panel) · A real subscription-backed read-only browser check passed in Edge.
+
+### Your existing Codex session or another MCP client
+
+Keep the conversation and model selection **in your existing client**. Add ToolBraid's local MCP server there. For another provider, use its supported client and sign-in route; a subscription alone does not connect that provider to ToolBraid.
+
+[Set up an external client →](INSTALL.md#option-b-an-external-mcp-client) · Includes Codex and a Claude Code example. Claude Code pairing requires manual setup and has not been end-to-end certified.
+
+### A model running locally
+
+Use a tool-capable model in an MCP-capable client such as **LM Studio**. Load a model that fits your machine, then add ToolBraid in that client's MCP settings. **No ChatGPT account is needed** for this route.
+
+[Set up a local model →](INSTALL.md#option-c-a-local-model-in-lm-studio) · LM Studio instructions are documentation-based; model/client combinations have not been end-to-end certified.
 
 **There is no “connect any subscription” button, Ollama endpoint field or LM Studio model selector in the built-in chat.** Other providers and local models stay in their own client. A subscription does not automatically include API access or grant arbitrary third-party integrations; the provider's supported sign-in route and limits apply. [OpenAI explains subscription sign-in versus API billing](https://learn.chatgpt.com/docs/auth).
 
@@ -112,11 +126,10 @@ With a local model, inference can stay on your PC; browser requests, submitted a
 
 ### Which download do I need?
 
-| Release asset | Use it for |
-| --- | --- |
-| **`ToolBraid-0.3.1-windows-x64.zip`** | **A new installation.** Companion, bundled Node.js, installer and matching extension. |
-| `ToolBraid-0.3.1-extension.zip` | Extension only; a matching installed Windows companion is still required. |
-| `SHA256SUMS.txt` | Verify the downloaded ZIP bytes. |
+- **[Windows package — start here](https://github.com/Maharajahu/toolbraid-releases/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip):** companion, bundled Node.js, installer and matching extension for a new installation.
+- **[Extension only — manual installation](https://github.com/Maharajahu/toolbraid-releases/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip):** for Chrome or unpacked Edge; requires the matching installed Windows companion.
+- **Edge submission package:** `ToolBraid-0.3.1-edge-extension.zip` is the keyless package prepared for **Edge Add-ons submission**, not the manual-install download. Loading it unpacked produces a different extension identity and may not connect to the companion. Use one of the downloads above until the Store listing is published.
+- **[SHA256SUMS.txt](https://github.com/Maharajahu/toolbraid-releases/releases/download/v0.3.1-rc.1/SHA256SUMS.txt):** verifies the three published ZIPs and the 4K demo. The [repository copy](SHA256SUMS.txt) contains the same checksums.
 
 Use the release's **Assets** section. GitHub's automatic **Source code** archives contain this documentation repository, **not the application installer**.
 
@@ -124,7 +137,7 @@ Use the release's **Assets** section. GitHub's automatic **Source code** archive
 
 | Browser or client | Current status |
 | --- | --- |
-| **Microsoft Edge** | Planned official store channel. Edge Add-ons is **not published yet**; the RC can be loaded unpacked. |
+| **Microsoft Edge** | Submitted to Edge Add-ons on **13 September 2026**; last confirmed status **In review**. Not yet published. Use the ordinary extension ZIP for unpacked installation. |
 | **Google Chrome** | Official ZIP downloads with manual installation and updates. No Chrome Web Store release is planned. |
 | **Codex / ChatGPT account** | Integrated streaming chat through official App Server; ChatGPT sign-in only. External MCP helper also included. |
 | **Other MCP clients** | Manual configuration required. Compatibility with every client is not established. |

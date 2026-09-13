@@ -8,10 +8,19 @@ The extension now includes a compact footer with optional Buy Me a Coffee suppor
 
 - `ToolBraid-0.3.1-windows-x64.zip` — Windows x64 companion, bundled Node.js, installer and matching extension.
 - `ToolBraid-0.3.1-extension.zip` — matching extension only; requires the Windows companion.
+- `ToolBraid-0.3.1-edge-extension.zip` — **Edge Add-ons submission package, not for manual installation**. Use the ordinary extension ZIP above for Chrome or unpacked Edge.
 - `ToolBraid-Windows-real-demo-4K.mp4` — the real Windows walkthrough, without audio.
-- `SHA256SUMS.txt` — SHA-256 checksums for the two ZIPs and demo.
+- `SHA256SUMS.txt` — SHA-256 checksums for the three published ZIPs and demo; the repository copy matches the release asset.
 
-Use the release **Assets**, not GitHub's Source code archives. See the [installation and update guide](INSTALL.md). Existing 0.3.0 release assets are not replaced.
+Use the release **Assets**, not GitHub's Source code archives. See the [installation and update guide](https://github.com/Maharajahu/toolbraid-releases/blob/main/INSTALL.md). Existing 0.3.0 release assets are not replaced.
+
+## Presentation update — 13 September 2026
+
+- Synchronized the repository checksum file with the published 0.3.1 assets and clearly separated manual-install downloads from the Edge submission archive.
+- Updated the Edge status to **In review**, as confirmed after submission on 13 September 2026. Listing materials and privacy declarations have been submitted; store approval is still pending.
+- Replaced the wide AI-choice table with three mobile-friendly setup sections and kept direct links to each installation guide.
+- Refreshed the paired high-resolution previews from the packaged 0.3.1 UI, including the optional support footer. Preview data is offline; the recorded chat exchange is replayed, not a new live account test.
+- These are documentation and presentation changes only. Published ZIP/video assets, their checksums, runtime versions and Microsoft submissions are unchanged.
 
 ## What changed
 
@@ -25,7 +34,7 @@ Use the release **Assets**, not GitHub's Source code archives. See the [installa
 - Added **Check connection** to the Store companion: runtime/configuration checks, MCP initialize/ping and authenticated extension status, with a separate no-page state. Reports omit URLs, titles, tokens, paths and raw errors. No browser action or model request is sent; AI sign-in is not tested. This is not a new button in the ZIP edition.
 - Prepared a Store listing draft and reviewer packet covering capabilities, retention, disconnect-before-uninstall and certification gates. Added diagnostic and compiled Store-launcher tests: **16 passed**, plus isolated C# registration/ACL checks. These use a fixture extension and test-only configuration, not installed Store aliases or a live browser.
 - Added a separate `ToolBraid-0.3.1-edge-extension.zip` for Edge Add-ons after Microsoft's package validator rejected the Chrome unpacked manifest's `key`. The Edge artifact omits only that field; the Chrome archive retains its stable public key. The corrected Edge package passed Microsoft's upload validation on 13 September 2026. Upload validation is not store certification or publication.
-- Reserved the Windows application identity and obtained the actual Edge Add-ons CRX ID for the MSIX browser allowlist. Windows Companion is in certification. Edge Add-ons remains a separate, unpublished submission.
+- Reserved the Windows application identity and obtained the actual Edge Add-ons CRX ID for the MSIX browser allowlist. Windows Companion is in certification. The separate Edge Add-ons submission was completed on 13 September 2026 and Partner Center confirmed **In review**; neither product is published yet.
 - Corrected the Windows package after Microsoft rejected hidden helper applications. One visible companion now declares one execution-alias extension with both aliases pointing to the bundled connection launcher; the MCP configuration selects `--mcp`. Manifest checks and all 16 Store diagnostic/launcher tests pass. This avoids claiming permission to publish a headless application; restricted capabilities still need Microsoft's approval.
 
 ## Validation and remaining gates
@@ -37,7 +46,7 @@ The recorded Windows demo supplies real website/X read and reply-draft evidence.
 - Clean-install native site-access and optional-debugger grant/decline dialogs still need manual testing.
 - Claude Code is installed but signed out on the validation machine; LM Studio is not installed. Their documented setup paths are not end-to-end certified.
 - The downloadable Windows launcher is **unsigned**. The selected free signing route is Microsoft Store distribution of an MSIX after certification; that does not sign the independent ZIP/EXE. No self-signed certificate is installed or treated as publicly trusted. Checksums are not a publisher signature. Do not disable security protections.
-- Final Edge Add-ons privacy declarations, listing material and store review remain outstanding. The publisher account and actual store extension ID are now available. Chrome uses manual ZIP installation.
+- Edge Add-ons privacy declarations and listing materials have been submitted. Microsoft's **Edge review** and **Windows Store certification** are still pending. After approval, installation from each store and the official download links still need verification. Chrome uses manual ZIP installation.
 - The privacy policy documents optional external support links, local retention and provider data transfers. No model, subscription or API credit is included.
 
 Website: [toolbraid.pages.dev](https://toolbraid.pages.dev/). Support: [Feedback form](https://toolbraid.pages.dev/feedback/). Do not send secrets, authentication files or private page content.
