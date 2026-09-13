@@ -59,11 +59,11 @@ These are example workflows, not a promise that every website or application is 
 
 ## Watch the real Windows demo
 
-[![Play ToolBraid on real websites in Microsoft Edge on Windows](assets/toolbraid-demo-poster.jpg)](https://toolbraid.pages.dev/#demo)
+https://github.com/user-attachments/assets/5696a89b-59d6-4fd8-ad80-023f04fb16b7
 
-**[Watch on the website](https://toolbraid.pages.dev/#demo)** · [Download the 4K export](https://github.com/Maharajahu/toolbraid-releases/releases/download/v0.3.1-rc.1/ToolBraid-Windows-real-demo-4K.mp4)
+[Watch on the website](https://toolbraid.pages.dev/#demo) · [Download the 4K export](https://github.com/Maharajahu/toolbraid-releases/releases/download/v0.3.1-rc.1/ToolBraid-Windows-real-demo-4K.mp4)
 
-Actual model responses, a live website and public X conversation, a reply draft, and GitHub navigation after approval. No voice or live X post. Shortened waits, zooms and captions are editorial edits; the browser UI is a real Windows capture. The 4K file is an upscaled/reframed export; the website uses a lighter 1080p copy.
+Play the full **1 minute 23 second demo directly above**, in 1080p with no audio. Actual model responses, a live website and public X conversation, a reply draft, and GitHub navigation after approval. No voice or live X post. Shortened waits, zooms and captions are editorial edits; the browser UI is a real Windows capture. The GitHub player uses a size-optimized copy of the website demo with the same resolution and complete timeline. The 4K download is an upscaled/reframed export.
 
 **You do not have to use the built-in chat.** Keep talking in your existing Codex session and connect ToolBraid as an MCP server.
 
