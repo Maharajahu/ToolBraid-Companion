@@ -1,100 +1,74 @@
-# Install ToolBraid on Windows
+# Install ToolBraid Companion
 
-These instructions cover the **0.3.1 release candidate**. The Edge Add-ons submission was completed on **13 September 2026**, with status **In review** confirmed in Partner Center. It is not approved or published yet. Chrome uses manual unpacked installation.
+[Overview](README.md) · [Full specs](docs/capabilities.md) · [Compatibility](docs/compatibility.md)
 
-<a id="microsoft-store-companion--in-preparation"></a>
+This guide covers **Windows x64, Chrome or Edge, and 0.3.1 RC1**. The Windows package includes the companion, Node.js runtime and matching extension. It does not include an AI model, subscription, Codex or FFmpeg.
 
-## Microsoft Store companion — in certification
-
-ToolBraid Companion 0.3.1.0 was submitted on 13 September 2026 and Partner Center confirmed **In certification**, with free publication after approval. This is a separate route for the Windows companion, not an Edge Add-ons installation, and it is **not available from Microsoft Store yet**. The Store identity and actual Edge extension ID are assigned. Store-installed lifecycle testing is not claimed. An unsigned `local-validation` MSIX is a packaging check, not a trusted installer. The ZIP instructions below remain the manual route.
-
-Once the final Store package is available: install the matching extension separately, open **ToolBraid Companion**, choose **Connect browsers**, and explicitly enable a test site in the extension. **Check connection** checks runtime/configuration, MCP initialize/ping and extension status. **NOT SELECTED** means the extension answered but no page is bound; **WAITING** means no working extension connection was established. It sends no browser action or model request, hides URLs/titles and credentials, and does not test AI sign-in. The ZIP edition does not include this window.
-
-For external clients, use **Open MCP configuration**, under `%LOCALAPPDATA%\ToolBraid\store`, instead of the ZIP edition's `public` path and helper scripts below. Merge only its `toolbraid` entry. Built-in chat remains optional and needs no separate MCP entry. Do not run the ZIP installer over the Store registration unless deliberately switching companions.
-
-Close browser connections and select **Disconnect browsers** before uninstalling the Store app in Windows Settings. Previous public registrations are restored only if still owned by this companion; local connection/chat data is retained. Direct uninstall can leave a stale registration; reinstall and disconnect to restore it. Remove the extension separately. Store signing will not sign the independent ZIP/EXE.
+The ZIP launcher is unsigned. Checksums identify downloaded bytes, not a trusted publisher signature. Do not disable Windows, browser or organization security controls. [Store availability](#microsoft-store-companion) is a separate distribution route.
 
 ## 1. Download and extract
 
-Download `ToolBraid-0.3.1-windows-x64.zip` and `SHA256SUMS.txt` from the same [official release](https://github.com/Maharajahu/toolbraid-releases/releases). Use the release's Assets section, not GitHub's Source code archive.
-
-You can compare the ZIP's SHA-256 hash with the matching entry in the checksum file:
+Download the [Windows package](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip) and [SHA256SUMS.txt](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/SHA256SUMS.txt) from the same release. Compare the ZIP hash with its exact filename entry:
 
 ```powershell
 Get-FileHash -LiteralPath '.\ToolBraid-0.3.1-windows-x64.zip' -Algorithm SHA256
 ```
 
-Extract the complete ZIP into a permanent folder. Keep the `extension` subfolder in place while using an unpacked installation. No separate Node.js installation is needed.
+Use release **Assets**, not GitHub's automatic **Source code** archives. Extract the complete ZIP into a permanent folder and retain the `extension` subfolder while using it unpacked.
 
 ## 2. Install the companion
 
-Close any existing ToolBraid browser connection. Run `Install.cmd` as your normal Windows user, not as administrator. It installs the public companion and registers its native host for both Chrome and Edge.
+Close an existing ToolBraid browser connection. Run `Install.cmd` as your normal Windows user, **not administrator**. It installs the public edition under `%LOCALAPPDATA%\ToolBraid\public` and registers its native host for Chrome and Edge.
 
-To register **only Chrome**, open a terminal in the extracted folder and run:
+To register only one browser, run `Install.cmd -Browsers Chrome` or `Install.cmd -Browsers Edge` from the extracted folder.
 
-```powershell
-.\Install.cmd -Browsers Chrome
-```
-
-For **Edge unpacked testing only**:
-
-```powershell
-.\Install.cmd -Browsers Edge
-```
-
-The launcher is unsigned; an unknown-publisher warning is possible. Do not disable Windows or browser protections.
+If you already use the Store edition, do not overwrite its browser registration with the ZIP installer. Use the matching edition's configuration.
 
 ## 3. Install the extension
 
-### Google Chrome — manual installation
+1. Open `chrome://extensions` or `edge://extensions`.
+2. Enable **Developer mode** and select **Load unpacked**.
+3. Select the extracted `extension` folder containing `manifest.json`, not the ZIP or its parent folder.
+4. Read and accept the browser's required-permission prompt if shown. The refreshed extension declares `debugger` at installation/re-enablement; **there is no separate “Allow advanced tools” step**.
 
-1. Open `chrome://extensions`.
-2. Enable **Developer mode**.
-3. Select **Load unpacked** and choose the extracted package's `extension` folder, which contains `manifest.json`.
-4. Keep that folder on disk. Loading the ZIP itself will not install the extension.
+Basic page tools do not attach the debugger. Screenshots, browser accessibility inspection and file attachment use it when needed. Site access and ToolBraid's own control opt-in are still required.
 
-This is the [Chrome-documented unpacked installation flow](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked), not a Chrome Web Store installation. Organization-managed browsers may disallow developer-mode extensions; do not change administrator policies to bypass that restriction.
+Use the ordinary [extension ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) if you already have the matching companion. **The `edge-extension.zip` asset is for publisher submission, not unpacked installation.** It omits the stable unpacked key and may receive a different extension identity.
 
-### Microsoft Edge — store release pending
+Organization-managed browsers may prohibit unpacked installation. See the [Chrome installation documentation](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked); do not bypass administrator policy.
 
-The Edge extension is **in review**, separately from the Windows companion's Microsoft Store certification. The official Edge Add-ons link will be added after publication. Until then, early testers can open `edge://extensions`, enable Developer mode and load the same `extension` folder unpacked.
+## 4. Connect your AI
 
-The Chrome/unpacked extension ID is `gpjhdlbjfhlaeakphfognpijgmclecmn`. The assigned Edge Add-ons ID is `ailfkkdmjppafngmkobpiogoamidipcl`; it is included in the submitted Store companion's allowlist. Use the ordinary extension folder for unpacked testing, not `ToolBraid-0.3.1-edge-extension.zip`: that keyless archive is for **Store submission only** and can receive a different ID when loaded unpacked. Do not assume an old ZIP companion registration accepts the Store extension ID.
+Choose **one** route. Open the panel on an ordinary public page, read the direct-control disclosure, tick its consent checkbox, choose **Enable on this site**, and grant the browser's site access. Use **Connect this site** for another origin. Keep the browser open.
 
-## 4. Connect your AI client
+<a id="option-a-chatgpt-in-the-toolbraid-panel"></a>
 
-**The built-in chat is optional. Choose one route; you do not need to configure all three.** A ChatGPT account and Codex installation are needed only for Option A. Options B and C keep the conversation and model selection in your external client.
+### A. Optional ChatGPT panel chat
 
-Before any route, open the ToolBraid panel on a test page, read the direct-control disclosure, tick its consent checkbox, choose **Enable on this site**, and handle the browser's site-access prompt. **Allow advanced tools** is a separate optional permission. Use **Connect this site** for additional sites. Keep the browser open and the companion connected.
+1. Install current [Codex](https://developers.openai.com/codex/cli/) on this Windows PC and sign in with your own ChatGPT account with Codex access.
+2. Open **Your browser agent → Connection & model → Sign in with ChatGPT**. Complete the official login. If Codex is already signed in, connect without signing in again.
+3. Choose **Connect to Codex**, then an offered **Codex model** or **Account default**.
+4. Enable **Share the selected connected page and its tools** when you want browser assistance. Sharing starts off.
 
-### Option A: ChatGPT in the ToolBraid panel
+This uses your account's Codex allowance, **not an API key or separate model API billing**. Signing in to the ChatGPT website alone does not sign in the local Codex runtime. Other providers' logins are not accepted in this panel. If needed, run `codex login` using ChatGPT sign-in, then reconnect. Do not share authentication files.
 
-1. Install a current [Codex CLI](https://developers.openai.com/codex/cli/) or Codex desktop app on this Windows PC. ToolBraid's bundled Node.js is for its companion; it does not install Codex or include an AI subscription.
-2. Open **Your browser agent → Connection & model → Sign in with ChatGPT**. Complete the official OpenAI login in your browser using your own account with Codex access. Already signed in to Codex? Skip login and connect. Being signed in to the ChatGPT website alone is not the same as signing in to the local Codex runtime.
-3. Choose **Connect to Codex**. The panel loads the models available to your account. Choose one in **Codex model**, or leave the field blank for **Account default**. This selector is not an arbitrary provider or local-model selector.
-4. For browser assistance, select **Share the selected connected page and its tools**. It starts off; without it, chat has no ToolBraid page tools. Ask for the read-only check below and verify the actual tool activity and page title.
+You do not need `Configure-Codex.cmd` or a separate MCP entry for panel chat. Review browser mutations before approving. A run stays on its selected tab; stopping cannot undo an action already sent. Clearing local chat does not remove provider-side records.
 
-This route uses your ChatGPT account's Codex allowance, not a separately billed API key. ToolBraid rejects API-key-only accounts and does not accept Claude, Gemini or other providers' logins in this panel. The official [authentication guide](https://learn.chatgpt.com/docs/auth) explains the difference between subscription and API access. Account limits and model availability still apply.
+<a id="option-b-an-external-mcp-client"></a>
 
-If sign-in cannot open, run `codex login` yourself and use ChatGPT sign-in, then reconnect. `codex login status` can help confirm the active login method. Do not paste passwords, browser cookies, login tokens or authentication files into ToolBraid or support reports. The advanced executable field is needed only when Codex is not found automatically.
+### B. Your existing Codex session or another MCP client
 
-You do **not** need `Configure-Codex.cmd`, a separate MCP entry or a model API key for this built-in route. The run stays on its selected tab. Review each mutation before approving; **Stop** cancels new work but cannot undo an action already sent. **Clear chat** removes ToolBraid's recent local conversation copy, not provider-side records.
+Keep the conversation, sign-in and model selection **in your existing client**. It must support local **stdio MCP servers**; a cloud-only chat cannot directly start the companion on your PC.
 
-### Option B: An external MCP client
+1. Open the installer-generated `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json` locally.
+2. Merge only `mcpServers.toolbraid` into your client's configuration, preserving other servers and the generated executable/arguments. Use its documented equivalent if it does not use this JSON format.
+3. Reload the client's MCP connection once. Confirm ToolBraid exposes tools, then run the read-only check below.
 
-Use this route to keep working in your existing assistant, including a provider-supported subscription client. Sign in and choose the model **in that client**, not in ToolBraid. A paid chatbot subscription is not automatically an API key or a license for any third-party integration. Confirm that the chosen provider/client supports your account and **local stdio MCP servers**; a cloud-only connector cannot directly launch a program on your Windows PC.
+For **Codex**, the package's `Configure-Codex.cmd` helper backs up the existing configuration and updates only ToolBraid's entry. This configures your external Codex conversation, not panel chat. Do not publish the generated configuration or expose it as a public HTTP server.
 
-1. The companion installer generates `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`. Open this file locally; it contains an `mcpServers.toolbraid` entry with the installed executable and arguments.
-2. In a client that uses an `mcpServers` JSON object, merge **only the `toolbraid` entry** into that object's existing entries. Preserve other servers and the generated paths/arguments. Clients with different configuration formats need their documented equivalent. Do not copy an example from another person's PC.
-3. Reload the client's MCP connections and check that ToolBraid appears with tools available. Select your model in that client's model picker and run the read-only check below.
+#### Claude Code example
 
-The generated entry points to the companion's private local configuration; it is not your AI provider's login. Do not publish your installed configuration or change its paths into a public HTTP endpoint.
-
-**Codex as an external client:** `Configure-Codex.cmd` is an optional helper that backs up the existing configuration and updates only ToolBraid's MCP entry. This configures the Codex app/CLI conversation, not the extension's built-in chat. Other clients are not configured automatically.
-
-#### Example: your Claude subscription through Claude Code
-
-Install Claude Code using its [official setup and authentication instructions](https://code.claude.com/docs/en/authentication), and sign in there with an account that includes Claude Code. This is not an embedded Claude chat in ToolBraid. To register the generated local server, run the following in PowerShell on the same PC:
+Use Claude Code's [official authentication](https://code.claude.com/docs/en/authentication) with an eligible account. Check whether a `toolbraid` server already exists before adding it. For a new entry, run:
 
 ```powershell
 $toolbraidClient = Get-Content -LiteralPath "$env:LOCALAPPDATA\ToolBraid\public\mcp-client.json" -Raw | ConvertFrom-Json
@@ -103,54 +77,54 @@ $toolbraidArguments = @('mcp', 'add', '--transport', 'stdio', '--scope', 'user',
 claude @toolbraidArguments
 ```
 
-This adds a user-scoped server in Claude Code; it does not log in or change your subscription. If `toolbraid` already exists, inspect the existing entry rather than adding it again. In a Claude Code session, use `/mcp` to check the connection and `/status` to check which account/billing route is active. Follow the client's [MCP documentation](https://code.claude.com/docs/en/mcp) for permission or configuration issues. Keep its approval controls enabled; do not assume it uses the extension chat's per-action approval UI.
+Use `/mcp` to inspect the connection and `/status` to check the account/billing route. Follow the client's [MCP documentation](https://code.claude.com/docs/en/mcp), keeping its approvals enabled. A subscription alone does not connect a provider to ToolBraid. This pairing is documented, not end-to-end certified by this release.
 
-The configuration example follows the provider's documented stdio interface. A real Claude Code + ToolBraid session has **not** been certified by this release's end-to-end tests.
+<a id="option-c-a-local-model-in-lm-studio"></a>
 
-### Option C: A local model in LM Studio
+### C. A local model in an external MCP host
 
-This uses **LM Studio's own chat**, not the chat built into ToolBraid. No ChatGPT account, Codex login or cloud model key is required for this local-model route.
+For example, in [LM Studio](https://lmstudio.ai/docs/app/mcp):
 
-1. Install current [LM Studio](https://lmstudio.ai/docs/app). Download or import a supported model that fits your RAM/VRAM and supports tool use. If it is already on disk, load it rather than downloading another copy.
-2. Select and load that model in LM Studio's chat. The model choice, context size and hardware settings belong to LM Studio; entering its model name into ToolBraid's **Codex model** field will not connect it.
-3. Open the **Program** sidebar, then **Install → Edit mcp.json**. Merge the generated `mcpServers.toolbraid` entry from `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json` into LM Studio's `mcpServers` object. Preserve existing entries. Save and enable the ToolBraid integration in the chat. See the [official MCP setup](https://lmstudio.ai/docs/app/mcp).
-4. Keep ToolBraid enabled on your test page and ask the local model to read its title. Check for a real ToolBraid tool call and the correct title, not just an answer based on the prompt. If tools are listed but not called correctly, check the model's tool-use support and context capacity.
+1. Load a model that fits your machine and supports tool calling.
+2. Open **Program → Install → Edit mcp.json**.
+3. Merge the generated `mcpServers.toolbraid` entry, preserving other servers, and enable the integration in the chat.
+4. Verify a real read-only ToolBraid tool call and the correct page title.
 
-You do not need to expose LM Studio's HTTP server, enable CORS or enter a local API URL in ToolBraid for this desktop-chat/MCP route. Local model inference can stay on your PC, but visited websites and submitted browser actions still use the network. Other enabled integrations or a separately configured media/cloud endpoint can also send data out. Loading a local model is not a blanket offline or privacy guarantee.
+This is LM Studio's chat, not ToolBraid's panel. No ChatGPT account is needed. There is no need to expose an HTTP model server or enable CORS for this stdio route. Ollama likewise needs an external host supporting both its model tools and MCP; there is no built-in Ollama endpoint or universal model selector.
 
-**Ollama and other local runtimes:** there is no Ollama endpoint field in ToolBraid 0.3.1's built-in chat. They need an external client that supports both that runtime's tool calling and ToolBraid's local stdio MCP server; configure the model in that client. This release does not provide or certify a one-click Ollama integration.
+LM Studio and individual local models are not end-to-end certified by this release. Local inference can stay on your PC, but website actions, other integrations or a configured cloud/media endpoint can still send data out.
 
-LM Studio setup is based on its documented MCP interface. This release has **not** end-to-end certified LM Studio or every local model. Start with the read-only check; do not interpret these instructions as a new built-in provider feature.
+## AI-assisted setup
 
-### Controls shared by all routes
-
-**Pause control** blocks new extension commands and disconnects the companion; it does not undo actions already dispatched. External MCP clients use their own approval policy plus ToolBraid's existing direct-control opt-in. The integrated chat's per-mutation approvals do not automatically apply to external clients. Only connect clients you trust; browser results, selected files and desktop information may reach their configured provider. Read `PRIVACY.md` and the [data-handling page](https://toolbraid.pages.dev/privacy/).
+An assistant with local file and terminal tools can follow the [canonical setup instructions](https://toolbraid.pages.dev/agent-setup.txt). [Copy the setup prompt](https://toolbraid.pages.dev/#ai-setup) into your existing session. It checks an existing installation, verifies the download, configures one client and finishes with a read-only test. Browser consent, file selection and account login may require you; a cloud-only chat cannot install local software by itself.
 
 ## First read-only check
 
-In the integrated chat, share your connected test page and ask: “Use the page's read-only tool to read its title. Do not click or submit anything.” You should see activity and a streamed answer. Native WebMCP can be checked separately using **Discover native tools** on a compatible site. An unavailable result means this browser/page does not expose the native API; other browser tools remain usable.
+Ask: **“Read this page's title and summarize its visible text. Do not click or submit anything.”** Check the actual tool activity and intended page title. In panel chat, page sharing must be on.
 
-For community monitoring, open X Notifications, Mentions or a specific post conversation in a dedicated tab. Under **Your X community**, inspect it, choose an interval and start watching. Notifications are optional and have no message previews. Keep Edge and the watched tab open. Monitoring does not use a model or post replies; its local inbox only covers rendered content. Pause stops future checks.
+Test native WebMCP separately with **Discover native tools** on a compatible page. An unavailable native API does not disable ordinary browser tools. [Requirements and limits](docs/compatibility.md#browser-and-client-compatibility).
 
-After connecting your AI client, open an ordinary public page and enable that site in ToolBraid. Ask your assistant: **“Read this page's title and summarize its visible text. Do not click or submit anything.”** Confirm that the result refers to the intended page before trying actions that change anything.
+**Pause control** blocks new browser commands; it cannot undo dispatched actions or guarantee cancellation of existing companion jobs. External clients use direct-control opt-in and their own approval policies, not the panel chat's per-action UI. [Permissions and data handling](docs/compatibility.md#permissions-and-data).
 
 ## Troubleshooting
 
-- **The extension will not load:** select the extracted `extension` folder containing `manifest.json`, not the ZIP or its parent folder. Keep it on disk. An organization-managed browser may prohibit unpacked extensions.
-- **The companion is not connected:** confirm that `Install.cmd` completed for your browser and that the extension and companion come from the same release. External clients need the generated `mcp-client.json` entry; built-in chat does not. Restart the affected connection after configuration changes.
-- **Chat login, account or model error:** confirm Codex is installed and signed in through ChatGPT. Reconnect to refresh available models or leave **Codex model** blank for the account default. API-key accounts and other providers cannot be used in this built-in chat. Check account limits in Codex; ToolBraid does not bypass them.
-- **Chat answers without reading the page:** enable the intended site and select **Share the selected connected page and its tools** for built-in chat. In an external client, check that the ToolBraid server and its tools are enabled for that conversation.
-- **A local model cannot use tools:** check both the client's MCP connection and the model's tool-calling support. Model files or an Ollama server alone do not connect to ToolBraid. Use the external-client route, not the Codex model field.
-- **Tools are paused or a page is unavailable:** open the side panel, read the disclosure and enable the intended site. Grant browser site access; use **Connect this site** for another origin. Do not bypass browser or organization restrictions.
-- **Advanced tools are unavailable:** the refreshed 0.3.1 extension declares `debugger` at installation, not through a separate “Allow advanced tools” button. Reload/re-enable the matching extension and accept the browser's required-permission prompt if shown. Basic page tools do not attach the debugger; screenshots, accessibility inspection and file attachment use it when needed. Do not bypass browser or organization restrictions.
-- **Codex keeps using the old connector:** install the refreshed full package, use its generated MCP configuration and restart the existing ToolBraid MCP connection once to load the updated code. The corrected connector rereads its configuration on reconnect and does not automatically repeat an interrupted action. Extracting files into a different folder alone does not replace a running connector.
-- **Still stuck:** use the [Feedback form](https://toolbraid.pages.dev/feedback/). Include the release version, browser and exact error, but remove tokens, personal paths and private page content. Do not attach your full configuration or browser profile.
+| Symptom | Check |
+| --- | --- |
+| Extension will not load | Select the permanent folder containing `manifest.json`. Check browser policy. |
+| Companion disconnected | Install the same release for your browser. Check the edition and generated MCP entry; reconnect once after a configuration change. |
+| Repeated old-connector launches | Install the refreshed full package and use its generated configuration. Restart the existing MCP connection once; do not repeatedly reinstall a working connection. |
+| Advanced tools unavailable | Reload/re-enable the matching extension and handle its required-permission prompt. Do not search for the removed permission button. |
+| Chat account/model error | Confirm local Codex uses ChatGPT sign-in, reconnect to refresh models and check account limits. |
+| AI answers without using the page | Enable the intended site and tools in the external client, or turn on selected-page sharing in panel chat. |
+| Local model does not call tools | Check the model's tool-use support and the host's MCP integration. Model files alone are not a connection. |
+
+For unresolved problems, use the [issue form](https://github.com/Maharajahu/ToolBraid-Companion/issues/new/choose) or [Feedback form](https://toolbraid.pages.dev/feedback/). Include version, browser and sanitized error text—not tokens, full configuration, browser profiles or private page contents.
 
 ## Update
 
-Updates are manual. Close the browser connection, extract the new full package and rerun its installer. Replace the files in the permanently loaded `extension` folder with the matching new extension files, then click **Reload** on its browser extensions page. Merely extracting a new ZIP elsewhere does not update the extension already loaded by the browser. Preserve the manifest's supplied public key so its unpacked ID stays consistent. The companion installer preserves its existing authentication token and local data; it does not download future updates.
+Updates are manual. Close the browser connection, extract the new full package and run its installer. Replace the files in the permanently loaded extension folder with the matching extension, then **Reload** it on the browser's extensions page. Preserve the supplied manifest key. Extracting a ZIP elsewhere does not replace a loaded extension or running connector.
 
-The **13 September 2026 fixes refresh keeps version 0.3.1**. Compare the ZIP's SHA-256 with the current release checksum file; the unchanged version number alone does not identify the refreshed build. Restart an already-running MCP connection once after replacing its runtime. The Edge submission archive is for the publisher portal, not a manual-install download; refreshing that archive on GitHub does not update an existing Microsoft submission.
+The **13 September 2026 fixes refresh remains version 0.3.1**. Identify it by [SHA256SUMS.txt](SHA256SUMS.txt), not version alone. Restart an existing MCP connection once after updating. The installer preserves its existing token and local data.
 
 ## Uninstall
 
@@ -160,4 +134,17 @@ Close the browser connection and run:
 & "$env:LOCALAPPDATA\ToolBraid\public\uninstall.ps1"
 ```
 
-Remove the extension separately through the browser. The companion uninstaller removes recorded program files, native-host registrations and its own MCP entry, but preserves settings, tokens, backups and local data. Data retained by a website or AI provider is separate.
+Remove the extension separately in the browser. The uninstaller removes recorded program files, native-host registrations and its MCP entry, but retains settings, tokens, backups and local data. Provider-side records are separate; see [data retention](https://toolbraid.pages.dev/privacy/).
+
+<a id="microsoft-store-companion--in-preparation"></a>
+<a id="microsoft-store-companion--in-certification"></a>
+
+## Microsoft Store companion
+
+**Last recorded publisher status, 13 September 2026:** Windows Companion 0.3.1.0 was **In certification**; the separate Edge Add-ons extension was **In review**. No verified public Store installation link is listed here. The prepared Store package has not been certified by this project's installed-Store lifecycle tests.
+
+The Store edition has a native window with **Connect browsers**, **Disconnect browsers**, **Open MCP configuration** and **Check connection**. Its configuration lives under `%LOCALAPPDATA%\ToolBraid\store`, not the ZIP edition's `public` directory. The extension remains a separate installation.
+
+Diagnostics distinguish configuration, MCP handshake, extension connection and selected-page state without sending browser actions or model requests; they do not test AI sign-in. This window is not part of the ZIP installer.
+
+Before removing a Store installation, select **Disconnect browsers**, then uninstall through Windows Settings. Direct uninstall can leave a stale registration; reinstall and disconnect to restore it. Local data is retained. Microsoft signing of an approved MSIX does not sign the independent ZIP/EXE.

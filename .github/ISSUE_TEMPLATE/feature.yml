@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest a focused improvement to ToolBraid Companion.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: This request is public. Describe the workflow without sharing private account or project data.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the task and what currently gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Explain the smallest change that would solve it, and any relevant alternatives.
+    validations:
+      required: true

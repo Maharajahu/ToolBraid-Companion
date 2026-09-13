@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a reproducible problem with ToolBraid Companion.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This report is public. Remove tokens, personal paths, account details and private page content.
+        For a suspected vulnerability, use the [Feedback form](https://toolbraid.pages.dev/feedback/), not this issue.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: ToolBraid version and package date/hash, Windows version, browser/version, and AI client if relevant. No account identifiers.
+      placeholder: 0.3.1 RC1, 13 September refresh; Windows 11; Edge; external MCP client
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Use a public example or harmless test data. Mention whether this is panel chat or an external client.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include a sanitized error or cropped screenshot if useful. Do not attach full logs or configuration files.
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and removed sensitive information from this report.
+          required: true

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup and troubleshooting
+    url: https://github.com/Maharajahu/ToolBraid-Companion/blob/main/INSTALL.md
+    about: Install the matching companion and extension, choose an AI client, or troubleshoot a connection.
+  - name: Feedback form
+    url: https://toolbraid.pages.dev/feedback/
+    about: Non-public feedback or a sanitized security report. Do not send credentials or private documents.
