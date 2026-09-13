@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>LOCAL X TEST — no live account</title></head>
+<body>
+  <main>
+    <h1>Local X control fixture</h1>
+    <p>All requests are intercepted by the test. Nothing is sent to X.</p>
+    <article data-testid="tweet" id="post">
+      <a href="https://x.com/fixture">Fixture author @fixture</a>
+      <a href="https://x.com/fixture/status/42"><time datetime="2026-09-12T00:00:00Z">12 September</time></a>
+      <p data-testid="tweetText">One exact test post.</p>
+      <button data-testid="like" id="like" type="button" aria-label="Like">Like</button>
+      <button data-testid="retweet" id="repost" type="button" aria-label="Repost">Repost</button>
+    </article>
+    <template id="menu-template"><div id="menu" role="menu">
+      <button id="repost-confirm" data-testid="retweetConfirm" role="menuitem" type="button">Repost</button>
+      <button id="quote" role="menuitem" type="button">Quote</button>
+    </div></template>
+    <template id="composer-template"><form id="composer" aria-label="X composer">
+      <p id="quote-context" hidden>Quoting <a href="https://x.com/fixture/status/42">the exact fixture post</a></p>
+      <label>Post text <textarea id="post-text" name="text" data-testid="tweetTextarea_0" required></textarea></label>
+      <button id="publish" data-testid="tweetButton" type="submit" disabled>Post</button>
+    </form></template>
+    <p id="result" role="status"></p>
+  </main>
+  <script>
+    const originalPost = 'https://x.com/fixture/status/42';
+    const byId = (id) => document.getElementById(id);
+    const record = (action, data = {}) => fetch('/api/toolbraid-fixture', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...data }),
+    });
+    byId('like').addEventListener('click', async () => {
+      await record('like', { target: originalPost });
+      byId('like').dataset.testid = 'unlike';
+      byId('like').setAttribute('aria-label', 'Unlike');
+      byId('like').textContent = 'Unlike';
+    });
+    byId('repost').addEventListener('click', () => {
+      document.querySelector('main').append(byId('menu-template').content.cloneNode(true));
+      if (byId('repost').dataset.testid === 'unretweet') byId('repost-confirm').remove();
+      else byId('repost-confirm').addEventListener('click', async () => {
+        await record('repost', { target: originalPost });
+        byId('repost').dataset.testid = 'unretweet';
+        byId('repost').setAttribute('aria-label', 'Undo repost');
+        byId('repost').textContent = 'Undo repost';
+        byId('menu').remove();
+      });
+      byId('quote').addEventListener('click', () => {
+        byId('menu').remove();
+        history.pushState({}, '', `/compose/post?attachment_url=${encodeURIComponent(originalPost)}`);
+        openComposer();
+      });
+    });
+    function openComposer() {
+      byId('post').remove();
+      document.querySelector('main').append(byId('composer-template').content.cloneNode(true));
+      byId('quote-context').hidden = !new URL(location.href).searchParams.has('attachment_url');
+      byId('post-text').addEventListener('input', () => { byId('publish').disabled = !byId('post-text').value.trim(); });
+      byId('composer').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const target = new URL(location.href).searchParams.get('attachment_url');
+        await record(target ? 'quote' : 'post', { text: byId('post-text').value, ...(target ? { target } : {}) });
+        byId('result').textContent = 'Local submission recorded once.';
+        byId('post-text').value = '';
+        byId('publish').disabled = true;
+      });
+      byId('post-text').focus();
+    }
+    if (location.pathname === '/compose/post') openComposer();
+  </script>
+</body>
+</html>

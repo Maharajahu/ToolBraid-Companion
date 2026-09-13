@@ -1,0 +1,27 @@
+{
+  "name": "toolbraid-companion",
+  "version": "0.3.1",
+  "private": true,
+  "type": "module",
+  "description": "WebMCP-enabled browser extension and local Windows companion for your AI tools.",
+  "author": "Maharajahu",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=22" },
+  "repository": { "type": "git", "url": "https://github.com/Maharajahu/ToolBraid-Companion.git" },
+  "homepage": "https://toolbraid.pages.dev/",
+  "bugs": { "url": "https://github.com/Maharajahu/ToolBraid-Companion/issues" },
+  "scripts": {
+    "check": "node scripts/check-public.mjs && node scripts/check-docs.mjs",
+    "test": "node --test tests/universal/*.test.mjs tests/local-agent/*.test.mjs tests/local-only/*.test.mjs",
+    "test:bridge": "node --test tests/universal/extension-native-mcp-bridge.test.mjs tests/universal/mcp-bridge-server.test.mjs",
+    "test:extension:e2e": "node scripts/e2e-universal-extension.mjs --json",
+    "test:extension:standard": "node scripts/e2e-standard-browser.mjs",
+    "test:x:fixtures": "node scripts/e2e-x-content.mjs",
+    "dev:fixtures": "node scripts/serve-universal-fixtures.mjs",
+    "build:extension": "node scripts/build-universal-extension.mjs",
+    "build:extension:public": "node scripts/build-universal-extension.mjs --edition public",
+    "package:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-release.ps1",
+    "test:store": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-store.ps1",
+    "validate": "npm run check && npm test && npm run build:extension"
+  }
+}

@@ -1,0 +1,56 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ToolBraid data handling</title><link rel="stylesheet" href="sidepanel.css"></head><body><main class="app-shell"><pre class="privacy-copy"># ToolBraid data handling
+
+Privacy and data-handling policy for ToolBraid 0.3.1, updated 13 September 2026. Microsoft certification is a separate process; this policy does not claim Store approval.
+
+## What the software processes
+
+ToolBraid connects an MCP-compatible AI client to browser pages using a Windows companion. It can process the URL, title, visible text, links, forms, field values, accessibility information and media on pages to which the extension has access. Depending on the pages you permit, this content can include personal information, private communications, location, health or financial information. Requested visual features can process screenshots, images, video frames and audio from the selected page. The form extractor omits password and recognized payment-field values; this is not a guarantee that sensitive information elsewhere in page text or captured media is removed.
+
+Browser tools can manage tabs, navigate pages, fill or submit forms, inspect downloads and attach a user-selected file. The companion also provides desktop accessibility controls and bounded file operations. File and folder grants use local selectors and opaque handles; granting access permits the corresponding tool to process that content.
+
+## Where data goes
+
+The browser-to-companion connection uses native messaging. The companion-to-client connection uses an authenticated local named pipe. The distributed runtime does not include a ToolBraid analytics or advertising endpoint.
+
+Tool results and requested page content are returned to the MCP client you configure. If that client uses a cloud AI provider, that provider may receive this data under its own terms and privacy policy. Local transport is not a promise that all AI processing is local.
+
+An optional OpenAI-compatible multimodal endpoint can be configured in the extension. When enabled, captured media and analysis requests are sent to that endpoint. The endpoint and model configuration are stored locally; an entered API key is stored in browser session storage, not in the persistent settings record. Browser session storage is not an encrypted password vault.
+
+Normal browser requests to the websites you visit still occur. Submitted forms, uploads and other actions send data to those websites as part of the requested action.
+
+The extension's GitHub and Buy Me a Coffee links open their respective websites only when clicked. Their icons are bundled locally; the extension does not load a donation widget, tracking script or payment form. Optional support is handled on Buy Me a Coffee under that site's terms and privacy policy. ToolBraid does not receive payment details or send page content, chat messages or a referrer through these links.
+
+## Limited use
+
+ToolBraid uses the data it handles to provide the browser, media and local workflow features the user enables. The distributed software contains no mechanism for selling page data, advertising profiles or publisher-side model training, and no publisher endpoint that receives page contents. Transfers to the user's selected MCP client, AI endpoint or target website are made to carry out those features.
+
+Data sent to a separately configured AI provider is also subject to that provider's policy. Feedback is handled separately through the support form described below; never send credentials or private page contents in a support request.
+
+## Store companion diagnostics and data
+
+The Microsoft Store companion is in certification, not yet approved or available for download. It keeps connection/authentication and local chat/workflow data under `%LOCALAPPDATA%\ToolBraid\store`, separate from the ZIP edition's `public` directory. Its Check connection function inspects local configuration and requests MCP initialization, ping and extension status. It performs no browser actions or model requests. The report omits page URLs/titles, tokens, paths and raw errors, stays in the local window and is not uploaded automatically. AI account sign-in is not tested.
+
+Before uninstalling the Store app in Windows Settings, close browser connections and choose Disconnect browsers to restore previous public registrations still owned by this companion. App removal retains local connection and conversation data; uninstalling without disconnecting can also leave a stale browser registration. Reinstall and disconnect to restore it. Browser extension storage and provider-side records are separate.
+
+## Storage and retention
+
+The integrated chat connects to official Codex App Server with ChatGPT sign-in only. It rejects API-key accounts and uses the signed-in account's Codex limits. OpenAI receives chat messages and, only when selected for a turn, the permitted page context/tool results. Codex manages authentication; the extension does not receive or copy login tokens, passwords or account email. No publisher credentials are included. The local UI's Clear chat action does not delete provider-side records; OpenAI account data controls still apply.
+
+Up to 40 recent chat messages, further bounded by context size, are retained in the companion's `assistant-state.json` and reused as conversation context. This is ordinary local storage, not an encrypted vault. Quiet X monitoring stores the watched tab/account, up to 1,000 observed post IDs and 60 inbox items in browser-local storage. It runs only while the browser is available, does not call a model, and stops when access is paused or the watched account/page changes. Optional notifications contain counts, not message previews. Reading an X page can refresh it and therefore make normal requests to X.
+
+Native WebMCP tools are implementations supplied by the visited page. Their descriptions and results are untrusted page data. ToolBraid binds execution handles to the discovered page/frame/session and does not automatically repeat an uncertain mutation.
+
+The extension stores local preferences, approval and audit records, workflow state and explicitly saved semantic memory. Live page bindings, nonces and captured-media handles are transient. The companion stores authentication configuration and local job, schedule, workflow or media-job records in its installation data directories. Retention is feature-dependent; this release does not promise automatic deletion after a fixed number of days.
+
+Removing the extension through the browser removes its browser-local storage. The companion uninstaller removes program files and registrations but deliberately preserves settings, authentication configuration, backups and local data. Remove the retained installation data separately if you no longer need it. Removing local data does not remove copies held by websites, the MCP client or its AI provider.
+
+## Control and contact
+
+The public edition starts with AI control paused. Its side panel explains direct control and requires an explicit checkbox and enable action. Enabling control permits the connected AI to use available tools without repeated approval, including form submission. The choice persists across browser restarts. Site access is requested for the selected origin. Chrome requires the debugger permission at installation or re-enablement; file attachment, accessibility inspection and precise visual clicks use it, while basic page tools do not. AI-control and site-access checks still apply.
+
+Pause control blocks new extension commands and disconnects the companion connection. Actions already dispatched, including long-running local jobs, may finish; pause cannot undo them. Review or revoke site permissions in the browser. Disable or remove the extension to revoke its required debugger permission. Configure only trusted MCP clients and only connect AI endpoints whose data handling you accept.
+
+The integrated chat adds per-action approval before mutations, independently of external MCP direct control. Pausing also stops chat and community monitoring; already-dispatched actions cannot be undone.
+
+Publisher privacy/support contact: [Feedback form](https://toolbraid.pages.dev/feedback/). Never include API keys, authentication tokens, private page contents or personal documents in a support report. A publicly accessible copy of the final policy is required before distribution through a browser store.
+</pre></main></body></html>

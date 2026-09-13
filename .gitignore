@@ -1,1 +1,15 @@
 *.zip
+node_modules/
+dist/
+.tmp/
+.playwright/
+coverage/
+*.log
+.env
+.env.*
+.private/
+__pycache__/
+*.py[cod]
+*.pfx
+*.p12
+*.key

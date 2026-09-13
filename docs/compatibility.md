@@ -2,7 +2,7 @@
 
 [Overview](../README.md) · [Install](../INSTALL.md) · [Capabilities](capabilities.md)
 
-Scope: **0.3.1 RC1, fixes refresh dated 13 September 2026**. The version number did not change; [SHA256SUMS.txt](../SHA256SUMS.txt) identifies the three refreshed ZIPs and the demo export.
+Scope: **0.3.1 RC1, source/runtime refresh dated 13 September 2026**. The version number did not change; [SHA256SUMS.txt](../SHA256SUMS.txt) identifies the refreshed runtime packages, dedicated source archive and unchanged demo export.
 
 ## Browser and client compatibility
 
@@ -42,16 +42,18 @@ The [privacy policy](https://toolbraid.pages.dev/privacy/) documents retention a
 
 ## Recorded validation
 
-These are previously recorded **application** results for the release, not tests rerun by this documentation repository's CI.
+The public repository now runs source tests and the extension build in CI. Earlier application snapshots remain recorded separately below; CI is not a live-site or Store certification.
 
 | Check | Recorded result | Boundary |
 | --- | --- | --- |
-| Automated suite, 13 September | **616 passed, 4 opt-in skipped, 0 failed** | Not every integration is a live-site test. |
+| Public-source suite, 13 September | **580 passed, 4 opt-in skipped, 0 failed** | Excludes old cloud-demo/private CLI-agent tests; not directly comparable with the earlier total. |
+| Read/scroll patch before export | **77 targeted automated checks; 12 read-only live X checks passed** | Content churn, cached reads, root scrolling and rejected old-page bindings. |
+| Earlier automated snapshot, 13 September | **616 passed, 4 opt-in skipped, 0 failed** | Historical wider development suite; not every integration is a live-site test. |
 | MCP server tests | **8/8 passed** | Configuration refresh, authenticated reconnect, concurrency and no replay of interrupted commands. Included in the total above. |
 | Browser integration | Chromium/Edge checks and required-debugger panel state | Clean-install native permission dialogs and all re-enablement paths still need manual checks. |
 | ChatGPT panel chat | Real account-backed read-only browser call and streamed result in Edge | Does not certify every account, model or provider combination. |
 | Native WebMCP | Real API discovery/execution on an isolated localhost page in Chromium 151 with its experimental flag | Not certification of the entire native extension-to-MCP pipeline or default Edge availability. |
-| X | Live rendered-page reading and explicitly authorized replies; fixture coverage for broader actions | Media and article drafts are not fully live-certified; site changes can affect adapters. |
+| X | Live rendered-page reading and authorized replies confirmed by fresh page reads; fixture coverage for broader actions | Automatic account/postcondition matching did not independently confirm the latest replies. Media/article actions are not fully live-certified. |
 | Store companion | Diagnostic/launcher and isolated registration checks | Not proof of Store-installed lifecycle behavior or Microsoft approval. |
 
 Schedules require an active runner to invoke due-work ticks. Monitoring requires an open browser and selected watched tab. Neither is a promise of unattended, always-on cloud automation.

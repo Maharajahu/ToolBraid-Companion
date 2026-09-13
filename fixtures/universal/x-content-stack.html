@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>X content stack fixture</title>
+<style>body{font:18px system-ui;margin:24px}button,input,[contenteditable]{margin:8px;padding:10px}article{border:1px solid #bbb;padding:12px}#feed{height:150px;width:380px;overflow:auto}#feed div{height:650px;width:1000px}#long{height:1800px}#article-editor{display:none}[contenteditable]{border:1px solid #888;min-height:60px}</style>
+<nav><a href="https://x.com/home">Home</a><a href="https://x.com/notifications">Notifications</a><a href="https://x.com/notifications/mentions">Mentions</a><a href="https://x.com/compose/articles/123">Articles</a></nav>
+<button data-testid="SideNav_AccountSwitcher_Button">Fixture @fixture</button>
+<main><article data-testid="tweet" id="post"><div data-testid="User-Name">Fixture @fixture</div><a href="https://x.com/fixture/status/1"><time datetime="2026-09-13T00:00:00Z">13 Sep</time></a><div data-testid="tweetText">A local test post</div><button data-testid="reply">Reply</button><button data-testid="like">Like</button><button data-testid="retweet">Repost</button></article>
+<div id="post-editor"><div role="textbox" aria-label="Post text" data-testid="tweetTextarea_0" contenteditable="true"></div><button data-testid="tweetButton">Post</button></div>
+<section id="article-editor"><input aria-label="Title" type="text"><div role="textbox" aria-label="Article body" contenteditable="true">First paragraph. Second paragraph.</div><button id="bold" onmousedown="event.preventDefault()">Bold</button><button id="save">Save draft</button><button id="preview">Preview</button><button id="article-publish">Publish</button></section>
+<div id="feed" role="region" aria-label="Scrollable replies"><div>Scrollable content</div></div><div id="long"></div><div role="status" id="status"></div></main>
+<script>
+window.fixtureActions=[];
+const articleMode=location.pathname.startsWith('/compose/articles');
+document.querySelector('#article-editor').style.display=articleMode?'block':'none';
+document.querySelector('#post-editor').style.display=articleMode?'none':'block';
+document.querySelector('[data-testid="like"]').onclick=function(){window.fixtureActions.push('like');this.dataset.testid='unlike';this.textContent='Unlike'};
+document.querySelector('#bold').onclick=()=>document.execCommand('bold');
+document.querySelector('#save').onclick=()=>{window.fixtureActions.push('save-draft');document.querySelector('#status').textContent='Draft saved'};
+document.querySelector('#preview').onclick=()=>{window.fixtureActions.push('preview');document.querySelector('#status').textContent='Preview ready'};
+document.querySelector('[data-testid="tweetButton"]').onclick=()=>{const editor=document.querySelector('[data-testid="tweetTextarea_0"]');window.fixtureActions.push('publish');const post=document.createElement('article');post.dataset.testid='tweet';post.innerHTML='<div data-testid="User-Name">Fixture @fixture</div><a href="https://x.com/fixture/status/2"><time datetime="2026-09-13T00:01:00Z">Now</time></a><div data-testid="tweetText"></div>';post.querySelector('[data-testid="tweetText"]').textContent=editor.textContent;document.querySelector('main').prepend(post);editor.textContent='';document.querySelector('#status').textContent='Your post was sent'};
+window.addEventListener('scroll',()=>{if(scrollY>500&&!document.querySelector('#lazy')){const lazy=document.createElement('article');lazy.id='lazy';lazy.dataset.testid='tweet';lazy.innerHTML='<div data-testid="User-Name">Friend @friend</div><a href="https://x.com/friend/status/3"><time>Now</time></a><div data-testid="tweetText">A lazily loaded reply</div><button data-testid="unlike">Unlike</button>';document.querySelector('#long').prepend(lazy)}});
+</script></html>

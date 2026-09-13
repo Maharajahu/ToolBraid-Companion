@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/Maharajahu/ToolBraid-Companion/releases/tag/v0.3.1-rc.1"><img src="https://img.shields.io/badge/release-0.3.1_RC1-ffd278" alt="Release 0.3.1 RC1"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-77e7f4" alt="Apache License 2.0"></a>
-  <a href="https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/docs.yml"><img src="https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/docs.yml/badge.svg" alt="Documentation checks"></a>
+  <a href="https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/docs.yml"><img src="https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/docs.yml/badge.svg" alt="Source and documentation checks"></a>
 </p>
 
 <p align="center">
@@ -15,6 +15,7 @@
   <a href="INSTALL.md">Install</a> ·
   <a href="docs/capabilities.md">Full specs</a> ·
   <a href="docs/architecture.md">Architecture</a> ·
+  <a href="docs/development.md">Build from source</a> ·
   <a href="RELEASE-NOTES.md">What's new</a>
 </p>
 
@@ -25,11 +26,11 @@
 
 ToolBraid combines a **WebMCP-enabled browser extension** and a **local Windows companion**. Connect it to your existing Codex session or another MCP client, or use the optional ChatGPT side-panel chat. Your assistant can work with real pages, desktop controls, approved files and repeatable workflows.
 
-This is the official **downloads and documentation repository**. Application development source is not hosted here; GitHub's automatic **Source code** archives are not installers.
+This is the official **source, releases and documentation repository** for the public edition. The browser extension, Windows companion, tests and packaging scripts are available under Apache 2.0.
 
 ## Get started
 
-**[Download for Windows](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip)** · [Extension only](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) · [Checksums](SHA256SUMS.txt)
+**[Download for Windows](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip)** · [Extension only](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) · [Source ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip) · [Checksums](SHA256SUMS.txt)
 
 1. Extract the Windows package and run `Install.cmd` as your normal Windows user.
 2. In Chrome or Edge, enable **Developer mode → Load unpacked** and select its `extension` folder.
@@ -102,8 +103,20 @@ Real pages and model responses, an X reply draft, and browser navigation. **1:23
 - [Compatibility, permissions and recorded validation](docs/compatibility.md)
 - [Release history](RELEASE-NOTES.md) · [Data handling](https://toolbraid.pages.dev/privacy/)
 
+## Develop
+
+Requires Node.js 24 LTS. The runtime and unit tests use Node built-ins; no dependency installation is needed for these commands.
+
+```sh
+git clone https://github.com/Maharajahu/ToolBraid-Companion.git
+cd ToolBraid-Companion
+npm run validate
+```
+
+Load `dist/toolbraid-extension` in Chrome or Edge. Windows packaging, optional browser integration tests and the source layout are covered in the [development guide](docs/development.md). See [contributing](CONTRIBUTING.md) for changes and regression tests.
+
 ## Feedback and support
 
-[Report a bug or suggest a feature](https://github.com/Maharajahu/ToolBraid-Companion/issues/new/choose). Issues are public; use the [Feedback form](https://toolbraid.pages.dev/feedback/) for non-public contact and [security reports](.github/SECURITY.md). Never include credentials or private page content. Documentation corrections are welcome as pull requests; this repository's CI checks documentation, not the application runtime.
+[Report a bug or suggest a feature](https://github.com/Maharajahu/ToolBraid-Companion/issues/new/choose). Issues are public; use the [Feedback form](https://toolbraid.pages.dev/feedback/) for non-public contact and [security reports](.github/SECURITY.md). Never include credentials or private page content. Source and documentation pull requests are welcome; CI checks the public identity, unit tests, extension build and documentation.
 
 Built by [Maharajahu](https://github.com/Maharajahu). [Apache 2.0](LICENSE); bundled Node.js licensing is included in the Windows package. Donations are optional and unlock no features.

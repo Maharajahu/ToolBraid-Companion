@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; style-src 'self'; object-src 'none';">
+    <title>ToolBraid</title>
+    <link rel="stylesheet" href="sidepanel.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"><img src="icons/toolbraid-128.png" alt=""></span>
+          <div>
+            <p class="eyebrow">TOOLBRAID</p>
+            <h1>Browser tools</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span id="connection-badge" class="status-badge status-pending" role="status">Connecting</span>
+          <button id="refresh-button" class="icon-button" type="button" aria-label="Refresh page state" title="Refresh page state">↻</button>
+        </div>
+      </header>
+
+      <p id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></p>
+
+      <main id="sidepanel-main" tabindex="-1">
+        <section id="public-access-panel" class="panel access-panel" aria-labelledby="access-heading" hidden>
+          <div class="owner-status-row">
+            <div><p class="eyebrow">YOUR PERMISSION FIRST</p><h2 id="access-heading">Connect your AI</h2></div>
+            <span id="access-status" class="status-badge status-pending" role="status">Paused</span>
+          </div>
+          <p class="owner-summary">Your connected AI can read allowed pages, manage tabs, fill and submit forms without asking again. The Windows companion also exposes local file and desktop tools to that AI.</p>
+          <p class="policy-note">Page content and tool results go to your chosen AI client and its model provider. Control stays enabled across browser restarts until you pause it. Pause blocks new commands; it cannot undo actions already dispatched.</p>
+          <label id="access-consent-label" class="access-consent" for="access-consent"><input id="access-consent" type="checkbox">I understand and allow this direct AI control.</label>
+          <p id="access-site" class="origin-value">Open an HTTP(S) page to connect.</p>
+          <div class="access-actions">
+            <button id="access-enable" class="button button-primary" type="button" disabled>Enable on this site</button>
+            <button id="access-pause" class="button button-danger" type="button" hidden>Pause control</button>
+          </div>
+          <details class="access-advanced"><summary>Advanced browser tools</summary><p class="policy-note">File attachment, accessibility inspection and precise visual clicks use the debugger permission granted when you install or re-enable ToolBraid. Basic page tools do not use it. AI control and site access still apply.</p><span id="access-debugger" class="status-badge status-pending" role="status">Checking permission</span></details>
+          <p class="policy-note"><a href="privacy.html" target="_blank" rel="noopener">Data handling and retention</a></p>
+        </section>
+        <section class="panel assistant-panel" aria-labelledby="assistant-heading">
+          <div class="section-heading"><div><p class="eyebrow">BUILD WITHOUT LOSING FOCUS</p><h2 id="assistant-heading">Your browser agent</h2></div><span class="mode-pill">ChatGPT account</span></div>
+          <p class="policy-note">Chat through Codex using your ChatGPT account and its Codex limits. No API key or separate API billing. Requires the Windows companion and Codex signed in on this PC.</p>
+          <details id="assistant-settings" open>
+            <summary>Connection &amp; model</summary>
+            <div class="assistant-settings-grid">
+              <label for="assistant-model">Codex model <input id="assistant-model" list="assistant-models" placeholder="Account default" maxlength="200" autocomplete="off"></label>
+              <datalist id="assistant-models"></datalist>
+              <details><summary>Codex executable</summary><label for="assistant-executable">Executable name or absolute .exe path <input id="assistant-executable" value="codex" maxlength="2048" spellcheck="false"></label></details>
+              <button id="assistant-connect" class="button" type="button">Connect to Codex</button>
+              <button id="assistant-login" class="button" type="button">Sign in with ChatGPT</button>
+              <p class="policy-note">Not signed in? Run <code>codex login</code> and choose your ChatGPT account, then connect here. ToolBraid never asks for your password or copies your login tokens.</p>
+            </div>
+          </details>
+          <p id="assistant-status" class="assistant-status" role="status" aria-live="polite">Connect to start a conversation.</p>
+          <div id="assistant-messages" class="assistant-messages" role="log" aria-label="Conversation" aria-live="off" tabindex="0"><p class="empty-state">Ask about the page, inspect native WebMCP tools, or catch up with your X community.</p></div>
+          <div id="assistant-approval" class="assistant-approval" hidden>
+            <h3>Review this action</h3><p id="assistant-approval-title"></p><p id="assistant-approval-page" class="policy-note"></p><pre id="assistant-approval-arguments"></pre>
+            <div class="assistant-actions"><button id="assistant-approve" type="button" class="button button-primary">Approve this action</button><button id="assistant-reject" type="button" class="button">Reject</button></div>
+          </div>
+          <form id="assistant-form">
+            <label for="assistant-message" class="visually-hidden">Message your browser agent</label>
+            <textarea id="assistant-message" rows="3" maxlength="16000" placeholder="What would you like to do?" required></textarea>
+            <label class="assistant-page-choice" for="assistant-use-page"><input id="assistant-use-page" type="checkbox">Share the selected connected page and its tools</label>
+            <div class="assistant-actions"><button id="assistant-send" class="button button-primary" type="submit">Send</button><button id="assistant-stop" class="button button-danger" type="button" disabled>Stop</button><button id="assistant-clear" class="button" type="button">Clear chat</button></div>
+          </form>
+          <p class="policy-note">A run stays on its selected tab even when you switch tabs. Chat asks before changes. Up to 40 recent messages are kept locally and reused as conversation context; clearing removes this local copy. Shared content is sent to OpenAI, subject to your account settings.</p>
+          <details><summary>Agent activity</summary><ol id="assistant-activity" class="assistant-activity" aria-label="Recent agent activity"></ol></details>
+        </section>
+        <section class="panel community-panel" aria-labelledby="community-heading">
+          <p class="eyebrow">STAY CONNECTED. KEEP BUILDING.</p><h2 id="community-heading">Your X community</h2>
+          <p class="policy-note">Review visible replies and mentions with their original links. Ask the agent for a summary or a draft, then decide what to send. No automatic replies or DMs.</p>
+          <div class="assistant-actions"><button id="community-inspect" type="button" class="button">Inspect X page</button><button id="community-summarize" type="button" class="button">Ask for a catch-up</button></div>
+          <details><summary>Optional quiet monitoring</summary><p class="policy-note">Open X Notifications, Mentions or a post conversation in a dedicated tab. Keep Edge and that tab open. ToolBraid can refresh it in the background and notify you only about newly observed posts. It does not call a model or consume Codex usage while monitoring.</p>
+            <label for="community-interval">Check every <select id="community-interval"><option value="5">5 minutes</option><option value="15" selected>15 minutes</option><option value="30">30 minutes</option><option value="60">60 minutes</option></select></label>
+            <label class="assistant-page-choice" for="community-notify"><input id="community-notify" type="checkbox">Allow desktop notifications without message previews</label>
+            <div class="assistant-actions"><button id="community-watch" type="button" class="button">Watch this X tab</button><button id="community-pause" type="button" class="button">Pause monitoring</button></div>
+          </details>
+          <p id="community-status" class="policy-note" role="status">Monitoring is off. Only currently rendered posts can be inspected; this is not a complete account archive.</p>
+          <div id="community-inbox" class="community-inbox"></div>
+        </section>
+        <section class="panel" aria-labelledby="native-webmcp-heading"><p class="eyebrow">SITE-PROVIDED TOOLS</p><h2 id="native-webmcp-heading">WebMCP enabled</h2><p class="policy-note">Discover and call tools registered by compatible sites through the browser's native WebMCP API. Availability depends on the browser and site; ToolBraid's other browser tools remain available independently.</p><button id="webmcp-discover" class="button" type="button">Discover native tools</button><p id="webmcp-status" class="policy-note" role="status">Connect a site to check native WebMCP availability.</p><ul id="webmcp-tools" class="assistant-activity"></ul></section>
+        <section class="workflow-strip" aria-labelledby="workflow-heading">
+          <h2 id="workflow-heading" class="visually-hidden">Current workflow</h2>
+          <div class="workflow-step workflow-now">
+            <span class="workflow-label">NOW</span>
+            <strong id="workflow-now">Connecting to the page</strong>
+          </div>
+          <div class="workflow-arrow" aria-hidden="true">→</div>
+          <div class="workflow-step">
+            <span class="workflow-label">NEXT</span>
+            <strong id="workflow-next">Discover live tools</strong>
+          </div>
+          <div class="workflow-step workflow-required">
+            <span class="workflow-label">REQUIRES YOU</span>
+            <strong id="workflow-required">Nothing yet</strong>
+          </div>
+        </section>
+
+        <section class="panel owner-panel" aria-labelledby="owner-heading">
+          <div class="owner-status-row">
+            <div>
+              <p class="eyebrow">LOCAL CONTROL PLANE</p>
+              <h2 id="owner-heading">AI control</h2>
+            </div>
+            <span id="owner-mode-badge" class="status-badge status-ready" role="status">Active</span>
+          </div>
+          <p id="owner-mode-summary" class="owner-summary">Direct execution is enabled under the local owner policy.</p>
+          <div class="owner-metrics">
+            <div><span class="metric-label">Control plane</span><strong id="owner-control-plane">Local</strong></div>
+            <div><span class="metric-label">Agent model</span><strong id="owner-model-route">Local / cloud via MCP</strong></div>
+          </div>
+          <p class="policy-note">The integrated chat uses your ChatGPT account through Codex. External MCP clients choose their own models. CAPTCHA, MFA, and passkey steps remain explicit handoffs.</p>
+        </section>
+
+        <section class="panel page-panel" aria-labelledby="page-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ACTIVE CONTEXT</p>
+              <h2 id="page-heading">Current page</h2>
+            </div>
+            <span id="page-mode" class="mode-pill">Waiting</span>
+          </div>
+          <div class="origin-row">
+            <span class="origin-dot" aria-hidden="true"></span>
+            <p id="page-origin" class="origin-value">No active HTTP(S) page</p>
+          </div>
+          <p id="page-title" class="muted">Activate ToolBraid on a tab to inspect its live context.</p>
+          <dl class="fingerprint-grid">
+            <div>
+              <dt>Tab</dt>
+              <dd id="tab-value">—</dd>
+            </div>
+            <div>
+              <dt>Snapshot fingerprint</dt>
+              <dd id="fingerprint-value" class="fingerprint-value">—</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="panel mission-panel" aria-labelledby="missions-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">MULTI-PAGE CONTINUITY</p>
+              <h2 id="missions-heading">Missions <span id="missions-count" class="count-badge">0</span></h2>
+            </div>
+            <button id="mission-start" class="button button-primary" type="button">Start on this page</button>
+          </div>
+          <div class="mission-composer">
+            <label class="field-label" for="mission-objective">
+              Mission objective
+              <input id="mission-objective" name="objective" type="text" maxlength="280" autocomplete="off" value="Inspect the active page and recover safely.">
+            </label>
+            <p class="field-hint">This bounded brief travels with the mission so every page keeps the same intent.</p>
+          </div>
+          <div id="missions-list" class="stack-list">
+            <p class="empty-state">No active mission. Start one from the current page.</p>
+          </div>
+          <div id="mission-inspect-result" class="mission-inspect-result stack-list" aria-label="Latest mission inspection results"></div>
+          <p id="mission-note" class="policy-note">Each mission keeps exact tab, frame, session, origin, and page-fingerprint ownership.</p>
+        </section>
+
+        <section class="panel handoff-panel" aria-labelledby="handoffs-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">INTERVENTION HANDOFF</p>
+              <h2 id="handoffs-heading">CAPTCHA / MFA steps <span id="handoffs-count" class="count-badge">0</span></h2>
+            </div>
+          </div>
+          <div id="handoffs-list" class="stack-list">
+            <p class="empty-state">No CAPTCHA, MFA, or passkey step is waiting.</p>
+          </div>
+          <div id="handoff-request" class="handoff-request"></div>
+          <p id="handoff-note" class="policy-note">Credentials stay inside the approved site. ToolBraid stores no password, one-time code, or raw login URL.</p>
+        </section>
+
+        <details id="tools-panel" class="panel disclosure-panel">
+          <summary class="disclosure-summary">
+            <div>
+              <p class="eyebrow">DISCOVERY</p>
+              <h2 id="tools-heading">Available tools <span id="tools-count" class="count-badge">0</span></h2>
+            </div>
+            <span class="summary-status">
+              <span id="quarantine-count" class="mode-pill">No quarantined tools</span>
+              <span class="disclosure-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </summary>
+          <div class="disclosure-body" aria-labelledby="tools-heading">
+            <div class="capability-summary">
+              <div class="metric-cluster">
+                <span class="metric-label">Selected packs</span>
+                <strong id="packs-selected">0</strong>
+              </div>
+              <div class="metric-cluster">
+                <span class="metric-label">Active packs</span>
+                <strong id="packs-active">0</strong>
+              </div>
+              <div class="metric-cluster">
+                <span class="metric-label">Tool budget</span>
+                <strong id="packs-budget">0 / 0</strong>
+              </div>
+            </div>
+            <div id="packs-list" class="stack-list compact-list"></div>
+            <div id="quarantine-list" class="stack-list compact-list"></div>
+            <div id="tools-list" class="stack-list">
+              <p class="empty-state">No tools discovered yet.</p>
+            </div>
+          </div>
+        </details>
+
+        <details id="evidence-panel" class="panel disclosure-panel">
+          <summary class="disclosure-summary">
+            <div>
+              <p class="eyebrow">MULTIMODAL CONTEXT</p>
+              <h2 id="evidence-heading">Evidence <span id="evidence-count" class="count-badge">0</span></h2>
+            </div>
+            <span class="disclosure-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="disclosure-body" aria-labelledby="evidence-heading">
+            <div class="section-toolbar">
+              <p id="evidence-stats" class="metric-line">0 analyzed · 0 degraded · 0 blocked</p>
+              <button id="evidence-analyze" class="button" type="button">Analyze again</button>
+            </div>
+            <div id="evidence-list" class="stack-list">
+              <p class="empty-state">No visual, audio, or video evidence on this page.</p>
+            </div>
+            <p id="evidence-warnings" class="policy-note">Visible-tab capture is ephemeral and never grants action authority.</p>
+          </div>
+        </details>
+
+        <details id="provider-panel" class="panel disclosure-panel provider-panel">
+          <summary class="disclosure-summary">
+            <div>
+              <p class="eyebrow">OPTIONAL ANALYSIS</p>
+              <h2 id="provider-heading">Multimodal provider</h2>
+            </div>
+            <span class="summary-status">
+              <span id="provider-badge" class="status-badge status-pending">Metadata only</span>
+              <span class="disclosure-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </summary>
+          <div class="disclosure-body" aria-labelledby="provider-heading">
+            <form id="provider-form" class="provider-form" novalidate>
+              <label class="field-label">
+                OpenAI-compatible endpoint
+                <input id="provider-endpoint" name="baseUrl" type="url" inputmode="url" autocomplete="off" placeholder="http://127.0.0.1:11434/v1/" required>
+              </label>
+              <div class="provider-grid">
+                <label class="field-label">
+                  Vision model
+                  <input id="provider-vision-model" name="visionModel" type="text" autocomplete="off" placeholder="qwen2.5-vl" required>
+                </label>
+                <label class="field-label">
+                  Audio model (optional)
+                  <input id="provider-audio-model" name="audioModel" type="text" autocomplete="off" placeholder="whisper-1">
+                </label>
+              </div>
+              <label class="field-label">
+                Session API key
+                <input id="provider-api-key" name="apiKey" type="password" autocomplete="new-password" placeholder="Leave blank to keep the current key">
+              </label>
+              <div class="action-footer provider-actions">
+                <button id="provider-disable" class="button button-danger" type="button">Use metadata only</button>
+                <button id="provider-save" class="button button-primary" type="submit">Save &amp; analyze</button>
+              </div>
+            </form>
+            <p id="provider-note" class="policy-note">Disabled by default. Enabling requests access only to the exact endpoint origin; the API key stays in extension session storage.</p>
+          </div>
+        </details>
+
+        <section class="panel action-panel" aria-labelledby="actions-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CONTROL SURFACE</p>
+              <h2 id="actions-heading">Page actions <span id="actions-count" class="count-badge">0</span></h2>
+            </div>
+          </div>
+          <div id="actions-list" class="stack-list">
+            <p class="empty-state">No page actions discovered yet.</p>
+          </div>
+        </section>
+
+        <section class="panel approval-panel" aria-labelledby="approvals-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">FALLBACK &amp; HISTORY</p>
+              <h2 id="approvals-heading">Approval records <span id="approvals-count" class="count-badge">0</span></h2>
+            </div>
+          </div>
+          <div class="subsection-heading">
+            <h3>Current context</h3>
+            <span id="approvals-current-count" class="mode-pill">0 actionable</span>
+          </div>
+          <div id="approvals-list" class="stack-list">
+            <p class="empty-state">No approval is actionable on this page.</p>
+          </div>
+          <div class="subsection-heading subsection-heading-spaced">
+            <h3>History &amp; other contexts</h3>
+            <span id="approvals-history-count" class="mode-pill">0 records</span>
+          </div>
+          <div id="approvals-history-list" class="stack-list">
+            <p class="empty-state">No approval history.</p>
+          </div>
+          <p class="policy-note"><span aria-hidden="true">⌁</span> Owner Autonomy dispatches policy-covered effects directly. Items appear here only when manual fallback is required or for history.</p>
+        </section>
+
+        <section class="panel proof-panel" aria-labelledby="proof-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">EXECUTION PROOF</p>
+              <h2 id="proof-heading">Receipts <span id="receipts-count" class="count-badge">0</span></h2>
+            </div>
+            <span id="audit-badge" class="status-badge status-pending">Checking chain</span>
+          </div>
+          <div id="receipts-list" class="stack-list">
+            <p class="empty-state">No action has been dispatched.</p>
+          </div>
+          <details id="audit-panel" class="nested-disclosure">
+            <summary>
+              <span>Audit trail</span>
+              <span class="disclosure-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="nested-disclosure-body">
+              <div class="audit-summary">
+                <span>Audit head</span>
+                <code id="audit-head">—</code>
+              </div>
+              <div id="audit-list" class="audit-list" aria-label="Recent audit events">
+                <p class="empty-state">Audit entries appear after activation.</p>
+              </div>
+              <button id="audit-more" class="button audit-more" type="button" hidden>Show all recent events</button>
+            </div>
+          </details>
+        </section>
+      </main>
+
+      <footer class="project-footer">
+        <div class="project-footer-inner">
+          <p class="project-support-note">Free to use<span>Support is optional</span></p>
+          <nav class="project-links" aria-label="Support and project links">
+            <a class="project-link project-coffee" href="https://buymeacoffee.com/dumitrescup" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" aria-label="Buy me a coffee — optional support (opens in a new tab)" title="Support ToolBraid on Buy Me a Coffee (opens in a new tab)">
+              <svg aria-hidden="true" focusable="false" width="18" height="22" viewBox="0 0 20 24" fill="none"><path d="M4 7h12l-1.5 14h-9L4 7Zm-1-3h14v3H3V4Zm3-2h8v2H6V2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+              <span>Buy me a coffee</span>
+            </a>
+            <a class="project-link project-github" href="https://github.com/Maharajahu/ToolBraid-Companion" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" aria-label="ToolBraid on GitHub (opens in a new tab)" title="ToolBraid on GitHub (opens in a new tab)">
+              <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .75a11.25 11.25 0 0 0-3.558 21.923c.563.104.769-.244.769-.542 0-.267-.01-.975-.015-1.913-3.13.68-3.791-1.508-3.791-1.508-.512-1.3-1.25-1.646-1.25-1.646-1.022-.7.078-.686.078-.686 1.13.08 1.725 1.16 1.725 1.16 1.005 1.723 2.637 1.225 3.28.937.102-.729.393-1.225.715-1.507-2.499-.285-5.126-1.25-5.126-5.564 0-1.229.44-2.232 1.16-3.019-.117-.285-.503-1.429.11-2.979 0 0 .945-.303 3.094 1.153a10.79 10.79 0 0 1 5.63 0c2.147-1.456 3.09-1.153 3.09-1.153.615 1.55.23 2.694.113 2.979.721.787 1.158 1.79 1.158 3.019 0 4.325-2.63 5.276-5.135 5.555.404.35.766 1.041.766 2.098 0 1.515-.014 2.737-.014 3.109 0 .301.203.652.774.541A11.25 11.25 0 0 0 12 .75Z"/></svg>
+            </a>
+          </nav>
+        </div>
+      </footer>
+
+      <p id="sidepanel-announcer" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></p>
+    </div>
+    <script type="module" src="sidepanel.js"></script>
+    <script type="module" src="assistant-panel.js"></script>
+  </body>
+</html>

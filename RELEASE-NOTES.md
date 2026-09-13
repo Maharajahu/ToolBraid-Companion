@@ -4,6 +4,23 @@
 
 Release candidates are pre-releases. Dates below describe recorded changes and validation, not a claim that every integration is certified today.
 
+## Source and runtime refresh — 13 September 2026
+
+Runtime **0.3.1**, release **v0.3.1-rc.1**; no version bump.
+
+- Published the public extension, companion, Store app source, regression tests and packaging scripts. Added a [build guide](docs/development.md), contribution instructions and source/build CI.
+- Added `ToolBraid-0.3.1-source.zip` alongside refreshed Windows, unpacked-extension and Edge submission ZIPs. The release's checksum file identifies the new bytes; the dedicated source ZIP is distinct from the historical tag's automatic GitHub archives.
+- **MCP discovery:** content updates no longer discard already-listed tools. An unknown exact tool name triggers one fresh lookup; stale aliases are not substituted and interrupted actions are never replayed.
+- **Live pages:** read handles survive content-only updates while retaining exact URL, tab, frame and session binding. Mutations and file attachment remain strictly bound. Navigating to another page rejects the old handle.
+- **Scrolling:** root viewport scroll tolerates content changes on the same prepared URL. Nested scroll targets keep their strict fingerprint checks.
+- Updated the extension's GitHub link to the canonical Companion repository.
+
+**Validation:** public-source suite **580 passed, 4 opt-in skipped, 0 failed**. The published suite excludes the old cloud-demo and private CLI-agent tests; its total is not directly comparable with the earlier 616-test snapshot. Before export, **77 targeted regression checks** and **12 read-only live X checks** covered cached reads, page-binding rejection and scrolling across changing content. Two separately authorized live replies were subsequently confirmed by fresh rendered-page reads. Automatic account/postcondition matching did not independently confirm those replies; this remains a known limitation, not a claimed fix.
+
+The exported source also passed **8 offline Chromium X workflow scenarios** through the production MCP endpoint and a real DOM fixture adapter. The full packaged native-companion browser test could not run in this sandbox because Windows registry writes were denied; no fresh full-companion E2E pass is claimed for this refresh.
+
+Reinstall the refreshed Windows package, reload its matching unpacked extension and restart an existing MCP connection once. Source publication and GitHub asset replacement do **not** update Microsoft's submitted MSIX or Edge review. The ZIP launcher remains unsigned.
+
 ## Repository update — 13 September 2026
 
 - Renamed the official public repository to **ToolBraid-Companion**, with the product title **ToolBraid Companion**.
@@ -12,7 +29,7 @@ Release candidates are pre-releases. Dates below describe recorded changes and v
 - Added bug and feature forms, a non-public security reporting route, and documentation checks for links, assets and checksum-list structure.
 - Corrected installation instructions for the required debugger permission and added the AI-assisted setup route.
 
-**Documentation and presentation only:** runtime version `0.3.1`, release tag `v0.3.1-rc.1`, ZIPs, videos, checksum values and Microsoft submissions are unchanged by this repository update.
+**Earlier documentation-only update:** this reorganization did not change runtime packages. The later source/runtime refresh above replaces the ZIPs and their checksums; the demo and Microsoft submissions remain unchanged.
 
 ## 0.3.1 RC1
 

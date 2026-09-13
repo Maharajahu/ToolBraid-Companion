@@ -9,7 +9,7 @@ const documents = new Map();
 
 async function walk(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.name === '.git') continue;
+    if (['.git', 'node_modules', 'dist', '.tmp', '.playwright'].includes(entry.name)) continue;
     const full = path.join(directory, entry.name);
     if (entry.isDirectory()) await walk(full);
     else if (entry.name.endsWith('.md')) {
@@ -32,7 +32,7 @@ await walk(root);
 let links = 0;
 for (const [file, { text, prose }] of documents) {
   const name = path.relative(root, file);
-  assert.ok(!text.includes('https://github.com/Maharajahu/toolbraid-releases'), `${name}: obsolete repository URL`);
+  assert.ok(!text.includes('https://github.com/Maharajahu/' + 'toolbraid-releases'), `${name}: obsolete repository URL`);
   assert.doesNotMatch(text, /(?:[A-Z]:[\\/]Users[\\/]|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|github_pat_[A-Za-z0-9_]{30,}|ghp_[A-Za-z0-9]{30,})/, `${name}: possible private data`);
   const refs = [
     ...[...prose.matchAll(/!?\[[^\]\n]*\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g)].map(match => match[1]),
@@ -58,6 +58,12 @@ const expected = [
   'ToolBraid-0.3.1-windows-x64.zip',
   'ToolBraid-Windows-real-demo-4K.mp4',
 ].sort();
+// A source snapshot cannot contain its own archive hash. The release manifest
+// adds it after archiving the source commit; both forms validate the runtime ZIPs.
+if (manifest.some(line => line.endsWith('  ToolBraid-0.3.1-source.zip'))) {
+  expected.push('ToolBraid-0.3.1-source.zip');
+  expected.sort();
+}
 for (const line of manifest) assert.match(line, /^[a-f0-9]{64}  [A-Za-z0-9._-]+$/, 'Invalid checksum-list entry');
 assert.deepEqual(manifest.map(line => line.slice(66)).sort(), expected, 'Unexpected or duplicate release asset');
 
@@ -65,4 +71,4 @@ const readme = documents.get(path.join(root, 'README.md')).text;
 assert.match(readme, /<h1 align="center">ToolBraid Companion<\/h1>/);
 assert.ok(readme.includes(`${canonical}/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip`));
 assert.ok(readme.includes('\nhttps://github.com/user-attachments/assets/5696a89b-59d6-4fd8-ad80-023f04fb16b7\n'), 'Keep the native video embed');
-console.log(`PASS: ${documents.size} documents, ${links} local links/anchors, image references and 4 checksum-list entries. No application/runtime tests were run.`);
+console.log(`PASS: ${documents.size} documents, ${links} local links/anchors, image references and ${manifest.length} checksum-list entries.`);
