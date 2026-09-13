@@ -142,12 +142,15 @@ After connecting your AI client, open an ordinary public page and enable that si
 - **Chat answers without reading the page:** enable the intended site and select **Share the selected connected page and its tools** for built-in chat. In an external client, check that the ToolBraid server and its tools are enabled for that conversation.
 - **A local model cannot use tools:** check both the client's MCP connection and the model's tool-calling support. Model files or an Ollama server alone do not connect to ToolBraid. Use the external-client route, not the Codex model field.
 - **Tools are paused or a page is unavailable:** open the side panel, read the disclosure and enable the intended site. Grant browser site access; use **Connect this site** for another origin. Do not bypass browser or organization restrictions.
-- **Advanced tools are unavailable:** those tools require the separate optional advanced-tools permission. Ordinary page tools do not require that permission.
+- **Advanced tools are unavailable:** the refreshed 0.3.1 extension declares `debugger` at installation, not through a separate “Allow advanced tools” button. Reload/re-enable the matching extension and accept the browser's required-permission prompt if shown. Basic page tools do not attach the debugger; screenshots, accessibility inspection and file attachment use it when needed. Do not bypass browser or organization restrictions.
+- **Codex keeps using the old connector:** install the refreshed full package, use its generated MCP configuration and restart the existing ToolBraid MCP connection once to load the updated code. The corrected connector rereads its configuration on reconnect and does not automatically repeat an interrupted action. Extracting files into a different folder alone does not replace a running connector.
 - **Still stuck:** use the [Feedback form](https://toolbraid.pages.dev/feedback/). Include the release version, browser and exact error, but remove tokens, personal paths and private page content. Do not attach your full configuration or browser profile.
 
 ## Update
 
 Updates are manual. Close the browser connection, extract the new full package and rerun its installer. Replace the files in the permanently loaded `extension` folder with the matching new extension files, then click **Reload** on its browser extensions page. Merely extracting a new ZIP elsewhere does not update the extension already loaded by the browser. Preserve the manifest's supplied public key so its unpacked ID stays consistent. The companion installer preserves its existing authentication token and local data; it does not download future updates.
+
+The **13 September 2026 fixes refresh keeps version 0.3.1**. Compare the ZIP's SHA-256 with the current release checksum file; the unchanged version number alone does not identify the refreshed build. Restart an already-running MCP connection once after replacing its runtime. The Edge submission archive is for the publisher portal, not a manual-install download; refreshing that archive on GitHub does not update an existing Microsoft submission.
 
 ## Uninstall
 

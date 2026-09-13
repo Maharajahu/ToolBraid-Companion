@@ -2,6 +2,21 @@
 
 Public release candidate, updated 13 September 2026. Runtime version `0.3.1`; GitHub tag [`v0.3.1-rc.1`](https://github.com/Maharajahu/toolbraid-releases/releases/tag/v0.3.1-rc.1). This is a pre-release, not a stable or Microsoft-approved launch.
 
+## Fixes and validation — 13 September 2026
+
+The version remains **0.3.1 / RC1**. The Windows, manual-install extension and Edge submission ZIPs have been rebuilt with these fixes; use the refreshed `SHA256SUMS.txt` to identify this update.
+
+- **MCP reconnection:** the connector reloads its validated configuration before reconnecting, instead of retaining an obsolete connection. Concurrent requests share one reconnect. An interrupted action is not automatically replayed.
+- **Advanced browser tools:** `debugger` is declared as a required install-time permission. The panel shows the actual permission state; the invalid “Allow advanced tools” request has been removed. Basic page tools do not attach the debugger; screenshots, accessibility inspection and file attachment use it when required.
+- **X workflows:** page and nested-container scrolling, exact post/reply identification, composer focus recovery, reply verification, media controls and article draft editing. Quoted posts and unrelated background content cannot replace the intended target.
+- **Connection and action handling:** fixes for navigation/session recovery, stale tool state, cancellation and approval boundaries, alongside companion diagnostics and scoped-file checks.
+
+**Validated:** the current automated suite reports **616 passed, 4 opt-in checks skipped, 0 failed**. This includes all **8 MCP server tests**, covering changed configuration, authenticated reconnection, concurrent requests and no replay of interrupted commands. Source integrity checks pass. Fresh launches through both the current entry point and the retired local launcher connected to the real browser and reported **26 page tools**.
+
+Real Chromium extension checks also verified the required debugger permission and panel state. X scrolling, reply composition and article draft workflows have automated browser-fixture coverage; the owner's live X page was used for reading and explicitly authorized replies during the preceding audit. This refresh does not claim live testing of every X media/article operation, every client or every website.
+
+**Updating:** reinstall the refreshed Windows ZIP and reload the matching unpacked extension. Restart an already-running MCP client connection once to load the new connector code. The Edge submission ZIP is refreshed here; replacing a GitHub asset does **not** update a package already submitted to Microsoft. Store approval and the submitted MSIX are unchanged.
+
 ## Downloads
 
 The extension now includes a compact footer with optional Buy Me a Coffee support and the official GitHub project link. Both open in a separate tab; no payment form, tracking script, new permission or paid feature is added. The Windows companion MSIX already submitted to Microsoft is unchanged by this UI update. The ZIP edition includes the updated extension and documentation.
@@ -41,9 +56,9 @@ Use the release **Assets**, not GitHub's Source code archives. See the [installa
 
 The prior full automated suite passed **575 tests**, with **two opt-in tests skipped** and zero failures. The native WebMCP check used the real browser API on an isolated localhost page; it does not certify the full native extension-to-MCP pipeline or default Edge availability. The footer update passed **18 side-panel tests and 2 build tests**, plus an isolated Chromium render at 320, 400 and 760 CSS pixels, keyboard focus and separate-tab/no-opener/no-referrer checks. External destinations were intercepted for navigation tests; no payment was made.
 
-The recorded Windows demo supplies real website/X read and reply-draft evidence. **No live X post, reply, like, repost or quote was submitted.** Automated mutation coverage remains fixture-based.
+The recorded Windows demo supplies real website/X read and reply-draft evidence and did not submit a live X action. The later audit also exercised explicitly authorized replies on the owner's live X page, as recorded in the dated update above. Broader mutation coverage remains fixture-based.
 
-- Clean-install native site-access and optional-debugger grant/decline dialogs still need manual testing.
+- Clean-install native site-access dialogs and installation/re-enablement with the required debugger permission still need manual testing.
 - Claude Code is installed but signed out on the validation machine; LM Studio is not installed. Their documented setup paths are not end-to-end certified.
 - The downloadable Windows launcher is **unsigned**. The selected free signing route is Microsoft Store distribution of an MSIX after certification; that does not sign the independent ZIP/EXE. No self-signed certificate is installed or treated as publicly trusted. Checksums are not a publisher signature. Do not disable security protections.
 - Edge Add-ons privacy declarations and listing materials have been submitted. Microsoft's **Edge review** and **Windows Store certification** are still pending. After approval, installation from each store and the official download links still need verification. Chrome uses manual ZIP installation.

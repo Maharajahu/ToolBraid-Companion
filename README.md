@@ -55,7 +55,13 @@ Optional quiet monitoring watches one dedicated notifications/conversation tab w
 | Work through a form on a site you allow | Field inspection, filling and browser actions, including submission. |
 | Work with selected local files or a Windows application | Companion file tools and desktop accessibility controls. Availability depends on the application and granted access. |
 
-These are example workflows, not a promise that every website or application is supported. Packaged X actions include Post, Reply, Like, Repost and Quote; automated checks use an **offline X fixture**, not a certified live account.
+These are example workflows, not a promise that every website or application is supported. Packaged X actions include Post, Reply, Like, Repost, Quote, scrolling, media controls and article draft editing. Automated coverage uses **offline X fixtures**; reading and explicitly authorized replies were also exercised on the owner's real X page. This is not certification of every X operation.
+
+## Latest update — 13 September 2026
+
+**Version unchanged: 0.3.1 / RC1.** Refreshed Windows, extension and Edge submission packages include MCP reconnection fixes, corrected advanced-tool permissions, X scrolling/composer recovery and action/session fixes.
+
+**Validated:** 616 automated checks passed, 4 opt-in checks skipped, 0 failed; all 8 MCP server tests passed. Fresh current and retired-launcher checks connected to the live browser with 26 page tools. See the [dated update and validation boundaries](RELEASE-NOTES.md#fixes-and-validation--13-september-2026) and use the refreshed [checksums](SHA256SUMS.txt).
 
 ## Watch the real Windows demo
 
