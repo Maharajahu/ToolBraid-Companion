@@ -49,7 +49,7 @@ async function desktopTest(action, imageName) {
 }
 const screenshot = (name) => desktopTest('capture', name);
 async function click(window, name) {
-  const control = (await uia.listControls(window)).find(item => item.name === name && item.controlType === 'ControlType.Button');
+  const control = (await uia.listControls(window)).find(item => item.name === name && item.controlType === 'ControlType.Button' && item.enabled);
   assert.ok(control?.enabled, `Enabled native button not found: ${name}`);
   await uia.invoke(control);
 }
@@ -61,8 +61,7 @@ async function checkDialog(expected, name) {
   });
   await save(`${name}.txt`, text);
   await screenshot(`${name}.png`);
-  const dialog = (await uia.listWindows()).find(window => window.name === 'ToolBraid connection check');
-  await click(dialog, 'Close');
+  await click(app, 'Close');
   return text;
 }
 async function startClient() {

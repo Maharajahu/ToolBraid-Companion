@@ -26,9 +26,7 @@ switch ($Action) {
   'prepare' {
     # Complete only the known first-login privacy page in this disposable image.
     for ($step = 0; $step -lt 6; $step++) {
-      $account = Window 'Microsoft account'
-      if (-not $account) { break }
-      $privacy = Named $account 'Choose privacy settings for your device'
+      $privacy = Named $desktop 'Choose privacy settings for your device'
       if (-not $privacy) { break }
       foreach ($control in $privacy.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)) {
         $toggle = $null
@@ -36,7 +34,7 @@ switch ($Action) {
             $toggle.Current.ToggleState -eq [System.Windows.Automation.ToggleState]::On) { $toggle.Toggle() }
       }
       $condition = New-Object System.Windows.Automation.PropertyCondition -ArgumentList @([System.Windows.Automation.AutomationElement]::AutomationIdProperty, 'OobeSettingsAcceptButton')
-      $next = $account.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+      $next = $privacy.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
       if (-not $next) { throw 'Unknown runner privacy page.' }
       $next.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
       Start-Sleep -Milliseconds 500
@@ -48,14 +46,19 @@ switch ($Action) {
     @{ launched = $true } | ConvertTo-Json -Compress
   }
   'diagnostic' {
-    $window = Window 'ToolBraid connection check'
+    $window = Named (Window 'ToolBraid Companion') 'ToolBraid connection check'
     if (-not $window) { throw 'Connection check dialog is not open.' }
     $control = Named $window 'Connection check results'
-    $value = $control.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).Current.Value
+    $value = $control.GetCurrentPattern([System.Windows.Automation.TextPattern]::Pattern).DocumentRange.GetText(-1)
     @{ text = $value } | ConvertTo-Json -Compress
   }
   'capture' {
     if ($ImageName -notmatch '^[a-zA-Z0-9-]+\.png$') { throw 'Invalid screenshot filename.' }
+    $companion = Window 'ToolBraid Companion'
+    if ($companion) {
+      $dialog = Named $companion 'ToolBraid connection check'
+      if ($dialog) { $dialog.SetFocus() } else { $companion.SetFocus() }
+    }
     Add-Type -AssemblyName System.Windows.Forms
     Add-Type -AssemblyName System.Drawing
     $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
