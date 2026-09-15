@@ -69,21 +69,27 @@ try {
   $driverPath = @('C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe', 'C:\Program Files\Windows Application Driver\WinAppDriver.exe') |
     Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
   if (-not $driverPath) { throw 'The runner is missing Microsoft WinAppDriver.' }
-  $driver = Start-Process -FilePath $driverPath -ArgumentList '4723' -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $env:RUNNER_TEMP 'toolbraid-winappdriver.log') -RedirectStandardError (Join-Path $env:RUNNER_TEMP 'toolbraid-winappdriver-error.log')
+  # Keep stdin open: WinAppDriver exits immediately when CI supplies stdin EOF.
+  $driver = [Diagnostics.Process]::new()
+  $driver.StartInfo = [Diagnostics.ProcessStartInfo]@{ FileName = $driverPath; Arguments = '4723';
+    UseShellExecute = $false; CreateNoWindow = $true; WindowStyle = 'Hidden';
+    RedirectStandardInput = $true; RedirectStandardOutput = $true; RedirectStandardError = $true }
+  [void]$driver.Start()
+  $driverOutput = $driver.StandardOutput.ReadToEndAsync()
+  $driverError = $driver.StandardError.ReadToEndAsync()
   $env:E2E_PLAYWRIGHT_MODULE = Join-Path $env:RUNNER_TEMP 'toolbraid-test-deps\node_modules\playwright-core'
   $env:TOOLBRAID_INSTALLED_ROOT = $installed.InstallLocation
   $env:TOOLBRAID_E2E_EVIDENCE = $evidence
   node (Join-Path $PSScriptRoot 'e2e-store-installed.mjs')
   if ($LASTEXITCODE -ne 0) { throw 'Installed user-flow verification failed. See evidence.' }
 } finally {
-  foreach ($log in @('toolbraid-winappdriver.log', 'toolbraid-winappdriver-error.log')) {
-    $logPath = Join-Path $env:RUNNER_TEMP $log
-    if (Test-Path -LiteralPath $logPath) {
-      Get-Content -LiteralPath $logPath -Tail 30 | Write-Output
-      Copy-Item -LiteralPath $logPath -Destination (Join-Path $evidence $log)
-    }
+  if ($driver) {
+    if (-not $driver.HasExited) { $driver.StandardInput.Close(); if (-not $driver.WaitForExit(3000)) { $driver.Kill(); $driver.WaitForExit() } }
+    $driverOutput.Result | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver.log') -Encoding UTF8
+    $driverError.Result | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver-error.log') -Encoding UTF8
+    ($driverOutput.Result -split "`n" | Select-Object -Last 15) | Write-Output
+    $driverError.Result | Write-Output
   }
-  if ($driver -and -not $driver.HasExited) { Stop-Process -Id $driver.Id }
   if ($installed) {
     Remove-AppxPackage -Package $installed.PackageFullName
     [ordered]@{ packageRemoved = -not [bool](Get-AppxPackage -Name $identity) } | ConvertTo-Json |
