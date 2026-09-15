@@ -9,8 +9,15 @@ permissions:
 
 jobs:
   installed-flow:
+    name: Installed flow (${{ matrix.browser }})
     runs-on: windows-11-arm
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [msedge, chrome]
+    env:
+      TOOLBRAID_E2E_BROWSER: ${{ matrix.browser }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -28,7 +35,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: store-installed-evidence
+          name: store-installed-evidence-${{ matrix.browser }}
           path: dist/store-e2e-evidence/
           retention-days: 7
           if-no-files-found: warn

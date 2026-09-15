@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawn, spawnSync, execFile } from 'node:child_process';
@@ -18,6 +19,9 @@ const root = path.resolve(import.meta.dirname, '..');
 const evidence = process.env.TOOLBRAID_E2E_EVIDENCE;
 const installedRoot = process.env.TOOLBRAID_INSTALLED_ROOT;
 const extension = path.join(root, 'dist/release-0.3.1/companion/extension');
+const browserName = process.env.TOOLBRAID_E2E_BROWSER ?? 'msedge';
+assert.ok(['msedge', 'chrome'].includes(browserName));
+const browserWindowTitle = browserName === 'msedge' ? 'Microsoft Edge' : 'Google Chrome';
 const manifest = JSON.parse(await readFile(path.join(extension, 'manifest.json'), 'utf8'));
 assert.equal(manifest.host_permissions, undefined, 'Use the unchanged production permissions.');
 const dataRoot = path.join(process.env.LOCALAPPDATA, 'ToolBraid/store');
@@ -98,8 +102,8 @@ async function enableSite(worker, origin) {
     const granted = await worker.evaluate((expected) => chrome.permissions.contains({ origins: [`${expected}/*`] }), origin);
     if (granted && await panel.evaluate(() => document.querySelector('#access-status')?.textContent === 'Enabled')) return true;
     if (!promptClicked) {
-      const chromeWindow = (await uia.listWindows()).find(window => window.name.includes('Google Chrome'));
-      const allow = chromeWindow && (await uia.listControls(chromeWindow)).find(control => control.name === 'Allow' && control.supportsInvoke);
+      const browserWindow = (await uia.listWindows()).find(window => window.name.includes(browserWindowTitle));
+      const allow = browserWindow && (await uia.listControls(browserWindow)).find(control => control.name === 'Allow' && control.supportsInvoke);
       if (allow) { await uia.invoke(allow); promptClicked = true; }
     }
     return false;
@@ -126,7 +130,10 @@ try {
 
   phase = 'browser-first-run';
   const playwright = resolvePlaywright();
-  const executablePath = resolveChromePath();
+  const executablePath = browserName === 'msedge'
+    ? ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(existsSync)
+    : resolveChromePath();
+  assert.ok(executablePath, `${browserWindowTitle} is not installed on the test runner.`);
   const profile = await mkdtemp(path.join(os.tmpdir(), 'toolbraid-installed-'));
   const launch = async () => {
     context = await playwright.chromium.launchPersistentContext(profile, { executablePath, headless: false,
@@ -166,7 +173,7 @@ try {
   assert.match(JSON.stringify(read), /Example Domain/);
   await panel.captureScreenshot(path.join(evidence, '03-enabled-extension.png'));
   await checkDialog('Selected page — READY', '04-connected-diagnostic');
-  record('real-site-read-through-installed-mcp-alias', { page: 'https://example.org/', textVerified: 'Example Domain' });
+  record('real-site-read-through-installed-mcp-alias', { browser: browserName, version: context.browser().version(), page: 'https://example.org/', textVerified: 'Example Domain' });
 
   phase = 'browser-restart';
   await panel.close(); await context.close(); context = null;
@@ -211,12 +218,12 @@ try {
   await save('failure.json', { phase, error: error.message, stack: error.stack });
   await screenshot('failure-desktop.png').catch(() => {});
   const windows = await uia.listWindows().catch(() => []);
-  await save('failure-ui.json', { windows, controls: await Promise.all(windows.filter(window => /ToolBraid|Google Chrome/.test(window.name)).map(async window => ({ name: window.name, controls: await uia.listControls(window).catch(() => []) }))) });
+  await save('failure-ui.json', { windows, controls: await Promise.all(windows.filter(window => /ToolBraid|Google Chrome|Microsoft Edge/.test(window.name)).map(async window => ({ name: window.name, controls: await uia.listControls(window).catch(() => []) }))) });
   throw error;
 } finally {
   await client?.close().catch(() => {});
   await context?.close().catch(() => {});
   await fixture.close();
-  await save('result.json', { passed, phase, results, storeSigned: false, microsoftSubmitted: false,
-    optionalAiAccountNotTested: true, browserHarness: 'headed system Chrome, unpacked production ZIP; no host pregrant or manifest edits' });
+  await save('result.json', { passed, phase, results, browser: browserName, storeSigned: false, microsoftSubmitted: false,
+    optionalAiAccountNotTested: true, browserHarness: 'headed system browser, stable-ID public unpacked ZIP; no host pregrant or manifest edits; Edge Add-ons delivery not tested' });
 }
