@@ -25,6 +25,31 @@ $environment | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $evidence 'e
 Write-Output ($environment | ConvertTo-Json -Compress)
 & (Join-Path $PSScriptRoot 'build-release.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
+$release = Join-Path $projectRoot 'dist\release-0.3.1'
+$extensionRoot = Join-Path $release 'companion\extension'
+$edgeZip = Join-Path $release 'ToolBraid-0.3.1-edge-extension.zip'
+$edgeArchive = [System.IO.Compression.ZipFile]::OpenRead($edgeZip)
+try {
+  $entries = @($edgeArchive.Entries | Where-Object { $_.Name })
+  if ($entries.Count -ne @(Get-ChildItem -LiteralPath $extensionRoot -File -Recurse).Count) { throw 'Edge ZIP file list differs from the tested extension.' }
+  foreach ($entry in $entries) {
+    $stream = $entry.Open()
+    try {
+      $source = Join-Path $extensionRoot $entry.FullName
+      if ($entry.FullName -eq 'manifest.json') {
+        $reader = [IO.StreamReader]::new($stream)
+        $edgeManifest = $reader.ReadToEnd() | ConvertFrom-Json
+        $publicManifest = Get-Content -LiteralPath $source -Raw | ConvertFrom-Json
+        $publicManifest.PSObject.Properties.Remove('key')
+        if (($edgeManifest | ConvertTo-Json -Depth 30 -Compress) -ne ($publicManifest | ConvertTo-Json -Depth 30 -Compress)) { throw 'Unexpected Edge manifest difference.' }
+      } elseif ((Get-FileHash -InputStream $stream -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash) {
+        throw "Edge ZIP code differs from tested extension: $($entry.FullName)"
+      }
+    } finally { $stream.Dispose() }
+  }
+  @{ filesMatched = $entries.Count; onlyManifestDifference = 'Store ZIP omits the public unpacked key'; edgeZipSha256 = (Get-FileHash -LiteralPath $edgeZip -Algorithm SHA256).Hash } |
+    ConvertTo-Json | Set-Content -LiteralPath (Join-Path $evidence 'edge-extension-equivalence.json') -Encoding UTF8
+} finally { $edgeArchive.Dispose() }
 $sdk = Get-ChildItem -LiteralPath 'C:\Program Files (x86)\Windows Kits\10\bin' -Directory |
   Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'x64\makeappx.exe') } |
   Sort-Object Name -Descending | Select-Object -First 1
@@ -69,6 +94,7 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'Installed user-flow verification failed. See evidence.' }
   # Preserve the unsigned candidate whose exact payload passed. Never export the private test key.
   Copy-Item -LiteralPath $unsigned -Destination (Join-Path $evidence 'ToolBraid-0.3.1.0-unsigned-tested.msix')
+  Copy-Item -LiteralPath $edgeZip -Destination $evidence
 } finally {
   if ($installed) {
     Remove-AppxPackage -Package $installed.PackageFullName

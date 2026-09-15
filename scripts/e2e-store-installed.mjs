@@ -103,7 +103,7 @@ async function enableSite(worker, origin) {
     const granted = await worker.evaluate((expected) => chrome.permissions.contains({ origins: [`${expected}/*`] }), origin);
     if (granted && await panel.evaluate(() => document.querySelector('#access-status')?.textContent === 'Enabled')) return true;
     if (!promptClicked) {
-      const browserWindow = (await uia.listWindows()).find(window => window.name.includes(browserWindowTitle));
+      const browserWindow = (await uia.listWindows()).find(window => window.name.replace(/\p{Cf}/gu, '').includes(browserWindowTitle));
       const allow = browserWindow && (await uia.listControls(browserWindow)).find(control => control.name === 'Allow' && control.supportsInvoke);
       if (allow) { await uia.invoke(allow); promptClicked = true; }
     }
@@ -210,7 +210,7 @@ try {
   await panel.close(); await context.close(); context = null;
   await client.close(); client = null;
   await click(app, 'Disconnect browsers');
-  const registrations = spawnSync(powershell, ['-NoProfile', '-Command', "@('Google\\Chrome','Microsoft\\Edge') | ForEach-Object { Test-Path -LiteralPath \"HKCU:\\Software\\$_\\NativeMessagingHosts\\com.toolbraid.bridge\" }"], { encoding: 'utf8', windowsHide: true });
+  const registrations = spawnSync(powershell, ['-NoProfile', '-Command', "@('Google\\Chrome','Microsoft\\Edge') | ForEach-Object { $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey(\"Software\\$_\\NativeMessagingHosts\\com.toolbraid.bridge\"); try { [bool]($key -and $key.GetValue('')) } finally { if ($key) { $key.Dispose() } } }"], { encoding: 'utf8', windowsHide: true });
   assert.equal(registrations.status, 0);
   assert.doesNotMatch(registrations.stdout, /True/);
   record('disconnect-restores-browser-registration');
@@ -225,7 +225,7 @@ try {
   }
   await screenshot('failure-desktop.png').catch(() => {});
   const windows = await uia.listWindows().catch(() => []);
-  await save('failure-ui.json', { windows, controls: await Promise.all(windows.filter(window => /ToolBraid|Google Chrome|Microsoft Edge/.test(window.name)).map(async window => ({ name: window.name, controls: await uia.listControls(window).catch(() => []) }))) });
+  await save('failure-ui.json', { windows, controls: await Promise.all(windows.filter(window => /ToolBraid|Chrome|Edge/.test(window.name)).map(async window => ({ name: window.name, controls: await uia.listControls(window).catch(() => []) }))) });
   throw error;
 } finally {
   await client?.close().catch(() => {});
