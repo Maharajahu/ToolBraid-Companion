@@ -116,7 +116,15 @@ async function enableSite(worker) {
 try {
   await until('Windows Application Driver', () => wd('/status'));
   desktop = await session({ app: 'Root' });
-  app = await session({ app: 'Maharajahu.ToolBraidCompanion_f24v1p0f17va4!Companion' });
+  try {
+    app = await session({ app: 'Maharajahu.ToolBraidCompanion_f24v1p0f17va4!Companion', 'ms:waitForAppLaunch': '10' });
+  } catch (error) {
+    // WinAppDriver may miss the initial window even though packaged activation succeeded.
+    const window = await until('activated Companion window', () => element(desktop, '//Window[@Name="ToolBraid Companion"]', 'xpath'));
+    const handle = (await wd(`/session/${desktop}/element/${window}/attribute/NativeWindowHandle`)).value;
+    assert.ok(Number(handle) > 0, error.message);
+    app = await session({ appTopLevelWindow: Number(handle).toString(16) });
+  }
   const connect = await element(app, 'Connect browsers');
   assert.equal((await wd(`/session/${app}/element/${connect}/enabled`)).value, true, 'Packaged identity must enable Connect browsers.');
   await screenshot(app, '01-installed-companion.png');
