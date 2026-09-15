@@ -95,7 +95,8 @@ async function startClient() {
   return { request, async close() { child.stdin.end(); await Promise.race([new Promise(resolve => child.once('exit', resolve)), delay(3000)]); if (child.exitCode === null) child.kill(); lines.close(); } };
 }
 async function enableSite(worker, origin) {
-  await until('selected site in the panel', () => panel.evaluate((expected) => document.querySelector('#access-site')?.textContent === expected, origin));
+  await until('selected site and ready connection button', () => panel.evaluate((expected) =>
+    document.querySelector('#access-site')?.textContent === expected && document.querySelector('#access-enable')?.disabled === false, origin));
   await panel.clickSelector('#access-enable');
   let promptClicked = false;
   await until('browser site permission and public enablement', async () => {
@@ -179,7 +180,7 @@ try {
   await panel.close(); await context.close(); context = null;
   ({ worker, page, tabId } = await launch());
   await until('persisted enabled preference', async () => (await access()).state === 'Enabled');
-  await panel.clickSelector('#access-enable');
+  await enableSite(worker, 'https://example.org');
   await until('connection after browser restart', async () => (await status()).page?.tabId === tabId);
   record('browser-restart');
 
@@ -216,6 +217,12 @@ try {
   passed = true;
 } catch (error) {
   await save('failure.json', { phase, error: error.message, stack: error.stack });
+  if (panel) {
+    await panel.captureScreenshot(path.join(evidence, 'failure-extension.png')).catch(() => {});
+    await save('failure-panel-state.json', await panel.evaluate(() => ({ state: document.querySelector('#access-status')?.textContent,
+      site: document.querySelector('#access-site')?.textContent, disabled: document.querySelector('#access-enable')?.disabled,
+      toast: document.querySelector('#toast')?.textContent })).catch(() => null));
+  }
   await screenshot('failure-desktop.png').catch(() => {});
   const windows = await uia.listWindows().catch(() => []);
   await save('failure-ui.json', { windows, controls: await Promise.all(windows.filter(window => /ToolBraid|Google Chrome|Microsoft Edge/.test(window.name)).map(async window => ({ name: window.name, controls: await uia.listControls(window).catch(() => []) }))) });
