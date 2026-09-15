@@ -18,6 +18,7 @@
           </div>
         </div>
         <div class="topbar-actions">
+          <button id="access-setup" class="button setup-button" type="button" aria-controls="public-access-panel" hidden>Finish setup</button>
           <span id="connection-badge" class="status-badge status-pending" role="status">Connecting</span>
           <button id="refresh-button" class="icon-button" type="button" aria-label="Refresh page state" title="Refresh page state">↻</button>
         </div>
@@ -35,15 +36,17 @@
           <p class="policy-note">Page content and tool results go to your chosen AI client and its model provider. Control stays enabled across browser restarts until you pause it. Pause blocks new commands; it cannot undo actions already dispatched.</p>
           <label id="access-consent-label" class="access-consent" for="access-consent"><input id="access-consent" type="checkbox">I understand and allow this direct AI control.</label>
           <p id="access-site" class="origin-value">Open an HTTP(S) page to connect.</p>
+          <p id="access-help" class="policy-note" role="status">Open a normal website, review the disclosure, then tick the checkbox to enable this site.</p>
           <div class="access-actions">
-            <button id="access-enable" class="button button-primary" type="button" disabled>Enable on this site</button>
+            <button id="access-enable" class="button button-primary" type="button" aria-describedby="access-help" disabled>Enable on this site</button>
             <button id="access-pause" class="button button-danger" type="button" hidden>Pause control</button>
           </div>
           <details class="access-advanced"><summary>Advanced browser tools</summary><p class="policy-note">File attachment, accessibility inspection and precise visual clicks use the debugger permission granted when you install or re-enable ToolBraid. Basic page tools do not use it. AI control and site access still apply.</p><span id="access-debugger" class="status-badge status-pending" role="status">Checking permission</span></details>
           <p class="policy-note"><a href="privacy.html" target="_blank" rel="noopener">Data handling and retention</a></p>
         </section>
         <section class="panel assistant-panel" aria-labelledby="assistant-heading">
-          <div class="section-heading"><div><p class="eyebrow">BUILD WITHOUT LOSING FOCUS</p><h2 id="assistant-heading">Your browser agent</h2></div><span class="mode-pill">ChatGPT account</span></div>
+          <div class="section-heading"><div><p class="eyebrow">OPTIONAL CHAT</p><h2 id="assistant-heading">Your browser agent</h2></div><span class="mode-pill">ChatGPT account</span></div>
+          <p class="policy-note">You can use ToolBraid from your existing MCP client instead. ChatGPT sign-in is not required to connect a page or check the companion connection.</p>
           <p class="policy-note">Chat through Codex using your ChatGPT account and its Codex limits. No API key or separate API billing. Requires the Windows companion and Codex signed in on this PC.</p>
           <details id="assistant-settings" open>
             <summary>Connection &amp; model</summary>

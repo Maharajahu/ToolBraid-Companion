@@ -27,7 +27,7 @@ internal sealed class StoreApp : Form
         Text = "ToolBraid Companion";
         Font = new Font("Segoe UI", 10);
         AutoScaleMode = AutoScaleMode.Dpi;
-        ClientSize = new Size(660, 590);
+        ClientSize = new Size(660, 720);
         MinimumSize = new Size(580, 580);
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = SystemColors.Window;
@@ -37,7 +37,7 @@ internal sealed class StoreApp : Form
         Controls.Add(layout);
         layout.Controls.Add(new Label { Text = "ToolBraid Companion", AutoSize = true, Font = new Font(Font.FontFamily, 23, FontStyle.Bold), Margin = new Padding(0, 0, 0, 12) });
         layout.Controls.Add(Paragraph("Your browser. Your AI. Connected locally.", 32));
-        layout.Controls.Add(Paragraph("Connect the public ToolBraid extension in Edge and Chrome to this Windows companion. Install the extension separately, then enable only the sites you choose. Browser control starts paused.", 78));
+        layout.Controls.Add(Paragraph("Finish setup in both the companion and your browser:\r\n\r\n1. Install the public ToolBraid extension separately.\r\n2. Select Connect browsers below. This registers the companion; it does not enable browser access.\r\n3. Open the test page and open the ToolBraid extension on that tab. Review the disclosure, tick the consent checkbox and select Enable on this site. Approve site access if asked.\r\n4. Keep the tab open and select Check connection here. No AI sign-in is required for this check.", 192));
         bool packaged = HasPackageIdentity();
         bool preview = (bool)settings["preview"];
         status = Paragraph(preview ? "Local validation build — not submitted or Store-signed." : packaged ? "Ready to configure the Store companion." : "Install this companion through Microsoft Store before connecting.", 56);
@@ -47,7 +47,7 @@ internal sealed class StoreApp : Form
         var actions = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true, Margin = new Padding(0, 8, 0, 8) };
         connect = ActionButton("&Connect browsers", actions, delegate {
             connection.Connect((string)settings["edgeExtensionId"], (string)settings["chromeExtensionId"]);
-            status.Text = "Browsers registered. Open the ToolBraid extension on a permitted site to establish the live connection.";
+            status.Text = "Companion registered. Next: open the test page, open ToolBraid and finish the browser permission step. Control stays paused until you enable it.";
             RefreshActions();
         });
         disconnect = ActionButton("&Disconnect browsers", actions, delegate {
@@ -56,6 +56,7 @@ internal sealed class StoreApp : Form
             RefreshActions();
         });
         connect.Enabled = packaged && !preview;
+        ActionButton("Open &test page", actions, delegate { Open("https://example.org/"); });
         ActionButton("Check co&nnection", actions, delegate { CheckConnection(packaged && !preview); });
         layout.Controls.Add(actions);
         var links = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, WrapContents = true, Margin = new Padding(0) };
@@ -105,11 +106,17 @@ internal sealed class StoreApp : Form
             var results = new TextBox { Dock = DockStyle.Fill, Multiline = true, ReadOnly = true, WordWrap = true,
                 ScrollBars = ScrollBars.Vertical, AccessibleName = "Connection check results", BackColor = SystemColors.Window,
                 Text = "Checking local configuration and MCP. No browser actions or model requests are sent..." };
-            var close = new Button { Text = "&Close", Dock = DockStyle.Bottom, Height = 42, DialogResult = DialogResult.Cancel };
+            var buttons = new FlowLayoutPanel { Dock = DockStyle.Bottom, AutoSize = true, WrapContents = true };
+            var retry = new Button { Text = "Check &again", AutoSize = true, MinimumSize = new Size(150, 42), Enabled = false };
+            var close = new Button { Text = "&Close", AutoSize = true, MinimumSize = new Size(150, 42), DialogResult = DialogResult.Cancel };
+            buttons.Controls.Add(retry);
+            buttons.Controls.Add(close);
             dialog.Controls.Add(results);
-            dialog.Controls.Add(close);
+            dialog.Controls.Add(buttons);
             dialog.CancelButton = close;
-            dialog.Shown += async delegate {
+            Func<Task> runCheck = async delegate {
+                retry.Enabled = false;
+                results.Text = "Checking local configuration and MCP. No browser actions or model requests are sent...";
                 string report;
                 try {
                     report = installed ? await Task.Run(() => RunConnectionCheck())
@@ -117,8 +124,10 @@ internal sealed class StoreApp : Form
                 } catch {
                     report = "CHECK UNAVAILABLE\r\n\r\nThe connection check could not finish. Reopen the Store companion and try again. No settings were changed.";
                 }
-                if (!results.IsDisposed) { results.Text = report; results.Select(0, 0); results.Focus(); }
+                if (!results.IsDisposed) { results.Text = report; results.Select(0, 0); results.Focus(); retry.Enabled = installed; }
             };
+            dialog.Shown += async delegate { await runCheck(); };
+            retry.Click += async delegate { await runCheck(); };
             dialog.ShowDialog(this);
         }
     }

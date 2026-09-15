@@ -1,0 +1,34 @@
+name: Store package end-to-end verification
+
+on:
+  push:
+    branches: ['test/store-e2e-*']
+
+permissions:
+  contents: read
+
+jobs:
+  installed-flow:
+    runs-on: windows-11-arm
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Install isolated browser-test dependency
+        shell: powershell
+        run: npm install --prefix "$env:RUNNER_TEMP\toolbraid-test-deps" --no-save --ignore-scripts playwright-core@1.58.2
+      - name: Install the real package and exercise the public first-run flow
+        shell: powershell
+        run: ./scripts/test-store-installed.ps1
+      - name: Preserve verification evidence, not profiles or signing keys
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: store-installed-evidence
+          path: dist/store-e2e-evidence/
+          retention-days: 7
+          if-no-files-found: warn

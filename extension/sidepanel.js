@@ -1922,7 +1922,7 @@ export function createSidepanelApp({
   let publicAccess = { enabled: !PUBLIC_RELEASE };
   let debuggerGranted = false;
   let accessTab = null;
-  const accessRefs = Object.fromEntries(['panel', 'status', 'consent', 'consent-label', 'site', 'enable', 'pause', 'debugger'].map((name) => [name, documentRef.getElementById(name === 'panel' ? 'public-access-panel' : `access-${name}`)]));
+  const accessRefs = Object.fromEntries(['panel', 'status', 'consent', 'consent-label', 'site', 'help', 'setup', 'enable', 'pause', 'debugger'].map((name) => [name, documentRef.getElementById(name === 'panel' ? 'public-access-panel' : `access-${name}`)]));
   const refs = {
     connection: documentRef.getElementById('connection-badge'),
     refresh: documentRef.getElementById('refresh-button'),
@@ -2198,6 +2198,12 @@ export function createSidepanelApp({
     accessRefs.enable.textContent = publicAccess.enabled ? 'Connect this site' : 'Enable on this site';
     accessRefs.enable.disabled = !accessTab || (!publicAccess.enabled && !accessRefs.consent.checked);
     accessRefs.site.textContent = accessTab?.origin ?? 'Open an HTTP(S) page to connect.';
+    if (accessRefs.setup) accessRefs.setup.hidden = publicAccess.enabled;
+    if (accessRefs.help) accessRefs.help.textContent = !accessTab
+      ? 'Open a normal website, such as https://example.org/, then reopen ToolBraid on that tab. Browser settings and new-tab pages cannot be connected.'
+      : !publicAccess.enabled && !accessRefs.consent.checked
+        ? 'Control is paused. Read the disclosure and tick the checkbox above to unlock Enable on this site.'
+        : 'Select ' + (publicAccess.enabled ? 'Connect this site' : 'Enable on this site') + ', then approve access to this site if your browser asks. You can then run Check connection in the companion. No AI sign-in is needed for this check.';
     accessRefs.debugger.textContent = debuggerGranted
       ? (publicAccess.enabled ? 'Enabled' : 'Paused')
       : 'Unavailable — update or re-enable the extension';
@@ -2207,9 +2213,9 @@ export function createSidepanelApp({
       refs.connection.className = 'status-badge status-pending';
       refs.ownerModeBadge.textContent = 'Paused';
       refs.ownerModeBadge.className = 'status-badge status-pending';
-      refs.ownerModeSummary.textContent = 'New AI commands are blocked. Enable control above to connect.';
+      refs.ownerModeSummary.textContent = 'New AI commands are blocked. Choose Finish setup at the top, review the disclosure, then enable the selected site.';
       refs.workflowNow.textContent = 'AI control paused';
-      refs.workflowNext.textContent = 'Review access above';
+      refs.workflowNext.textContent = 'Choose Finish setup';
       refs.workflowRequired.textContent = 'Your permission';
     }
     if (refs.missionStart) refs.missionStart.disabled = !publicAccess.enabled;
@@ -2232,6 +2238,11 @@ export function createSidepanelApp({
     return publicAccess.enabled;
   }
 
+  accessRefs.setup?.addEventListener('click', (event) => {
+    if (!PUBLIC_RELEASE || !trustedEvent(event)) return;
+    accessRefs.panel.scrollIntoView({ block: 'start' });
+    accessRefs.consent.focus({ preventScroll: true });
+  });
   accessRefs.consent?.addEventListener('change', renderAccess);
   accessRefs.enable?.addEventListener('click', async (event) => {
     if (!PUBLIC_RELEASE || !trustedEvent(event) || !accessTab || (!publicAccess.enabled && !accessRefs.consent.checked)) return;

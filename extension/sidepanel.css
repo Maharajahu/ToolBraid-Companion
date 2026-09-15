@@ -217,7 +217,10 @@ p { margin-top: 0; }
 h1 { margin-bottom: 0; font-size: 17px; font-weight: 680; letter-spacing: -0.025em; line-height: 1.2; }
 h2 { margin-bottom: 0; font-size: 15px; font-weight: 680; letter-spacing: -0.015em; line-height: 1.25; }
 
-.topbar-actions { flex: 0 0 auto; gap: 8px; }
+.topbar-actions { flex: 0 0 auto; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.topbar:has(.setup-button:not([hidden])) { flex-wrap: wrap; }
+.topbar .setup-button { min-height: 40px; color: var(--amber); }
+.access-panel { scroll-margin-top: 140px; }
 
 .status-badge,
 .mode-pill,

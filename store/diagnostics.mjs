@@ -122,7 +122,13 @@ export async function diagnose({ dataRoot, aliasRoot, edgeId, chromeId, register
   } else if (result.code === 'AUTH_REJECTED') {
     add('Extension', 'ACTION NEEDED', 'The local bridge rejected authentication. Close the old browser connection and reconnect the Store companion.');
   } else if (result.code === 'BROWSER_UNAVAILABLE') {
-    add('Extension', 'WAITING', 'Open the public extension and enable a site you choose. A paused or closed browser is not a working page connection.');
+    checks.unshift({ name: 'Extension', state: 'NOT CONNECTED', detail:
+      'Browser registration is not the same as enabling browser access. No live extension connection was found.\n\n'
+      + '1. Keep Chrome or Edge open on https://example.org/ (not a new tab or browser settings).\n'
+      + '2. Open the ToolBraid extension. If it says Paused, select Finish setup, read the disclosure and tick "I understand and allow this direct AI control."\n'
+      + '3. Select "Enable on this site" (or "Connect this site" if already enabled). Approve access to this site if the browser asks.\n'
+      + '4. Keep the test tab open, then select "Check again" here.\n\n'
+      + 'ChatGPT sign-in is not required for this check. If already enabled and still disconnected, verify that the matching public extension is installed and reopen it. No permissions were changed by this check.' });
   } else {
     add('Extension', 'NOT VERIFIED', result.code === 'TIMEOUT'
       ? 'The status request timed out. Reopen the extension and try again.'
