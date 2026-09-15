@@ -99,11 +99,13 @@ async function startClient() {
   child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })}\n`);
   return { request, async close() { child.stdin.end(); await Promise.race([new Promise(resolve => child.once('exit', resolve)), delay(3000)]); if (child.exitCode === null) child.kill(); lines.close(); } };
 }
-async function enableSite(worker) {
+async function enableSite(worker, origin) {
+  await until('selected site in the panel', () => panel.evaluate((expected) => document.querySelector('#access-site')?.textContent === expected, origin));
   await panel.clickSelector('#access-enable');
   let promptClicked = false;
   await until('browser site permission and public enablement', async () => {
-    if (await panel.evaluate(() => document.querySelector('#access-status')?.textContent === 'Enabled')) return true;
+    const granted = await worker.evaluate((expected) => chrome.permissions.contains({ origins: [`${expected}/*`] }), origin);
+    if (granted && await panel.evaluate(() => document.querySelector('#access-status')?.textContent === 'Enabled')) return true;
     if (!promptClicked) {
       const allow = await element(desktop, '//Window[contains(@Name,"Google Chrome")]//Button[@Name="Allow"]', 'xpath').catch(() => null);
       if (allow) { await wd(`/session/${desktop}/element/${allow}/click`, 'POST', {}); promptClicked = true; }
@@ -187,7 +189,7 @@ try {
   await panel.clickSelector('#access-setup');
   assert.equal((await access()).checked, false, 'Finish setup cannot grant consent.');
   await panel.clickSelector('#access-consent');
-  await enableSite(worker);
+  await enableSite(worker, 'https://example.org');
   await until('authenticated live example.org connection', async () => {
     const state = await status(); return state.connected && state.page?.url === 'https://example.org/' && state.page?.tabId === tabId;
   });
@@ -210,7 +212,7 @@ try {
   phase = 'real-form-action';
   await page.goto(`${fixture.origin}/form`);
   await page.bringToFront();
-  await enableSite(worker);
+  await enableSite(worker, fixture.origin);
   const form = await until('local form tool', async () => (await client.request('tools/list')).tools.find(tool =>
     tool._meta?.['toolbraid/classification'] === 'mutation' && Object.keys(tool.inputSchema?.properties ?? {}).some(key => /title/i.test(key)) &&
     Object.values(tool.inputSchema?.properties ?? {}).some(field => field?.type === 'boolean')));
