@@ -116,6 +116,21 @@ async function enableSite(worker) {
 try {
   await until('Windows Application Driver', () => wd('/status'));
   desktop = await session({ app: 'Root' });
+  // The hosted Windows 11 image can leave its first-login privacy page in front.
+  // Configure only that known page on this disposable runner; never sign into an account.
+  const privacyPath = '//Pane[@Name="Choose privacy settings for your device"]';
+  for (let step = 0; step < 6; step += 1) {
+    if (!await element(desktop, privacyPath, 'xpath').catch(() => null)) break;
+    const enabled = (await wd(`/session/${desktop}/elements`, 'POST', { using: 'xpath',
+      value: `${privacyPath}//Button[@ToggleState="On" and @IsOffscreen="False"]` })).value;
+    for (const control of enabled) {
+      const id = control.ELEMENT ?? control['element-6066-11e4-a52e-4f735466cecf'];
+      await wd(`/session/${desktop}/element/${id}/click`, 'POST', {});
+    }
+    await click(desktop, 'OobeSettingsAcceptButton', 'accessibility id');
+    await delay(500);
+  }
+  assert.equal(await element(desktop, privacyPath, 'xpath').catch(() => null), null, 'Runner privacy setup is still covering the desktop.');
   try {
     app = await session({ app: 'Maharajahu.ToolBraidCompanion_f24v1p0f17va4!Companion', 'ms:waitForAppLaunch': '10' });
   } catch (error) {

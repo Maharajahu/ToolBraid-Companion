@@ -82,12 +82,15 @@ try {
   $env:TOOLBRAID_E2E_EVIDENCE = $evidence
   node (Join-Path $PSScriptRoot 'e2e-store-installed.mjs')
   if ($LASTEXITCODE -ne 0) { throw 'Installed user-flow verification failed. See evidence.' }
+  # Preserve the unsigned candidate whose exact payload passed. Never export the private test key.
+  Copy-Item -LiteralPath $unsigned -Destination (Join-Path $evidence 'ToolBraid-0.3.1.0-unsigned-tested.msix')
 } finally {
   if ($driver) {
     if (-not $driver.HasExited) { $driver.StandardInput.Close(); if (-not $driver.WaitForExit(3000)) { $driver.Kill(); $driver.WaitForExit() } }
-    $driverOutput.Result | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver.log') -Encoding UTF8
+    $driverText = $driverOutput.Result.Replace([string][char]0, '')
+    $driverText | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver.log') -Encoding UTF8
     $driverError.Result | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver-error.log') -Encoding UTF8
-    ($driverOutput.Result -split "`n" | Select-Object -Last 15) | Write-Output
+    ($driverText -split "`n" | Select-Object -Last 15) | Write-Output
     $driverError.Result | Write-Output
   }
   if ($installed) {
