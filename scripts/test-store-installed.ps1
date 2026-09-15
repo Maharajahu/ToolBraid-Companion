@@ -39,7 +39,6 @@ $signed = Join-Path $env:RUNNER_TEMP 'ToolBraid-test-only.msix'
 Copy-Item -LiteralPath $unsigned -Destination $signed
 $certificate = $null
 $installed = $null
-$driver = $null
 try {
   $certificate = New-SelfSignedCertificate -Type Custom -KeyUsage DigitalSignature -Subject $publisher -CertStoreLocation 'Cert:\CurrentUser\My' -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}') -FriendlyName 'ToolBraid disposable CI test only'
   $publicCertificate = Join-Path $env:RUNNER_TEMP 'ToolBraid-test-only.cer'
@@ -63,20 +62,6 @@ try {
   [ordered]@{ installed = $true; family = $family; version = '0.3.1.0'; unsignedSha256 = (Get-FileHash -LiteralPath $unsigned -Algorithm SHA256).Hash.ToLowerInvariant(); payload = $files } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $evidence 'installation.json') -Encoding UTF8
   Write-Output "INSTALLED: $family, 0.3.1.0; $($files.Count) payload files verified."
-  # WinAppDriver requires Developer Mode on this throwaway machine, not on the owner's PC.
-  New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Force | Out-Null
-  New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' -Name 'AllowDevelopmentWithoutDevLicense' -Value 1 -PropertyType DWord -Force | Out-Null
-  $driverPath = @('C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe', 'C:\Program Files\Windows Application Driver\WinAppDriver.exe') |
-    Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-  if (-not $driverPath) { throw 'The runner is missing Microsoft WinAppDriver.' }
-  # Keep stdin open: WinAppDriver exits immediately when CI supplies stdin EOF.
-  $driver = [Diagnostics.Process]::new()
-  $driver.StartInfo = [Diagnostics.ProcessStartInfo]@{ FileName = $driverPath; Arguments = '4723';
-    UseShellExecute = $false; CreateNoWindow = $true; WindowStyle = 'Hidden';
-    RedirectStandardInput = $true; RedirectStandardOutput = $true; RedirectStandardError = $true }
-  [void]$driver.Start()
-  $driverOutput = $driver.StandardOutput.ReadToEndAsync()
-  $driverError = $driver.StandardError.ReadToEndAsync()
   $env:E2E_PLAYWRIGHT_MODULE = Join-Path $env:RUNNER_TEMP 'toolbraid-test-deps\node_modules\playwright-core'
   $env:TOOLBRAID_INSTALLED_ROOT = $installed.InstallLocation
   $env:TOOLBRAID_E2E_EVIDENCE = $evidence
@@ -85,14 +70,6 @@ try {
   # Preserve the unsigned candidate whose exact payload passed. Never export the private test key.
   Copy-Item -LiteralPath $unsigned -Destination (Join-Path $evidence 'ToolBraid-0.3.1.0-unsigned-tested.msix')
 } finally {
-  if ($driver) {
-    if (-not $driver.HasExited) { $driver.StandardInput.Close(); if (-not $driver.WaitForExit(3000)) { $driver.Kill(); $driver.WaitForExit() } }
-    $driverText = $driverOutput.Result.Replace([string][char]0, '')
-    $driverText | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver.log') -Encoding UTF8
-    $driverError.Result | Set-Content -LiteralPath (Join-Path $evidence 'winappdriver-error.log') -Encoding UTF8
-    ($driverText -split "`n" | Select-Object -Last 15) | Write-Output
-    $driverError.Result | Write-Output
-  }
   if ($installed) {
     Remove-AppxPackage -Package $installed.PackageFullName
     [ordered]@{ packageRemoved = -not [bool](Get-AppxPackage -Name $identity) } | ConvertTo-Json |

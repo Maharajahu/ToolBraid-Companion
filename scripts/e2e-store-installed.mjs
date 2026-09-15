@@ -2,11 +2,13 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn, spawnSync, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { createInterface } from 'node:readline';
 import { setTimeout as delay } from 'node:timers/promises';
 import { resolvePlaywright, resolveChromePath, waitForWorker, openTrustedSidePanel, fixtureFormArguments } from './e2e-universal-extension.mjs';
 import { startUniversalFixtureServer } from './serve-universal-fixtures.mjs';
+import { createPowerShellUiaAdapter } from '../bridge/windows-uia.mjs';
 
 assert.equal(process.env.GITHUB_ACTIONS, 'true');
 assert.equal(process.env.RUNNER_ENVIRONMENT, 'github-hosted');
@@ -22,7 +24,10 @@ const dataRoot = path.join(process.env.LOCALAPPDATA, 'ToolBraid/store');
 const aliasRoot = path.join(process.env.LOCALAPPDATA, 'Microsoft/WindowsApps');
 const fixture = await startUniversalFixtureServer({ port: 0 });
 const results = [];
-let app, desktop, context, panel, client;
+let app, context, panel, client;
+const powershell = path.join(process.env.WINDIR, 'System32/WindowsPowerShell/v1.0/powershell.exe');
+const uia = createPowerShellUiaAdapter({ powershell, timeoutMs: 30000 });
+const execFileAsync = promisify(execFile);
 let passed = false;
 let phase = 'packaged-app-activation';
 const save = (name, value) => writeFile(path.join(evidence, name), typeof value === 'string' ? value : JSON.stringify(value, null, 2));
@@ -36,48 +41,28 @@ async function until(label, predicate, timeout = 20000) {
   }
   throw new Error(`${label}: ${lastError?.message ?? 'timed out'}`);
 }
-async function wd(route, method = 'GET', body) {
-  const response = await fetch(`http://127.0.0.1:4723${route}`, { method,
-    headers: { 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(45000) });
-  const result = await response.json();
-  if (!response.ok || (result.status && result.status !== 0)) throw new Error(result.value?.message ?? JSON.stringify(result));
-  return result;
+async function desktopTest(action, imageName) {
+  const args = ['-NoProfile', '-NonInteractive', '-File', path.join(import.meta.dirname, 'store-e2e-desktop.ps1'), '-Action', action];
+  if (imageName) args.push('-ImageName', imageName);
+  const { stdout } = await execFileAsync(powershell, args, { windowsHide: true, timeout: 30000 });
+  return JSON.parse(stdout.trim());
 }
-async function session(capabilities) {
-  const result = await wd('/session', 'POST', { desiredCapabilities: { platformName: 'Windows', ...capabilities } });
-  return result.sessionId ?? result.value.sessionId;
-}
-async function element(sessionId, name, using = 'name') {
-  const result = await wd(`/session/${sessionId}/element`, 'POST', { using, value: name });
-  return result.value.ELEMENT ?? result.value['element-6066-11e4-a52e-4f735466cecf'];
-}
-async function focusCompanion() {
-  const handle = (await wd(`/session/${app}/window_handle`)).value;
-  await wd(`/session/${app}/window`, 'POST', { name: handle });
-  await until('Companion keyboard focus', async () =>
-    (await wd(`/session/${app}/source`)).value.includes('HasKeyboardFocus="True"'));
-}
-async function click(sessionId, name, using) {
-  if (sessionId === app) await focusCompanion();
-  const id = await element(sessionId, name, using);
-  await wd(`/session/${sessionId}/element/${id}/click`, 'POST', {});
-  return id;
-}
-async function screenshot(sessionId, name) {
-  const image = (await wd(`/session/${sessionId}/screenshot`)).value;
-  await writeFile(path.join(evidence, name), Buffer.from(image, 'base64'));
+const screenshot = (name) => desktopTest('capture', name);
+async function click(window, name) {
+  const control = (await uia.listControls(window)).find(item => item.name === name && item.controlType === 'ControlType.Button');
+  assert.ok(control?.enabled, `Enabled native button not found: ${name}`);
+  await uia.invoke(control);
 }
 async function checkDialog(expected, name) {
   await click(app, 'Check connection');
   const text = await until(`companion dialog ${expected}`, async () => {
-    const id = await element(desktop, 'Connection check results');
-    const value = (await wd(`/session/${desktop}/element/${id}/text`)).value;
+    const { text: value } = await desktopTest('diagnostic');
     return value.includes(expected) && value;
   });
   await save(`${name}.txt`, text);
-  await screenshot(desktop, `${name}.png`);
-  await click(desktop, '//Window[@Name="ToolBraid connection check"]//Button[@Name="Close"]', 'xpath');
+  await screenshot(`${name}.png`);
+  const dialog = (await uia.listWindows()).find(window => window.name === 'ToolBraid connection check');
+  await click(dialog, 'Close');
   return text;
 }
 async function startClient() {
@@ -114,8 +99,9 @@ async function enableSite(worker, origin) {
     const granted = await worker.evaluate((expected) => chrome.permissions.contains({ origins: [`${expected}/*`] }), origin);
     if (granted && await panel.evaluate(() => document.querySelector('#access-status')?.textContent === 'Enabled')) return true;
     if (!promptClicked) {
-      const allow = await element(desktop, '//Window[contains(@Name,"Google Chrome")]//Button[@Name="Allow"]', 'xpath').catch(() => null);
-      if (allow) { await wd(`/session/${desktop}/element/${allow}/click`, 'POST', {}); promptClicked = true; }
+      const chromeWindow = (await uia.listWindows()).find(window => window.name.includes('Google Chrome'));
+      const allow = chromeWindow && (await uia.listControls(chromeWindow)).find(control => control.name === 'Allow' && control.supportsInvoke);
+      if (allow) { await uia.invoke(allow); promptClicked = true; }
     }
     return false;
   });
@@ -123,36 +109,10 @@ async function enableSite(worker, origin) {
   record('site-opt-in', { nativePermissionPromptClicked: promptClicked, grantedOrigins: permissions.origins ?? [], manifestUnchanged: true });
 }
 try {
-  await until('Windows Application Driver', () => wd('/status'));
-  desktop = await session({ app: 'Root' });
-  // The hosted Windows 11 image can leave its first-login privacy page in front.
-  // Configure only that known page on this disposable runner; never sign into an account.
-  const privacyPath = '//Pane[@Name="Choose privacy settings for your device"]';
-  for (let step = 0; step < 6; step += 1) {
-    if (!await element(desktop, privacyPath, 'xpath').catch(() => null)) break;
-    const enabled = (await wd(`/session/${desktop}/elements`, 'POST', { using: 'xpath',
-      value: `${privacyPath}//Button[@ToggleState="On" and @IsOffscreen="False"]` })).value;
-    for (const control of enabled) {
-      const id = control.ELEMENT ?? control['element-6066-11e4-a52e-4f735466cecf'];
-      await wd(`/session/${desktop}/element/${id}/click`, 'POST', {});
-    }
-    await click(desktop, 'OobeSettingsAcceptButton', 'accessibility id');
-    await delay(500);
-  }
-  assert.equal(await element(desktop, privacyPath, 'xpath').catch(() => null), null, 'Runner privacy setup is still covering the desktop.');
-  try {
-    app = await session({ app: 'Maharajahu.ToolBraidCompanion_f24v1p0f17va4!Companion', 'ms:waitForAppLaunch': '10' });
-  } catch (error) {
-    // WinAppDriver may miss the initial window even though packaged activation succeeded.
-    const window = await until('activated Companion window', () => element(desktop, '//Window[@Name="ToolBraid Companion"]', 'xpath'));
-    const handle = (await wd(`/session/${desktop}/element/${window}/attribute/NativeWindowHandle`)).value;
-    assert.ok(Number(handle) > 0, error.message);
-    app = await session({ appTopLevelWindow: Number(handle).toString(16) });
-  }
-  const connect = await element(app, 'Connect browsers');
-  assert.equal((await wd(`/session/${app}/element/${connect}/enabled`)).value, true, 'Packaged identity must enable Connect browsers.');
-  await focusCompanion();
-  await screenshot(app, '01-installed-companion.png');
+  await desktopTest('prepare');
+  await desktopTest('launch');
+  app = await until('activated packaged Companion', async () => (await uia.listWindows()).find(window => window.name === 'ToolBraid Companion'));
+  await screenshot('01-installed-companion.png');
   await click(app, 'Connect browsers');
   await until('real companion configuration', () => readFile(path.join(dataRoot, 'mcp-client.json'), 'utf8'));
   record('packaged-activation-and-connect');
@@ -243,7 +203,6 @@ try {
   await panel.close(); await context.close(); context = null;
   await client.close(); client = null;
   await click(app, 'Disconnect browsers');
-  const powershell = path.join(process.env.WINDIR, 'System32/WindowsPowerShell/v1.0/powershell.exe');
   const registrations = spawnSync(powershell, ['-NoProfile', '-Command', "@('Google\\Chrome','Microsoft\\Edge') | ForEach-Object { Test-Path -LiteralPath \"HKCU:\\Software\\$_\\NativeMessagingHosts\\com.toolbraid.bridge\" }"], { encoding: 'utf8', windowsHide: true });
   assert.equal(registrations.status, 0);
   assert.doesNotMatch(registrations.stdout, /True/);
@@ -251,12 +210,13 @@ try {
   passed = true;
 } catch (error) {
   await save('failure.json', { phase, error: error.message, stack: error.stack });
-  if (desktop) { await screenshot(desktop, 'failure-desktop.png').catch(() => {}); await save('failure-ui.xml', (await wd(`/session/${desktop}/source`).catch(() => ({ value: '' }))).value); }
+  await screenshot('failure-desktop.png').catch(() => {});
+  const windows = await uia.listWindows().catch(() => []);
+  await save('failure-ui.json', { windows, controls: await Promise.all(windows.filter(window => /ToolBraid|Google Chrome/.test(window.name)).map(async window => ({ name: window.name, controls: await uia.listControls(window).catch(() => []) }))) });
   throw error;
 } finally {
   await client?.close().catch(() => {});
   await context?.close().catch(() => {});
-  for (const id of [app, desktop]) if (id) await wd(`/session/${id}`, 'DELETE').catch(() => {});
   await fixture.close();
   await save('result.json', { passed, phase, results, storeSigned: false, microsoftSubmitted: false,
     optionalAiAccountNotTested: true, browserHarness: 'headed system Chrome, unpacked production ZIP; no host pregrant or manifest edits' });
