@@ -32,6 +32,13 @@ export function createPowerShellUiaAdapter({ powershell = 'powershell.exe', time
 $Operation=$env:TOOLBRAID_UIA_OPERATION;$Payload=$env:TOOLBRAID_UIA_PAYLOAD
 $OutputEncoding=[Console]::OutputEncoding=New-Object System.Text.UTF8Encoding
 $ErrorActionPreference='Stop'; Add-Type -AssemblyName UIAutomationClient; Add-Type -AssemblyName UIAutomationTypes
+Add-Type -AssemblyName UIAutomationClientsideProviders
+# PowerShell dynamic stack frames can break .NET's first default-proxy initialization.
+try { [System.Windows.Automation.ClientSettings]::RegisterClientSideProviders([UIAutomationClientsideProviders.UIAutomationClientSideProviders]::ClientSideProviderDescriptionTable) }
+catch {
+  if ($_.Exception.InnerException -isnot [NullReferenceException]) { throw }
+  [System.Windows.Automation.ClientSettings]::RegisterClientSideProviders([UIAutomationClientsideProviders.UIAutomationClientSideProviders]::ClientSideProviderDescriptionTable)
+}
 $p=$Payload|ConvertFrom-Json
 function Coordinate([double]$v){if([double]::IsNaN($v) -or [double]::IsInfinity($v)){return 0};return [int][Math]::Max(-100000,[Math]::Min(100000,$v))}
 function Rect($r){@{x=Coordinate $r.X;y=Coordinate $r.Y;width=Coordinate $r.Width;height=Coordinate $r.Height}}

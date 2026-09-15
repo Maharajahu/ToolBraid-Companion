@@ -7,6 +7,12 @@ if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_ENVIRONMENT -ne 'github-hoste
 [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
+Add-Type -AssemblyName UIAutomationClientsideProviders
+try { [System.Windows.Automation.ClientSettings]::RegisterClientSideProviders([UIAutomationClientsideProviders.UIAutomationClientSideProviders]::ClientSideProviderDescriptionTable) }
+catch {
+  if ($_.Exception.InnerException -isnot [NullReferenceException]) { throw }
+  [System.Windows.Automation.ClientSettings]::RegisterClientSideProviders([UIAutomationClientsideProviders.UIAutomationClientSideProviders]::ClientSideProviderDescriptionTable)
+}
 $desktop = [System.Windows.Automation.AutomationElement]::RootElement
 function Named($parent, [string]$name) {
   $condition = New-Object System.Windows.Automation.PropertyCondition -ArgumentList @([System.Windows.Automation.AutomationElement]::NameProperty, $name)
