@@ -52,7 +52,14 @@ async function element(sessionId, name, using = 'name') {
   const result = await wd(`/session/${sessionId}/element`, 'POST', { using, value: name });
   return result.value.ELEMENT ?? result.value['element-6066-11e4-a52e-4f735466cecf'];
 }
+async function focusCompanion() {
+  const handle = (await wd(`/session/${app}/window_handle`)).value;
+  await wd(`/session/${app}/window`, 'POST', { name: handle });
+  await until('Companion keyboard focus', async () =>
+    (await wd(`/session/${app}/source`)).value.includes('HasKeyboardFocus="True"'));
+}
 async function click(sessionId, name, using) {
+  if (sessionId === app) await focusCompanion();
   const id = await element(sessionId, name, using);
   await wd(`/session/${sessionId}/element/${id}/click`, 'POST', {});
   return id;
@@ -144,6 +151,7 @@ try {
   }
   const connect = await element(app, 'Connect browsers');
   assert.equal((await wd(`/session/${app}/element/${connect}/enabled`)).value, true, 'Packaged identity must enable Connect browsers.');
+  await focusCompanion();
   await screenshot(app, '01-installed-companion.png');
   await click(app, 'Connect browsers');
   await until('real companion configuration', () => readFile(path.join(dataRoot, 'mcp-client.json'), 'utf8'));
