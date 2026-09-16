@@ -10,6 +10,7 @@ $evidence = Join-Path $projectRoot 'dist\store-e2e-evidence'
 New-Item -ItemType Directory -Path $evidence -Force | Out-Null
 $os = Get-CimInstance Win32_OperatingSystem
 $identity = 'Maharajahu.ToolBraidCompanion'
+$packageVersion = '0.3.2.0'
 $publisher = 'CN=E4BF216F-08D0-430A-8F4D-729DDA573ADE'
 $family = 'Maharajahu.ToolBraidCompanion_f24v1p0f17va4'
 if (Get-AppxPackage -Name $identity) { throw 'A clean test machine is required.' }
@@ -55,11 +56,11 @@ $sdk = Get-ChildItem -LiteralPath 'C:\Program Files (x86)\Windows Kits\10\bin' -
   Sort-Object Name -Descending | Select-Object -First 1
 if (-not $sdk) { throw 'Windows packaging SDK is missing.' }
 $sdkBin = Join-Path $sdk.FullName 'x64'
-& (Join-Path $PSScriptRoot 'build-store.ps1') -PackageName $identity -Publisher $publisher -PublisherDisplayName 'Maharajahu' -EdgeExtensionId 'ailfkkdmjppafngmkobpiogoamidipcl' -SdkBin $sdkBin
+& (Join-Path $PSScriptRoot 'build-store.ps1') -PackageName $identity -Publisher $publisher -PublisherDisplayName 'Maharajahu' -EdgeExtensionId 'ailfkkdmjppafngmkobpiogoamidipcl' -PackageVersion $packageVersion -SdkBin $sdkBin
 if ($LASTEXITCODE -ne 0) { throw 'Store build failed.' }
-$build = Get-ChildItem -LiteralPath (Join-Path $projectRoot 'dist') -Directory -Filter 'store-0.3.1-store-submission-*' |
+$build = Get-ChildItem -LiteralPath (Join-Path $projectRoot 'dist') -Directory -Filter "store-$packageVersion-store-submission-*" |
   Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
-$unsigned = Join-Path $build.FullName 'ToolBraid-0.3.1-store-submission-x64.msix'
+$unsigned = Join-Path $build.FullName "ToolBraid-$packageVersion-store-submission-x64.msix"
 $signed = Join-Path $env:RUNNER_TEMP 'ToolBraid-test-only.msix'
 Copy-Item -LiteralPath $unsigned -Destination $signed
 $certificate = $null
@@ -73,7 +74,7 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'Test signing failed.' }
   Add-AppxPackage -Path $signed
   $installed = Get-AppxPackage -Name $identity
-  if (-not $installed -or $installed.PackageFamilyName -ne $family -or $installed.Version -ne '0.3.1.0') {
+  if (-not $installed -or $installed.PackageFamilyName -ne $family -or $installed.Version -ne $packageVersion) {
     throw 'Windows did not install the expected package identity and version.'
   }
   $payload = Join-Path $build.FullName 'payload'
@@ -84,16 +85,16 @@ try {
     if ($expected -ne $actual) { throw "Installed payload mismatch: $relative" }
     [ordered]@{ file = $relative; sha256 = $expected.ToLowerInvariant() }
   })
-  [ordered]@{ installed = $true; family = $family; version = '0.3.1.0'; unsignedSha256 = (Get-FileHash -LiteralPath $unsigned -Algorithm SHA256).Hash.ToLowerInvariant(); payload = $files } |
+  [ordered]@{ installed = $true; family = $family; version = $packageVersion; unsignedSha256 = (Get-FileHash -LiteralPath $unsigned -Algorithm SHA256).Hash.ToLowerInvariant(); payload = $files } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $evidence 'installation.json') -Encoding UTF8
-  Write-Output "INSTALLED: $family, 0.3.1.0; $($files.Count) payload files verified."
+  Write-Output "INSTALLED: $family, $packageVersion; $($files.Count) payload files verified."
   $env:E2E_PLAYWRIGHT_MODULE = Join-Path $env:RUNNER_TEMP 'toolbraid-test-deps\node_modules\playwright-core'
   $env:TOOLBRAID_INSTALLED_ROOT = $installed.InstallLocation
   $env:TOOLBRAID_E2E_EVIDENCE = $evidence
   node (Join-Path $PSScriptRoot 'e2e-store-installed.mjs')
   if ($LASTEXITCODE -ne 0) { throw 'Installed user-flow verification failed. See evidence.' }
   # Preserve the unsigned candidate whose exact payload passed. Never export the private test key.
-  Copy-Item -LiteralPath $unsigned -Destination (Join-Path $evidence 'ToolBraid-0.3.1.0-unsigned-tested.msix')
+  Copy-Item -LiteralPath $unsigned -Destination (Join-Path $evidence "ToolBraid-$packageVersion-unsigned-tested.msix")
   Copy-Item -LiteralPath $edgeZip -Destination $evidence
 } finally {
   if ($installed) {

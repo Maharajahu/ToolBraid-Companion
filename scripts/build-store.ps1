@@ -5,12 +5,15 @@ param(
   [Parameter(Mandatory, ParameterSetName = 'Store')][ValidateLength(1, 256)][string] $PublisherDisplayName,
   [Parameter(Mandatory, ParameterSetName = 'Store')][ValidatePattern('^[a-p]{32}$')][string] $EdgeExtensionId,
   [Parameter(Mandatory, ParameterSetName = 'LocalValidation')][switch] $LocalValidation,
+  [ValidatePattern('^\d+\.\d+\.\d+\.0$')][string] $PackageVersion,
   [string] $SdkBin = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64'
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $version = (Get-Content -LiteralPath (Join-Path $projectRoot 'package.json') -Raw | ConvertFrom-Json).version
+$packageLabel = if ($PackageVersion) { $PackageVersion } else { $version }
+if (-not $PackageVersion) { $PackageVersion = "$version.0" }
 $companion = Join-Path $projectRoot "dist\release-$version\companion"
 if (-not (Test-Path -LiteralPath (Join-Path $companion 'runtime\node.exe'))) {
   throw 'Build the matching Windows companion first with scripts/build-release.ps1.'
@@ -32,7 +35,7 @@ if ($LocalValidation) {
   $displayName = 'ToolBraid Companion (local validation)'
 }
 $mode = if ($LocalValidation) { 'local-validation' } else { 'store-submission' }
-$output = Join-Path $projectRoot ("dist\store-$version-$mode-" + [Guid]::NewGuid().ToString('N').Substring(0, 8))
+$output = Join-Path $projectRoot ("dist\store-$packageLabel-$mode-" + [Guid]::NewGuid().ToString('N').Substring(0, 8))
 $payload = Join-Path $output 'payload'
 $assets = Join-Path $payload 'Assets'
 New-Item -ItemType Directory -Path $assets -Force | Out-Null
@@ -54,8 +57,8 @@ using System.Reflection;
 [assembly: AssemblyTitle("ToolBraid Companion")]
 [assembly: AssemblyProduct("ToolBraid")]
 [assembly: AssemblyCompany("Maharajahu")]
-[assembly: AssemblyVersion("$version.0")]
-[assembly: AssemblyFileVersion("$version.0")]
+[assembly: AssemblyVersion("$PackageVersion")]
+[assembly: AssemblyFileVersion("$PackageVersion")]
 "@, $encoding)
 $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 $source = Join-Path $projectRoot 'bridge\ToolBraidNativeHostLauncher.cs'
@@ -66,7 +69,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Could not compile the Store companion window.'
 $settings = @{ preview = [bool]$LocalValidation; edgeExtensionId = $EdgeExtensionId; chromeExtensionId = $chromeId } | ConvertTo-Json
 [IO.File]::WriteAllText((Join-Path $payload 'store-settings.json'), $settings, $encoding)
 $xml = Get-Content -LiteralPath (Join-Path $projectRoot 'store\AppxManifest.xml') -Raw
-$replacements = @{ PACKAGE_NAME = $PackageName; PUBLISHER = $Publisher; VERSION = "$version.0"; DISPLAY_NAME = $displayName; PUBLISHER_DISPLAY_NAME = $PublisherDisplayName }
+$replacements = @{ PACKAGE_NAME = $PackageName; PUBLISHER = $Publisher; VERSION = $PackageVersion; DISPLAY_NAME = $displayName; PUBLISHER_DISPLAY_NAME = $PublisherDisplayName }
 foreach ($key in $replacements.Keys) { $xml = $xml.Replace("@@$key@@", [Security.SecurityElement]::Escape($replacements[$key])) }
 if ($xml -match '@@[A-Z_]+@@') { throw 'An unresolved Store identity field remains.' }
 [IO.File]::WriteAllText((Join-Path $payload 'AppxManifest.xml'), $xml, $encoding)
@@ -85,7 +88,7 @@ try {
     } finally { $graphics.Dispose(); $bitmap.Dispose() }
   }
 } finally { $logo.Dispose() }
-$package = Join-Path $output "ToolBraid-$version-$mode-x64.msix"
+$package = Join-Path $output "ToolBraid-$packageLabel-$mode-x64.msix"
 & (Join-Path $SdkBin 'makeappx.exe') pack /d $payload /p $package /o
 if ($LASTEXITCODE -ne 0) { throw 'MSIX package validation failed.' }
 $hash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant()
