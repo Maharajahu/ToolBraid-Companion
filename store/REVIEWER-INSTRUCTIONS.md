@@ -1,10 +1,10 @@
-# Microsoft Store reviewer instructions — ToolBraid Companion 0.3.1
+# Microsoft Store reviewer instructions — ToolBraid Companion MSIX 0.3.3.0
 
-This local draft covers the MSIX companion, not the ZIP installer or Edge extension submission. A `local-validation` package uses a test identity, disables Connect/Disconnect and live diagnostics, and must not be submitted for certification.
+This packet covers the MSIX companion, not the ZIP installer or Edge extension submission. The extension/runtime version remains 0.3.1. Record the new passing build ID, source commit and unsigned candidate SHA-256 with the submission; do not reuse the previous candidate's evidence. A `local-validation` package uses a test identity, disables Connect/Disconnect and live diagnostics, and must not be submitted for certification.
 
 ## Prerequisites
 
-Use an isolated Windows x64 account. The owner must supply the real Partner Center identity, final MSIX, matching extension and actual Edge Add-ons ID. No publisher credentials or private source access are needed. Use the supported certification/test installation process without bypassing Windows protections or treating a self-signed certificate as publisher trust.
+Use an isolated Windows 11 account, build 22000 or later, and the submitted x64 MSIX. No publisher credentials or private source access are needed. Use the supported certification/test installation process without bypassing Windows protections or treating a self-signed certificate as publisher trust.
 
 Reserved Windows identity: `Maharajahu.ToolBraidCompanion`, publisher `CN=E4BF216F-08D0-430A-8F4D-729DDA573ADE`, display name `Maharajahu`, Store ID `9P7VF25K2X1R`. The matching Edge draft uses CRX ID `ailfkkdmjppafngmkobpiogoamidipcl` (Edge Store ID `0RDCKG19W71L`). Both are drafts, not live download links; supply reviewer-accessible artifacts before certification.
 
@@ -13,8 +13,8 @@ Microsoft Store distributes the Windows companion; Edge Add-ons distributes the 
 ## Read-only review flow
 
 1. Open **ToolBraid Companion** from Start. Select **Connect browsers**. No administrator prompt should be needed. This registers the companion but does **not** enable the extension or grant access to websites.
-2. Install the matching public Chrome extension ZIP from the official release: extract it, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and select the extracted directory containing `manifest.json`. Do not install the ZIP edition's Windows companion over the Store companion.
-3. In that same browser, open `https://example.org/`. Open ToolBraid from the browser's Extensions menu. Do not remain on a new tab, `chrome://extensions` or another browser settings page.
+2. In **Microsoft Edge**, download and extract the [matching public source ZIP](https://github.com/Maharajahu/ToolBraid-Companion/archive/dca9a2ad70b5eaba93c6d4fa457a0020133d2783.zip). Open `edge://extensions`, enable Developer mode, choose **Load unpacked**, and select the archive's **extension** subdirectory containing `manifest.json`. Expect ID `gpjhdlbjfhlaeakphfognpijgmclecmn`; the source key preserves it. The capability-only patch does not change this extension. Do not use the Edge Add-ons upload ZIP for unpacked installation: it omits the key. Chrome may use the same source via `chrome://extensions`. Do not install the ZIP edition's Windows companion over the Store companion.
+3. In that same browser, open `https://example.org/`. Open ToolBraid from the browser's Extensions menu. Do not remain on a new tab, `edge://extensions`, `chrome://extensions` or another browser settings page.
 4. If the extension says **Paused**, choose **Finish setup** in its top bar. Read the disclosure, tick **I understand and allow this direct AI control.**, then select **Enable on this site**. Approve access to `https://example.org` if the browser asks. If already enabled, use **Connect this site** instead. Installing the extension and registering the companion do not replace this explicit permission step.
 5. Keep that test tab open. In the companion select **Check connection**, or **Check again** in an existing results window. Expect **MCP — OK**, **Extension — CONNECTED** and **Selected page — READY** when bound. **NOT SELECTED** means a page still needs connecting. An unavailable extension is **NOT CONNECTED**, with setup instructions at the top; it is not reported as a successful connection.
 6. The extension should show the selected page's title and available browser tools. `example.org` needs no native WebMCP implementation. No AI account, API key, model download or ChatGPT sign-in is required for steps 1–6. **AI client — NOT TESTED** is intentional: Check connection sends no model request or sign-in check, and omits page addresses/titles, paths, tokens and raw errors from its report.
@@ -27,6 +27,44 @@ The 15 September 2026 report cited 10.1.2.10, functionality not working or uncle
 
 This flow requires no post, reply, like, purchase, form submission, upload or personal X account. Test native WebMCP only with a harmless authorized tool; unsupported browsers/pages should report unavailability. X monitoring covers rendered content in an open watched tab and does not automatically post or call a model.
 
+## Response to 17 September 2026 report: 10.6.3 Capabilities
+
+We request reconsideration for a changed, Windows-11-only package. We removed the legacy declarations rather than repeating the previous request for broad virtualization changes. ToolBraid is a non-game developer utility that connects a separately installed browser extension to local AI clients using the browser's native messaging protocol.
+
+### 1. Exact declarations
+
+The minimum desktop version is now `10.0.22000.0`. `desktop6:RegistryWriteVirtualization` and `desktop6:FileSystemWriteVirtualization` are **absent**, and the unused `desktop6` namespace has been removed. No legacy `disabled` setting is present. The remaining declarations are:
+
+```xml
+<virtualization:RegistryWriteVirtualization>
+  <virtualization:ExcludedKeys>
+    <virtualization:ExcludedKey>HKEY_CURRENT_USER\Software\Microsoft\Edge\NativeMessagingHosts\com.toolbraid.bridge</virtualization:ExcludedKey>
+    <virtualization:ExcludedKey>HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\com.toolbraid.bridge</virtualization:ExcludedKey>
+  </virtualization:ExcludedKeys>
+</virtualization:RegistryWriteVirtualization>
+<virtualization:FileSystemWriteVirtualization>
+  <virtualization:ExcludedDirectories>
+    <virtualization:ExcludedDirectory>$(KnownFolder:LocalAppData)\ToolBraid\store</virtualization:ExcludedDirectory>
+  </virtualization:ExcludedDirectories>
+</virtualization:FileSystemWriteVirtualization>
+```
+
+`virtualization` is `http://schemas.microsoft.com/appx/manifest/virtualization/windows10`. Capabilities remain `<rescap:Capability Name="runFullTrust" />` and `<rescap:Capability Name="unvirtualizedResources" />`. The latter is required for the scoped exclusions themselves, not only for the removed broad legacy switches.
+
+### 2. Supported Windows versions
+
+This MSIX requires **Windows 11 build 22000 or later**. Windows 10 cannot install this candidate because of the manifest minimum version. **No supported version requires blanket HKCU or AppData virtualization disabling.** On supported systems, only the two explicit host keys and one application-owned folder above are excluded. The separate ZIP edition is not part of this Store request.
+
+### 3. Business and technical necessity; no legacy approach
+
+There is no legacy fallback in this candidate. Microsoft Edge and Google Chrome run outside the MSIX package. On Windows, they locate a native messaging host through the vendor's `NativeMessagingHosts` Registry entry, whose default value points to a JSON manifest. An MSIX-private registry entry is not discoverable through that browser lookup. If this capability were removed while retaining native messaging, the browser could not discover the registered companion. [Microsoft Edge native messaging registration](https://learn.microsoft.com/en-us/microsoft-edge/extensions/developer-guide/native-messaging).
+
+Each excluded key holds only the path to ToolBraid's host manifest. The excluded folder contains that manifest and the local connection/client configuration and application records described below. Runtime executables remain inside the installed package; the manifest points to the stable Store execution alias. We do not request HKLM access, administrator elevation, a service, a wildcard registry subtree, or an exclusion for AppData generally. The purpose is explicit interoperability with the user's chosen browser and AI client, not game data or access to unrelated applications' settings.
+
+The user explicitly selects **Connect browsers**. Only exact extension origins are accepted; the local MCP pipe is authenticated. **Disconnect browsers** restores previous registrations only if ToolBraid still owns them. We disclose that excluded data remains after uninstall and that direct uninstall without disconnect may leave a stale host registration; we do not claim automatic cleanup of those exceptions. See the lifecycle section below.
+
+The new manifest-scope check rejects Windows 10 support, any legacy virtualization switches, extra/wildcard host keys and extra excluded folders. A fresh installed-package E2E run is required for this candidate, including Edge, browser restart/reconnect, pause, disconnect and uninstall. The submission's build ID and SHA-256 identify the exact tested package. We understand that successful functionality testing is separate from Microsoft's capability approval. [Microsoft flexible virtualization documentation](https://learn.microsoft.com/en-us/windows/msix/desktop/flexible-virtualization).
+
 ## Restricted capabilities
 
 | Declaration | Purpose |
@@ -34,7 +72,7 @@ This flow requires no post, reply, like, purchase, form submission, upload or pe
 | `runFullTrust` | Run the Win32 window and bundled Node native/MCP processes as the signed-in user, without administrator elevation. |
 | `unvirtualizedResources` | Make native-host registrations discoverable by browsers outside the package and share local connection state. |
 | Windows 11 exclusions | Limit exceptions to `HKCU\Software\Microsoft\Edge\NativeMessagingHosts\com.toolbraid.bridge`, `HKCU\Software\Google\Chrome\NativeMessagingHosts\com.toolbraid.bridge` and `%LOCALAPPDATA%\ToolBraid\store`. |
-| Windows 10 compatibility | Older supported Windows uses broader registry/filesystem virtualization switches. The implementation still targets only the described keys/data directory. |
+| Windows 10 / legacy switches | Not supported by this MSIX. Both broad legacy switches are absent. |
 
 Exact extension origins are allowlisted; the local MCP pipe requires a random token. Runtime files stay in the package. Stable `ToolBraidNativeHost.exe` and `ToolBraidMcp.exe` aliases select the installed version of the same launcher; the generated MCP client configuration passes `--mcp`. The manifest contains one visible application, not hidden helper applications. Capability approval remains Microsoft's decision. [Microsoft virtualization guidance](https://learn.microsoft.com/en-us/windows/msix/desktop/flexible-virtualization).
 

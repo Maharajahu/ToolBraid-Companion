@@ -34,7 +34,7 @@ Local transport does not mean all processing stays local: your AI client or prov
 
 ## Requirements and links
 
-- Windows 10 build 19041 or later, x64, including Windows 11. Actual Store-installed lifecycle validation is pending.
+- Windows 11 build 22000 or later, x64. This Store package does not support Windows 10. Microsoft signing, Store delivery and Store-delivered updates remain subject to certification and separate validation.
 - Separate matching public extension. The Edge Add-ons draft has CRX ID `ailfkkdmjppafngmkobpiogoamidipcl`; publication is pending. Chrome uses the official unpacked ZIP.
 - A local stdio MCP client, or Codex for integrated chat. No model is needed for Check connection.
 - Website: https://toolbraid.pages.dev/

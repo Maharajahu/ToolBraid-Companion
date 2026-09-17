@@ -10,7 +10,7 @@ $evidence = Join-Path $projectRoot 'dist\store-e2e-evidence'
 New-Item -ItemType Directory -Path $evidence -Force | Out-Null
 $os = Get-CimInstance Win32_OperatingSystem
 $identity = 'Maharajahu.ToolBraidCompanion'
-$packageVersion = '0.3.2.0'
+$packageVersion = '0.3.3.0'
 $publisher = 'CN=E4BF216F-08D0-430A-8F4D-729DDA573ADE'
 $family = 'Maharajahu.ToolBraidCompanion_f24v1p0f17va4'
 if (Get-AppxPackage -Name $identity) { throw 'A clean test machine is required.' }
@@ -24,6 +24,8 @@ $environment = [ordered]@{ os = $os.Caption; build = $os.Version; architecture =
   storeSigned = $false; submitted = $false; testCertificateOnly = $true }
 $environment | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $evidence 'environment.json') -Encoding UTF8
 Write-Output ($environment | ConvertTo-Json -Compress)
+& (Join-Path $PSScriptRoot 'test-store.ps1') -ManifestOnly
+if (-not $?) { throw 'Store manifest scope validation failed.' }
 & (Join-Path $PSScriptRoot 'build-release.ps1')
 if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
 $release = Join-Path $projectRoot 'dist\release-0.3.1'
