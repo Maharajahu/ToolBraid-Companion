@@ -81,6 +81,14 @@ Real pages and model responses, an X reply draft, and browser navigation. **1:23
 
 [Website player and video description](https://toolbraid.pages.dev/#demo) · [4K export](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-Windows-real-demo-4K.mp4)
 
+## Token-efficient context
+
+https://github.com/user-attachments/assets/418616cf-2b0f-4198-a9f6-327bfb9d27d3
+
+**The same seven public X posts: 821 tokens with ToolBraid Companion versus 5,094 in a full browser DOM snapshot.** 83.9% less returned context, preserving the messages, authors and links. A custom browser extraction returned 661 tokens; this is one measured sample, not a claim about total usage or every workflow. **15 seconds · 1080p · Sound effects, no voice.**
+
+[Measurement and video description](docs/token-efficiency.md) · [Watch on the website](https://toolbraid.pages.dev/#token-efficiency)
+
 <a id="see-the-interface"></a>
 
 ## The interface
