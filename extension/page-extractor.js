@@ -666,7 +666,15 @@
     }
     if (parts.length) return trimText(parts.join(' '));
     const own = safeGet(node, 'innerText', safeGet(node, 'textContent', ''));
-    return boundedText(own, max);
+    const text = boundedText(own, max);
+    // X's playback clock changes each second, but is not a change to the post
+    // or composer. Keep actual timestamps and clock text outside players exact.
+    if (/^\d{1,2}:\d{2}(?::\d{2})?(?:\s*\/\s*\d{1,2}:\d{2}(?::\d{2})?)?$/.test(text)
+      && /^https:\/\/(?:www\.)?(?:x|twitter)\.com\//i.test(node.ownerDocument?.location?.href ?? '')
+      && ancestor(node, (candidate) => ['videoPlayer', 'videoComponent'].includes(attr(candidate, 'data-testid', '')))) {
+      return '[playback time]';
+    }
+    return text;
   }
 
   function fieldType(element) {

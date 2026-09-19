@@ -33,16 +33,29 @@ $Operation=$env:TOOLBRAID_UIA_OPERATION;$Payload=$env:TOOLBRAID_UIA_PAYLOAD
 $OutputEncoding=[Console]::OutputEncoding=New-Object System.Text.UTF8Encoding
 $ErrorActionPreference='Stop'; Add-Type -AssemblyName UIAutomationClient; Add-Type -AssemblyName UIAutomationTypes
 Add-Type -AssemblyName UIAutomationClientsideProviders
-# PowerShell dynamic stack frames can break .NET's first default-proxy initialization.
-try { [System.Windows.Automation.ClientSettings]::RegisterClientSideProviders([UIAutomationClientsideProviders.UIAutomationClientSideProviders]::ClientSideProviderDescriptionTable) }
-catch {
-  if ($_.Exception.InnerException -isnot [NullReferenceException]) { throw }
-  [System.Windows.Automation.ClientSettings]::RegisterClientSideProviders([UIAutomationClientsideProviders.UIAutomationClientSideProviders]::ClientSideProviderDescriptionTable)
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class ToolBraidWin32Control {
+  [DllImport("user32.dll")] public static extern int GetWindowLong(IntPtr handle, int index);
+  [DllImport("user32.dll", CharSet=CharSet.Unicode, EntryPoint="SendMessageTimeoutW")]
+  public static extern IntPtr SendText(IntPtr handle, uint message, IntPtr wparam, string value, uint flags, uint timeout, out IntPtr result);
+  [DllImport("user32.dll", EntryPoint="SendMessageTimeoutW")]
+  public static extern IntPtr SendClick(IntPtr handle, uint message, IntPtr wparam, IntPtr value, uint flags, uint timeout, out IntPtr result);
 }
+'@
 $p=$Payload|ConvertFrom-Json
 function Coordinate([double]$v){if([double]::IsNaN($v) -or [double]::IsInfinity($v)){return 0};return [int][Math]::Max(-100000,[Math]::Min(100000,$v))}
 function Rect($r){@{x=Coordinate $r.X;y=Coordinate $r.Y;width=Coordinate $r.Width;height=Coordinate $r.Height}}
+function NativeKind($e){
+ $c=$e.Current;if($c.NativeWindowHandle -eq 0){return ''}
+ $style=[ToolBraidWin32Control]::GetWindowLong([IntPtr]$c.NativeWindowHandle,-16)
+ if($c.ClassName -eq 'Button' -and ($style -band 15) -ne 7){return 'Button'}
+ if($c.ClassName -eq 'Edit' -and -not $c.IsPassword -and ($style -band 2080) -eq 0){return 'Edit'}
+ return ''
+}
 $root=[System.Windows.Automation.AutomationElement]::RootElement
+[System.Windows.Automation.ClientSettings]::RegisterClientSideProviderAssembly([UIAutomationClientsideProviders.UIAutomationClientSideProviders].Assembly.GetName())
 if($Operation -eq 'windows'){$c=$root.FindAll([System.Windows.Automation.TreeScope]::Children,[System.Windows.Automation.Condition]::TrueCondition);@($c|%{@{processId=$_.Current.ProcessId;windowId=$_.Current.NativeWindowHandle;name=$_.Current.Name;enabled=$_.Current.IsEnabled;visible=(-not $_.Current.IsOffscreen);bounds=Rect $_.Current.BoundingRectangle}})|ConvertTo-Json -Compress -Depth 5;exit}
 $processCondition=New-Object System.Windows.Automation.PropertyCondition -ArgumentList @([System.Windows.Automation.AutomationElement]::ProcessIdProperty,[int]$p.processId)
 $windowCondition=New-Object System.Windows.Automation.PropertyCondition -ArgumentList @([System.Windows.Automation.AutomationElement]::NativeWindowHandleProperty,[int]$p.windowId)
@@ -51,16 +64,26 @@ $windowMatch=New-Object System.Windows.Automation.AndCondition -ArgumentList (,$
 $w=$root.FindFirst([System.Windows.Automation.TreeScope]::Children,$windowMatch)
 if($null -eq $w){throw 'target unavailable'}
 $all=$w.FindAll([System.Windows.Automation.TreeScope]::Descendants,[System.Windows.Automation.Condition]::TrueCondition)
-$items=@($all|%{$rid=[string]::Join('.', $_.GetRuntimeId());$ip=$null;$vp=$null;$ci=$_.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern,[ref]$ip);$cv=$_.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$vp);@{processId=$_.Current.ProcessId;windowId=$w.Current.NativeWindowHandle;runtimeId=$rid;name=$_.Current.Name;automationId=$_.Current.AutomationId;controlType=$_.Current.ControlType.ProgrammaticName;enabled=$_.Current.IsEnabled;visible=(-not $_.Current.IsOffscreen);password=$_.Current.IsPassword;supportsInvoke=$ci;supportsSetValue=$cv;bounds=Rect $_.Current.BoundingRectangle}})
+$items=@($all|%{try{$rid=[string]::Join('.', $_.GetRuntimeId());$ip=$null;$vp=$null;$ci=$_.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern,[ref]$ip);$cv=$_.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$vp);$kind=NativeKind $_;$type=$_.Current.ControlType.ProgrammaticName;if($kind){$type='ControlType.'+$kind};@{processId=$_.Current.ProcessId;windowId=$w.Current.NativeWindowHandle;runtimeId=$rid;name=$_.Current.Name;automationId=$_.Current.AutomationId;controlType=$type;enabled=$_.Current.IsEnabled;visible=(-not $_.Current.IsOffscreen);password=$_.Current.IsPassword;supportsInvoke=($ci -or $kind -eq 'Button');supportsSetValue=($cv -or $kind -eq 'Edit');bounds=Rect $_.Current.BoundingRectangle}}catch{}})
 if($Operation -eq 'controls'){$items|ConvertTo-Json -Compress -Depth 5;exit}
 $target=$null;foreach($e in $all){if(([string]::Join('.', $e.GetRuntimeId())) -eq [string]$p.runtimeId){$target=$e;break}}
 if($null -eq $target){throw 'target unavailable'}
-if($Operation -eq 'invoke'){$pat=$target.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern);$pat.Invoke();@{ok=$true}|ConvertTo-Json -Compress;exit}
-if($Operation -eq 'set'){$pat=$target.GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern);$pat.SetValue([string]$p.value);@{ok=$true}|ConvertTo-Json -Compress;exit}
+if(-not $target.Current.IsEnabled -or $target.Current.IsOffscreen -or $target.Current.IsPassword -or $target.Current.ProcessId -ne [int]$p.processId){throw 'target unavailable'}
+$kind=NativeKind $target;$pat=$null;$result=[IntPtr]::Zero
+if($Operation -eq 'invoke'){
+ if($target.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern,[ref]$pat)){$pat.Invoke()}
+ elseif($kind -eq 'Button'){if([ToolBraidWin32Control]::SendClick([IntPtr]$target.Current.NativeWindowHandle,245,[IntPtr]::Zero,[IntPtr]::Zero,2,2000,[ref]$result) -eq [IntPtr]::Zero){throw 'invoke unconfirmed'}}else{throw 'unsupported control'}
+ @{ok=$true}|ConvertTo-Json -Compress;exit
+}
+if($Operation -eq 'set'){
+ if($target.TryGetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern,[ref]$pat)){$pat.SetValue([string]$p.value)}
+ elseif($kind -eq 'Edit'){if([ToolBraidWin32Control]::SendText([IntPtr]$target.Current.NativeWindowHandle,12,[IntPtr]::Zero,[string]$p.value,2,2000,[ref]$result) -eq [IntPtr]::Zero -or $result -eq [IntPtr]::Zero){throw 'set unconfirmed'}}else{throw 'unsupported control'}
+ @{ok=$true}|ConvertTo-Json -Compress;exit
+}
 throw 'unsupported operation'`;
     try {
       const encodedScript = Buffer.from(script, 'utf16le').toString('base64');
-      const { stdout } = await execFileAsync(powershell, ['-NoProfile', '-NonInteractive', '-EncodedCommand', encodedScript], {
+      const { stdout } = await execFileAsync(powershell, ['-NoProfile', '-NonInteractive', '-Mta', '-EncodedCommand', encodedScript], {
         timeout: timeoutMs,
         windowsHide: true,
         maxBuffer: 1024 * 1024,

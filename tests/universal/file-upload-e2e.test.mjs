@@ -138,7 +138,7 @@ test('internal CDP failures remain pathless externally and always clean marker a
   const expanded = await h.broker.prepare(h.client, 'tools.call', { name: descriptor.name, arguments: { grantId: grant.grantId } });
 
   await assert.rejects(h.endpoint.handle('tools.call', expanded), (error) => {
-    assert.equal(error.code, 'FILE_UPLOAD_FAILED');
+    assert.equal(error.code, 'FILE_UPLOAD_OUTCOME_UNKNOWN');
     assert.equal(error.message.includes(LOCAL_PATH), false);
     return true;
   });

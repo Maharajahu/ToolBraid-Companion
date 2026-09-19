@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
+import { fileURLToPath } from 'node:url';
 import { createWindowsUiaBroker } from '../../bridge/windows-uia.mjs';
 
 function fixture() {
@@ -80,6 +81,47 @@ test('real Windows PowerShell adapter parses and returns only the public window 
     assert.deepEqual(Object.keys(window).sort(), ['bounds', 'enabled', 'handle', 'name', 'visible']);
     assert.match(window.handle, /^[a-f0-9]{48}$/);
   }
+});
+
+test('live UIA selects a file through standard Windows dialog controls', {
+  skip: process.platform !== 'win32' || process.env.TOOLBRAID_UIA_LIVE !== '1', timeout: 60_000,
+}, async () => {
+  const title = `ToolBraid file picker fixture ${process.pid}`;
+  const script = `
+$ErrorActionPreference='Stop'
+[Console]::OutputEncoding=New-Object System.Text.UTF8Encoding
+Add-Type -AssemblyName System.Windows.Forms
+$dialog=New-Object System.Windows.Forms.OpenFileDialog
+$dialog.Title='${title}';$dialog.CheckFileExists=$true;$dialog.Multiselect=$false
+$dialog.InitialDirectory=[IO.Path]::GetTempPath()
+if($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK){[Console]::Out.Write($dialog.FileName)}
+`;
+  const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-STA', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+  let output = '';
+  child.stdout.setEncoding('utf8'); child.stdout.on('data', (chunk) => { output += chunk; });
+  const done = new Promise((resolve, reject) => { child.once('close', resolve); child.once('error', reject); });
+  try {
+    const broker = createWindowsUiaBroker();
+    let window;
+    const deadline = Date.now() + 15_000;
+    while (!window && Date.now() < deadline) {
+      window = (await broker.call('windows.list')).windows.find((item) => item.name === title);
+      if (!window) await delay(200);
+    }
+    assert.ok(window, 'The owned Windows file picker must be visible.');
+    const list = async () => (await broker.call('controls.list', { window: window.handle })).controls;
+    let controls = await list();
+    const input = controls.find((item) => /File name|Nume fișier/i.test(item.name) && item.supportsSetValue);
+    assert.ok(input, 'Win32 filename edit must support setting a value.');
+    const selected = fileURLToPath(import.meta.url);
+    await broker.call('control.set_value', { control: input.handle, value: selected });
+    controls = await list();
+    const open = controls.find((item) => /^(Open|Deschidere)$/i.test(item.name) && item.supportsInvoke);
+    assert.ok(open, 'Win32 Open button must support invocation.');
+    await broker.call('control.invoke', { control: open.handle });
+    assert.equal(await done, 0);
+    assert.equal(output.trim(), selected);
+  } finally { child.kill(); }
 });
 
 test('live UIA sets and invokes only its own fixture and preserves Unicode', {

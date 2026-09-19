@@ -82,7 +82,7 @@ test('redacts local paths from debugger failures and still detaches', async () =
     setFilesError: Object.assign(new Error('failed D:\\private\\clip.mp4'), { code: 'CDP_FAILED' }),
   });
   await assert.rejects(controller.upload({ ...request, ...hooks }), (error) => {
-    assert.equal(error.code, 'CDP_FAILED');
+    assert.equal(error.code, 'FILE_UPLOAD_OUTCOME_UNKNOWN');
     assert.equal(error.message.includes('D:\\private'), false);
     return true;
   });
@@ -95,11 +95,10 @@ test('rejects a mismatched basename/size/count postcondition', async () => {
     nodes: [{ nodeName: 'INPUT', backendNodeId: 81, attributes: ['type', 'file', 'data-toolbraid-file-target', marker] }],
     verify: { ok: true, file: { name: 'other.mp4', size: 42, count: 1 } },
   });
-  await assert.rejects(controller.upload({ ...request, ...hooks }), (error) => error.code === 'FILE_UPLOAD_POSTCONDITION_FAILED');
+  await assert.rejects(controller.upload({ ...request, ...hooks }), (error) => error.code === 'FILE_UPLOAD_OUTCOME_UNKNOWN' && error.message.includes('before retrying'));
   const setCalls = calls.filter((entry) => entry[0] === 'command' && entry[2] === 'DOM.setFileInputFiles');
   assert.deepEqual(setCalls.map((entry) => entry[3]), [
     { files: ['D:\\private\\clip.mp4'], backendNodeId: 81 },
-    { files: [], backendNodeId: 81 },
   ]);
   assert.deepEqual(calls.slice(-2).map((entry) => entry[0]), ['cleanup', 'detach']);
 });

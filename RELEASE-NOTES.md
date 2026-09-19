@@ -4,6 +4,23 @@
 
 Release candidates are pre-releases. Dates below describe recorded changes and validation, not a claim that every integration is certified today.
 
+## Media upload and reply fixes — 19 September 2026
+
+Runtime **0.3.1**, release **v0.3.1-rc.1**; version and tag unchanged. Download the refreshed assets and current checksums, not the historical tag's automatic source archives.
+
+- **Windows file selection:** the companion can resolve and operate the standard Open dialog's filename field and Open button. Exact window/process/control checks and sensitive-field exclusions remain in place.
+- **Media attachments:** verification retains the exact selected input and trusted browser event receipt when a page clears or removes its file input. It no longer sends duplicate synthetic selection events. If dispatch happened but confirmation is missing, the result explicitly says the outcome is unknown and asks the caller to inspect attachments before retrying.
+- **X replies beside playing videos:** playback countdown changes no longer invalidate an otherwise unchanged prepared action. Changes to the post, recipient, editor, URL or binding still invalidate it.
+- Includes the previously prepared Store first-run guidance, connection diagnostics and Windows 11 scoped virtualization exclusions in the published source. Publishing that source does not approve or update a Microsoft submission.
+
+**Validation:** 51 targeted checks passed: 42 upload/action/page checks, including real Chromium/CDP selection, and 9 Windows UI Automation checks, including the real Open dialog. On authenticated Edge, ToolBraid prepared a reply and attached a video through a one-use file grant; fresh page reads confirmed the draft, video attachment and upload-ready state. The test draft was cleared without publishing. This is evidence for that workflow, not certification of every website or every X operation.
+
+To run the opt-in browser checks, install Playwright and Chromium (or set the existing `E2E_PLAYWRIGHT_MODULE` and `E2E_CHROME_PATH` overrides), then run `TOOLBRAID_BROWSER_LIVE=1 node --test tests/universal/file-upload-browser.test.mjs` in a shell that supports environment prefixes. In PowerShell, set `$env:TOOLBRAID_BROWSER_LIVE='1'` first. Windows UI checks use `TOOLBRAID_UIA_LIVE=1`.
+
+The full public-source suite additionally passed **587 tests, 5 opt-in skipped, 0 failed**, with browser checks enabled and test concurrency limited to 4. Targeted and full-suite counts overlap and must not be added together.
+
+The refreshed **Edge submission ZIP** is included at version 0.3.1. Microsoft requires a higher manifest version when replacing a previously submitted package, so this same-version refresh has **not** been submitted to Edge Add-ons. The Windows ZIP launcher remains unsigned. Reload the matching unpacked extension and reinstall the complete Windows package to apply both halves of the update.
+
 ## Source and runtime refresh — 13 September 2026
 
 Runtime **0.3.1**, release **v0.3.1-rc.1**; no version bump.

@@ -119,8 +119,7 @@ export function createFileUploadController({ chromeApi = globalThis.chrome, rand
       const debuggee = { tabId };
       let marked = false;
       let attached = false;
-      let attachedBackendNodeId = null;
-      let completed = false;
+      let selectionDispatched = false;
       try {
         const markResult = await markTarget({ binding, targetRef, marker, attribute: MARKER_ATTRIBUTE });
         if (!markResult || markResult.ok !== true) fail(markResult?.error?.code ?? 'FILE_TARGET_MARK_FAILED', 'The exact file input could not be marked.');
@@ -142,28 +141,22 @@ export function createFileUploadController({ chromeApi = globalThis.chrome, rand
         if (confirmedNode.backendNodeId !== node.backendNodeId) {
           fail('FILE_TARGET_BINDING_MISMATCH', 'The marked file input identity changed before attachment.');
         }
+        selectionDispatched = true;
         await debuggerApi.sendCommand(debuggee, 'DOM.setFileInputFiles', {
           files: [resolvedLocalPath],
           backendNodeId: confirmedNode.backendNodeId,
         });
-        attachedBackendNodeId = confirmedNode.backendNodeId;
 
         const verification = await verifyTarget({ binding, targetRef, marker, attribute: MARKER_ATTRIBUTE });
         assertVerification(verification, expected);
-        completed = true;
         return Object.freeze({ ok: true, file: expected });
       } catch (error) {
+        if (selectionDispatched) {
+          throw new FileUploadError('FILE_UPLOAD_OUTCOME_UNKNOWN', 'File selection was dispatched but could not be verified. The page may already have received the file; inspect its attachments before retrying.');
+        }
         if (error instanceof FileUploadError) throw error;
         throw new FileUploadError(error?.code ?? 'FILE_UPLOAD_FAILED', 'The local file upload operation failed.');
       } finally {
-        if (!completed && attachedBackendNodeId !== null) {
-          try {
-            await debuggerApi.sendCommand(debuggee, 'DOM.setFileInputFiles', {
-              files: [],
-              backendNodeId: attachedBackendNodeId,
-            });
-          } catch { /* best-effort file selection rollback */ }
-        }
         if (marked) {
           try { await cleanupTarget({ binding, targetRef, marker, attribute: MARKER_ATTRIBUTE }); } catch { /* best-effort marker cleanup */ }
         }

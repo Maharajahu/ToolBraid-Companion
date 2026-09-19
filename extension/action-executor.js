@@ -1393,16 +1393,46 @@
     return { accept, multiple };
   }
 
+  const fileTargetReceipts = new Map();
+
+  function markedFileTarget(request) {
+    const state = fileTargetReceipts.get(request.marker);
+    if (!state || state.documentRef !== documentFrom(request) || state.ref !== request.ref
+      || state.liveFingerprint !== request.pageFingerprint
+      || state.url !== state.documentRef.location?.href) {
+      throw executionError('FILE_TARGET_BINDING_MISMATCH', 'The file selection receipt does not match the original document and target.');
+    }
+    validateFileDescriptor(state.element, request);
+    return state;
+  }
+
   function markFileTarget(request = {}) {
     const state = fileTargetRequest(request);
     assertLiveFileInput(state.element, state.documentRef);
     const descriptor = validateFileDescriptor(state.element, request);
     const collision = state.elements.find((candidate) => attr(candidate, FILE_TARGET_MARKER_ATTRIBUTE, '') === state.marker);
-    if (collision) throw executionError('FILE_TARGET_MARKER_COLLISION', 'The temporary file target marker is already in use.');
+    if (collision || fileTargetReceipts.has(state.marker)) throw executionError('FILE_TARGET_MARKER_COLLISION', 'The temporary file target marker is already in use.');
     safeCall(state.element, 'setAttribute', [FILE_TARGET_MARKER_ATTRIBUTE, state.marker], null);
     if (attr(state.element, FILE_TARGET_MARKER_ATTRIBUTE, '') !== state.marker) {
       throw executionError('FILE_TARGET_MARK_FAILED', 'The file target marker could not be applied.');
     }
+    const receipt = { ...state, ref: request.ref, url: state.documentRef.location?.href, armed: false, files: null };
+    const eventSource = state.documentRef.defaultView ?? state.element;
+    const onSelection = (event) => {
+      if (!receipt.armed || event.isTrusted !== true || (event.composedPath?.()[0] ?? event.target) !== state.element) return;
+      const files = toArray(safeGet(state.element, 'files', [])).map((file) => ({
+        name: String(safeGet(file, 'name', '')),
+        size: Number(safeGet(file, 'size', 0)) || 0,
+      }));
+      if (files.length) receipt.files = files;
+    };
+    eventSource.addEventListener('input', onSelection, true);
+    eventSource.addEventListener('change', onSelection, true);
+    receipt.cleanup = () => {
+      eventSource.removeEventListener('input', onSelection, true);
+      eventSource.removeEventListener('change', onSelection, true);
+    };
+    fileTargetReceipts.set(state.marker, receipt);
     return { ok: true, ref: request.ref, pageFingerprint: state.liveFingerprint, marker: state.marker, attribute: FILE_TARGET_MARKER_ATTRIBUTE, ...descriptor };
   }
 
@@ -1414,23 +1444,18 @@
     if (marked.length !== 1 || marked[0] !== state.element) {
       throw executionError('FILE_TARGET_BINDING_MISMATCH', 'The temporary marker no longer identifies only the bound file target.');
     }
+    const receipt = markedFileTarget(request);
+    if (receipt.element !== state.element) throw executionError('FILE_TARGET_BINDING_MISMATCH', 'The original file input was replaced before attachment.');
+    receipt.armed = true;
     return { ok: true, ref: request.ref, pageFingerprint: state.liveFingerprint };
   }
 
   function verifyFileTarget(request = {}) {
-    const state = fileTargetRequest(request);
-    assertLiveFileInput(state.element, state.documentRef);
-    validateFileDescriptor(state.element, request);
-    const marked = state.elements.filter((candidate) => attr(candidate, FILE_TARGET_MARKER_ATTRIBUTE, '') === state.marker);
-    if (marked.length !== 1 || marked[0] !== state.element) throw executionError('FILE_TARGET_BINDING_MISMATCH', 'The temporary marker no longer identifies only the bound file target.');
-    const files = toArray(safeGet(state.element, 'files', [])).map((file) => ({
-      name: String(safeGet(file, 'name', '')),
-      size: Number(safeGet(file, 'size', 0)) || 0,
-    }));
-    if (files.length === 0) throw executionError('FILE_TARGET_EMPTY', 'No files were attached to the bound file target.');
-    const events = [];
-    dispatch(state.element, state.documentRef, 'input', events);
-    dispatch(state.element, state.documentRef, 'change', events);
+    // Selection itself changes the page, and React may clear or remove the input.
+    // Verify the browser's event on the exact prevalidated node, not the old page hash.
+    const state = markedFileTarget(request);
+    const files = state.files;
+    if (!state.armed || !files?.length) throw executionError('FILE_TARGET_EMPTY', 'No trusted file selection was observed on the bound file target.');
     return { ok: true, count: files.length, files };
   }
 
@@ -1440,6 +1465,15 @@
       const documentRef = documentFrom(request);
       const marker = typeof request.marker === 'string' ? request.marker.trim() : '';
       if (!marker) return { ok: false, removed: false };
+      const receipt = fileTargetReceipts.get(marker);
+      if (receipt) {
+        if (receipt.documentRef !== documentRef || receipt.ref !== request.ref) return { ok: false, removed: false };
+        receipt.cleanup();
+        fileTargetReceipts.delete(marker);
+        if (attr(receipt.element, FILE_TARGET_MARKER_ATTRIBUTE, '') !== marker) return { ok: true, removed: false };
+        safeCall(receipt.element, 'removeAttribute', [FILE_TARGET_MARKER_ATTRIBUTE], null);
+        return { ok: true, removed: attr(receipt.element, FILE_TARGET_MARKER_ATTRIBUTE, null) === null };
+      }
       const resolved = targetElements(documentRef, request.ref, Number.isInteger(request.maxNodes) ? request.maxNodes : 1024);
       if (attr(resolved.element, FILE_TARGET_MARKER_ATTRIBUTE, '') !== marker) return { ok: true, removed: false };
       safeCall(resolved.element, 'removeAttribute', [FILE_TARGET_MARKER_ATTRIBUTE], null);

@@ -38,6 +38,8 @@ This is the official **source, releases and documentation repository** for the p
 
 **Windows x64 · 0.3.1 RC1 · Free download.** The companion includes Node.js. This is a manual-install pre-release; the ZIP launcher is unsigned. See [compatibility and signing status](docs/compatibility.md) before installing.
 
+**Updated 19 September 2026:** Windows file selection, reliable media attachment verification and X replies beside playing videos. Version unchanged. [Changes, verified workflows and limits](RELEASE-NOTES.md#media-upload-and-reply-fixes--19-september-2026).
+
 <a id="what-is-toolbraid"></a>
 
 ## What it can do

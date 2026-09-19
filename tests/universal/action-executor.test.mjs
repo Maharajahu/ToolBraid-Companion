@@ -71,7 +71,11 @@ class FakeNode {
 
   removeAttribute(name) { delete this.attributes[name.toLowerCase()]; }
 
-  dispatchEvent(event) { this.events.push(event.type); return true; }
+  addEventListener(type, listener) { (this.listeners ??= new Map()).set(type, listener); }
+
+  removeEventListener(type, listener) { if (this.listeners?.get(type) === listener) this.listeners.delete(type); }
+
+  dispatchEvent(event) { this.events.push(event.type); this.listeners?.get(event.type)?.({ ...event, target: event.target ?? this }); return true; }
 
   click() { this.clicks += 1; }
 
@@ -271,6 +275,8 @@ test('file target hooks mark an exact live input, expose minimal metadata, and c
   assert.deepEqual({ ...executor.revalidateFileTarget(binding) }, { ok: true, ref: 'id:upload', pageFingerprint });
 
   fixture.input.files = [{ name: 'photo.png', size: 42, path: 'C:\\private\\photo.png', type: 'image/png' }];
+  fixture.input.dispatchEvent({ type: 'input', isTrusted: true });
+  fixture.input.dispatchEvent({ type: 'change', isTrusted: true });
   const verified = executor.verifyFileTarget(binding);
   assert.deepEqual(JSON.parse(JSON.stringify(verified)), { ok: true, count: 1, files: [{ name: 'photo.png', size: 42 }] });
   assert.deepEqual(fixture.input.events, ['input', 'change']);
@@ -323,6 +329,32 @@ test('file target verification requires the same marker and cleanup never remove
   assert.deepEqual({ ...executor.cleanupFileTarget({ ...binding, marker: 'other' }) }, { ok: true, removed: false });
   assert.equal(fixture.input.getAttribute('data-toolbraid-file-target'), 'owned');
   assert.deepEqual({ ...executor.cleanupFileTarget({ documentRef: fixture.documentRef, ref: 'missing', marker: 'owned' }) }, { ok: false, removed: false });
+});
+
+test('file receipts survive page changes and cleared/detached inputs without redispatching events', () => {
+  const context = loadRuntime();
+  const executor = context.ToolBraidUniversalActionExecutor;
+  const fixture = fileFixture();
+  const pageFingerprint = context.ToolBraidUniversalPageExtractor.extract({ documentRef: fixture.documentRef }).pageFingerprint;
+  const binding = { documentRef: fixture.documentRef, ref: 'id:upload', pageFingerprint, marker: 'react-upload' };
+  executor.markFileTarget(binding);
+  fixture.input.files = [{ name: 'clip.mp4', size: 99 }];
+  fixture.input.dispatchEvent({ type: 'input', isTrusted: true });
+  assert.throws(() => executor.verifyFileTarget(binding), { code: 'FILE_TARGET_EMPTY' });
+  executor.revalidateFileTarget(binding);
+  fixture.input.dispatchEvent({ type: 'input', isTrusted: false });
+  assert.throws(() => executor.verifyFileTarget(binding), { code: 'FILE_TARGET_EMPTY' });
+  fixture.input.dispatchEvent({ type: 'input', isTrusted: true });
+  fixture.input.files = [];
+  fixture.body.textContent = 'Video ready';
+  assert.notEqual(context.ToolBraidUniversalPageExtractor.extract({ documentRef: fixture.documentRef }).pageFingerprint, pageFingerprint);
+  assert.deepEqual(JSON.parse(JSON.stringify(executor.verifyFileTarget(binding))), { ok: true, count: 1, files: [{ name: 'clip.mp4', size: 99 }] });
+  assert.equal(fixture.input.events.length, 3);
+  assert.throws(() => executor.verifyFileTarget({ ...binding, pageFingerprint: 'different' }), { code: 'FILE_TARGET_BINDING_MISMATCH' });
+  fixture.documentRef.location.href += '/different';
+  assert.throws(() => executor.verifyFileTarget(binding), { code: 'FILE_TARGET_BINDING_MISMATCH' });
+  assert.equal(executor.cleanupFileTarget(binding).removed, true);
+  assert.equal(fixture.input.listeners.size, 0);
 });
 
 test('executor stages input, select, and checkbox values with native input/change events', () => {
