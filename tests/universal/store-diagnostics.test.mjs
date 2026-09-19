@@ -33,7 +33,7 @@ test('Store probe reports an unavailable executable without exposing its path', 
 
 test('Store diagnostics validate registration, exact IDs and config before a read-only probe', async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'toolbraid-store-diagnostics-'));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => rm(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }));
   const dataRoot = path.join(root, 'data'), aliasRoot = path.join(root, 'aliases');
   await Promise.all([mkdir(dataRoot), mkdir(aliasRoot)]);
   const edgeId = 'a'.repeat(32), chromeId = 'b'.repeat(32);
