@@ -2,4 +2,4 @@
 889b4d766310cbddf8201e6a0fbd1281af8203c1d700b28d8dcfe75421341985  ToolBraid-0.3.1-edge-extension.zip
 cd7791bbb9ea7aaa6fe7a6ec4bd39e42165da5bebfa1c25067b2e8ac986c5e03  ToolBraid-0.3.1-windows-x64.zip
 b707791988361f0bcc5740121ec835c43ee7fe77235746f5fa48fcebea9b2a03  ToolBraid-Windows-real-demo-4K.mp4
-d86f19b63698be53bcb1b8c3191c48d467305012af8caf1ca1cc8cc30dabd9dc  ToolBraid-0.3.1-source.zip
+49a7ce67a5221721cf6c13112b48dc3b201ec6cd22d1bc0676f070af32624b29  ToolBraid-0.3.1-source.zip

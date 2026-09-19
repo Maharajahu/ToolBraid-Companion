@@ -8,7 +8,7 @@ Release candidates are pre-releases. Dates below describe recorded changes and v
 
 Runtime **0.3.1**, release **v0.3.1-rc.1**; version and tag unchanged. Download the refreshed assets and current checksums, not the historical tag's automatic source archives.
 
-Source archive snapshot: [9e8f3b9](https://github.com/Maharajahu/ToolBraid-Companion/tree/9e8f3b9beb2f59eef3458e2a767f8fdc62abd103). The following provenance/checksum commit does not change that archive. [Download source](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip).
+Source archive snapshot: [5c8960f](https://github.com/Maharajahu/ToolBraid-Companion/tree/5c8960fc812674fde0766896f64aee3f5ed08dcc), including a bounded retry for Windows test cleanup while a diagnostic executable exits. The following provenance/checksum commit does not change that archive. [Download source](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip).
 
 - **Windows file selection:** the companion can resolve and operate the standard Open dialog's filename field and Open button. Exact window/process/control checks and sensitive-field exclusions remain in place.
 - **Media attachments:** verification retains the exact selected input and trusted browser event receipt when a page clears or removes its file input. It no longer sends duplicate synthetic selection events. If dispatch happened but confirmation is missing, the result explicitly says the outcome is unknown and asks the caller to inspect attachments before retrying.
