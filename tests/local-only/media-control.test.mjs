@@ -11,10 +11,11 @@ const OWNER = 'owner-client-0123456789abcdef';
 const OTHER_OWNER = 'other-client-0123456789abcdef';
 
 async function waitFor(control, jobId, ownerId, status) {
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
     const state = await control.state({ jobId }, ownerId);
     if (state.status === status) return state;
-    await new Promise((resolve) => setImmediate(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 10));
   }
   throw new Error(`Media job did not reach ${status}.`);
 }
