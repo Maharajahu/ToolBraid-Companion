@@ -24,9 +24,9 @@ The unpacked Chrome/Edge extension identity is `gpjhdlbjfhlaeakphfognpijgmclecmn
 
 The public downloads are a **pre-release candidate**, not a stable or Microsoft-approved release. The Windows ZIP launcher is unsigned. A matching checksum confirms integrity, not publisher identity; do not disable security protections.
 
-**Last recorded publisher status, 13 September 2026:** Windows Companion 0.3.1.0 was **In certification**, and the separate Edge Add-ons extension was **In review**. Submission is not approval. No verified public Store installation links are listed here. Microsoft signing of a certified MSIX will not sign the independent ZIP/EXE.
+Microsoft Store and Edge Add-ons downloads are not available here. Microsoft signing of a certified MSIX does not sign the independent ZIP/EXE.
 
-Store installation/update/removal still needs validation after availability. Chrome distribution uses manual ZIP installation and updates. Refreshing assets on GitHub does not change an existing Microsoft submission.
+Store installation/update/removal is not fully validated. Chrome and unpacked Edge use manual ZIP installation and updates.
 
 ## Permissions and data
 
@@ -46,8 +46,10 @@ The public repository now runs source tests and the extension build in CI. Earli
 
 | Check | Recorded result | Boundary |
 | --- | --- | --- |
-| Public-source suite, 13 September | **580 passed, 4 opt-in skipped, 0 failed** | Excludes old cloud-demo/private CLI-agent tests; not directly comparable with the earlier total. |
-| Read/scroll patch before export | **77 targeted automated checks; 12 read-only live X checks passed** | Content churn, cached reads, root scrolling and rejected old-page bindings. |
+| Public-source suite, 19 September | **587 passed, 5 opt-in skipped, 0 failed** | Includes upload regressions; not complete live-site coverage. |
+| Upload/reply fixes, 19 September | **51 targeted checks passed; live Edge reply draft and video attachment confirmed ready** | Overlaps the full suite; no live publication in this check. |
+| Public-source suite, 13 September | **580 passed, 4 opt-in skipped, 0 failed** | Historical suite with a different scope from the earlier total. |
+| Read/scroll checks, 13 September | **77 targeted automated checks; 12 read-only live X checks passed** | Content churn, cached reads, root scrolling and rejected old-page bindings. |
 | Earlier automated snapshot, 13 September | **616 passed, 4 opt-in skipped, 0 failed** | Historical wider development suite; not every integration is a live-site test. |
 | MCP server tests | **8/8 passed** | Configuration refresh, authenticated reconnect, concurrency and no replay of interrupted commands. Included in the total above. |
 | Browser integration | Chromium/Edge checks and required-debugger panel state | Clean-install native permission dialogs and all re-enablement paths still need manual checks. |

@@ -28,14 +28,7 @@ ToolBraid combines a **WebMCP-enabled browser extension** and a **local Windows 
 
 This is the official **source, releases and documentation repository** for the public edition. The browser extension, Windows companion, tests and packaging scripts are available under Apache 2.0.
 
-## Latest update · 19 September 2026
-
-- **Windows file picker:** standard Open dialogs can be completed through the companion.
-- **Media uploads:** attachment verification survives cleared or removed upload fields, without duplicate selection events.
-- **X replies:** playing-video countdowns no longer interrupt an otherwise unchanged prepared reply.
-- **Token-efficiency video:** a new 15-second 1080p video, native players on the website and GitHub, and the measurement with its limitations.
-
-**0.3.1 RC1 unchanged.** [Full update and validation record](RELEASE-NOTES.md#latest-update--19-september-2026) · [Watch the new video](#token-efficient-context). Microsoft submissions are unchanged.
+**Updated 19 September 2026:** more reliable file uploads and X replies. [What's new](RELEASE-NOTES.md#latest-update--19-september-2026) · [Token-efficiency video and measurement](#token-efficient-context).
 
 ## Get started
 

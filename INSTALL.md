@@ -141,7 +141,7 @@ Remove the extension separately in the browser. The uninstaller removes recorded
 
 ## Microsoft Store companion
 
-**Last recorded publisher status, 13 September 2026:** Windows Companion 0.3.1.0 was **In certification**; the separate Edge Add-ons extension was **In review**. No verified public Store installation link is listed here. The prepared Store package has not been certified by this project's installed-Store lifecycle tests.
+**Not available for Store installation yet.** Use the manual Windows package and matching unpacked extension. The separate Store edition's installation, update and removal lifecycle is not fully validated.
 
 The Store edition has a native window with **Connect browsers**, **Disconnect browsers**, **Open MCP configuration** and **Check connection**. Its configuration lives under `%LOCALAPPDATA%\ToolBraid\store`, not the ZIP edition's `public` directory. The extension remains a separate installation.
 

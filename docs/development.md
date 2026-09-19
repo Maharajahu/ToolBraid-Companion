@@ -41,7 +41,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-store.ps1 -Loc
 npm run test:store
 ```
 
-This produces an **unsigned local-validation MSIX**, not a certified installer. Store publishing requires the publisher's own Partner Center identity and approval; GitHub packaging does not update a Microsoft submission.
+This produces an **unsigned local-validation MSIX**, not a certified installer. Store distribution requires Microsoft certification and signing.
 
 ## Tests and optional integrations
 
