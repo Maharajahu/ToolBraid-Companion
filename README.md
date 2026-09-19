@@ -28,6 +28,15 @@ ToolBraid combines a **WebMCP-enabled browser extension** and a **local Windows 
 
 This is the official **source, releases and documentation repository** for the public edition. The browser extension, Windows companion, tests and packaging scripts are available under Apache 2.0.
 
+## Latest update · 19 September 2026
+
+- **Windows file picker:** standard Open dialogs can be completed through the companion.
+- **Media uploads:** attachment verification survives cleared or removed upload fields, without duplicate selection events.
+- **X replies:** playing-video countdowns no longer interrupt an otherwise unchanged prepared reply.
+- **Token-efficiency video:** a new 15-second 1080p video, native players on the website and GitHub, and the measurement with its limitations.
+
+**0.3.1 RC1 unchanged.** [Full update and validation record](RELEASE-NOTES.md#latest-update--19-september-2026) · [Watch the new video](#token-efficient-context). Microsoft submissions are unchanged.
+
 ## Get started
 
 **[Download for Windows](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip)** · [Extension only](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) · [Source ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip) · [Checksums](SHA256SUMS.txt)
@@ -37,8 +46,6 @@ This is the official **source, releases and documentation repository** for the p
 3. Enable your chosen site in ToolBraid and [connect your AI](INSTALL.md#4-connect-your-ai).
 
 **Windows x64 · 0.3.1 RC1 · Free download.** The companion includes Node.js. This is a manual-install pre-release; the ZIP launcher is unsigned. See [compatibility and signing status](docs/compatibility.md) before installing.
-
-**Updated 19 September 2026:** Windows file selection, reliable media attachment verification and X replies beside playing videos. Version unchanged. [Changes, verified workflows and limits](RELEASE-NOTES.md#media-upload-and-reply-fixes--19-september-2026).
 
 <a id="what-is-toolbraid"></a>
 

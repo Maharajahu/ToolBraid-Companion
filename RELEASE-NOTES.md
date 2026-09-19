@@ -4,6 +4,16 @@
 
 Release candidates are pre-releases. Dates below describe recorded changes and validation, not a claim that every integration is certified today.
 
+## Latest update — 19 September 2026
+
+**Version 0.3.1 and release tag v0.3.1-rc.1 are unchanged.** This is a refresh of the existing release, not a new version. Microsoft's existing review remains unchanged.
+
+- **Runtime fixes published:** Windows file selection, reliable media attachment verification and X replies beside playing videos. [Detailed changes and recorded validation](#media-upload-and-reply-fixes--19-september-2026).
+- **Added today:** the 15-second, 1080p token-efficiency video with native players on the [website](https://toolbraid.pages.dev/#token-efficiency) and both GitHub READMEs. [Measurement and limitations](docs/token-efficiency.md): 821 returned-context tokens versus 5,094 for the full DOM snapshot in one seven-post conversation; custom extraction returned 661. This is not a total-usage claim.
+- **Website and documentation:** dated update notices, the benchmark explanation and links to the refreshed downloads.
+
+**Video/site checks:** playback verified on the live website and official GitHub README; desktop/mobile layout checked; published video and page hashes matched the local files. Runtime validation is recorded below, separately from these presentation changes.
+
 ## Media upload and reply fixes — 19 September 2026
 
 Runtime **0.3.1**, release **v0.3.1-rc.1**; version and tag unchanged. Download the refreshed assets and current checksums, not the historical tag's automatic source archives.
