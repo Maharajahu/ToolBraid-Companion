@@ -39,7 +39,7 @@ This is the official **source, releases and documentation repository** for the p
 2. Download and extract the separate browser extension. In Chrome or Edge, enable **Developer mode → Load unpacked** and select the extracted folder containing `manifest.json`.
 3. Enable your chosen site in ToolBraid, use **Check connection** in the companion and [connect your AI](INSTALL.md#4-connect-your-ai).
 
-**Free · Store companion 0.3.3.0 · Extension 0.3.1.** The Store installs the Windows companion, not the browser extension. The separate **0.3.1 RC1 manual ZIP** remains available and unsigned. See [installation](INSTALL.md), [edition differences and signing](docs/compatibility.md#distribution-and-signing).
+**Free · Store companion 0.3.3.0 · Extension 0.3.1.** The Store installs the Windows companion, not the browser extension. The separate **0.3.1 RC1 manual ZIP** remains available and unsigned. See [installation](INSTALL.md), [edition differences](docs/compatibility.md#distribution-and-signing) and [Code signing policy](docs/code-signing.md).
 
 <a id="what-is-toolbraid"></a>
 

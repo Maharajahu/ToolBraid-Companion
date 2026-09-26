@@ -1,0 +1,90 @@
+name: Build and sign Windows ZIP
+
+on:
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: Request release signing (requires configured SignPath and manual approval)
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  windows-zip:
+    if: github.repository == 'Maharajahu/ToolBraid-Companion' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Check signing configuration
+        if: inputs.sign
+        shell: pwsh
+        env:
+          SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+          SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          SIGNPATH_ARTIFACT_CONFIGURATION_SLUG: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+        run: |
+          foreach ($name in @('SIGNPATH_API_TOKEN', 'SIGNPATH_ORGANIZATION_ID', 'SIGNPATH_PROJECT_SLUG', 'SIGNPATH_SIGNING_POLICY_SLUG', 'SIGNPATH_ARTIFACT_CONFIGURATION_SLUG')) {
+            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) { throw "Missing $name; signing is not configured." }
+          }
+      - name: Validate source and tests
+        run: npm run validate
+      - name: Build Windows ZIP from this commit
+        id: build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ./scripts/build-release.ps1
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "package=dist/release-$version/ToolBraid-$version-windows-x64.zip" >> $env:GITHUB_OUTPUT
+      - name: Preserve unsigned build provenance
+        id: unsigned
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsigned-windows-companion
+          path: ${{ steps.build.outputs.package }}
+          if-no-files-found: error
+          retention-days: 14
+      - name: Request SignPath release signing
+        if: inputs.sign
+        uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092 # v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: dist/signpath-signed
+          parameters: |
+            version: "${{ steps.build.outputs.version }}"
+      - name: Verify signature and unchanged package contents
+        if: inputs.sign
+        shell: pwsh
+        env:
+          UNSIGNED_PACKAGE: ${{ steps.build.outputs.package }}
+          PACKAGE_VERSION: ${{ steps.build.outputs.version }}
+        run: ./scripts/verify-signed-release.ps1 -UnsignedPackage $env:UNSIGNED_PACKAGE -SignedPackage "dist/signpath-signed/ToolBraid-$env:PACKAGE_VERSION-windows-x64.zip"
+      - name: Preserve verified signed package and checksum
+        if: inputs.sign
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verified-signed-windows-companion
+          path: |
+            dist/signpath-signed/ToolBraid-${{ steps.build.outputs.version }}-windows-x64.zip
+            dist/signpath-signed/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14

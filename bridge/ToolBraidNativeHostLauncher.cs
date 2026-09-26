@@ -4,6 +4,15 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
+#if PORTABLE
+[assembly: System.Reflection.AssemblyTitle("ToolBraid Companion")]
+[assembly: System.Reflection.AssemblyProduct("ToolBraid Companion")]
+[assembly: System.Reflection.AssemblyCompany("Maharajahu")]
+[assembly: System.Reflection.AssemblyVersion("0.3.1.0")]
+[assembly: System.Reflection.AssemblyFileVersion("0.3.1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersion("0.3.1")]
+#endif
+
 internal static class ToolBraidNativeHostLauncher
 {
 #if STORE

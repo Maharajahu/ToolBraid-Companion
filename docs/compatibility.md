@@ -32,6 +32,8 @@ The 19 September upload and reply fixes apply to the manual release and extensio
 
 A checksum confirms integrity, not publisher identity. Microsoft signing of the Store package does not sign the independent ZIP/EXE. Do not disable security protections. Installed-package Edge and Chrome tests covered connection and removal before submission; a Store-delivered upgrade to a newer version has not been verified.
 
+The [Code signing policy](code-signing.md) defines separate verification and approval requirements for independently signed GitHub releases.
+
 ## Permissions and data
 
 - **Control starts paused.** Read the disclosure, enable the intended site and grant browser site access.
