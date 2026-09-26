@@ -91,11 +91,13 @@ jobs:
         env:
           TOOLBRAID_INSTALL_TEST: '1'
         run: |
+          $ErrorActionPreference = 'Continue'
           node --test tests/universal/companion-install.test.mjs 2>&1 | Tee-Object dist/release-e2e-evidence/lifecycle.txt
           if ($LASTEXITCODE -ne 0) { throw 'Candidate lifecycle failed.' }
       - name: Standard browser first-run, restart, form and pause
         shell: powershell
         run: |
+          $ErrorActionPreference = 'Continue'
           node scripts/e2e-standard-browser.mjs 2>&1 | Tee-Object dist/release-e2e-evidence/standard.txt
           if ($LASTEXITCODE -ne 0) { throw 'Standard browser flow failed.' }
       - name: Native WebMCP through extension and installed companion
@@ -103,6 +105,7 @@ jobs:
         env:
           TOOLBRAID_WEBMCP_NATIVE: '1'
         run: |
+          $ErrorActionPreference = 'Continue'
           node scripts/e2e-standard-browser.mjs 2>&1 | Tee-Object dist/release-e2e-evidence/native-webmcp.txt
           if ($LASTEXITCODE -ne 0) { throw 'Native WebMCP flow failed.' }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
