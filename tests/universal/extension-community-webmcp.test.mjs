@@ -33,6 +33,23 @@ test('WebMCP handles bind tab, frame, URL and session; expire and execute once',
   const third = await discover(); now = 120001; await assert.rejects(execute(third), { code: 'WEBMCP_HANDLE_STALE' });
   assert.equal(executions, 1);
 });
+
+test('native WebMCP survives extension serialization ordering without accepting changed schemas', async () => {
+  const registered = { name: 'site.echo', description: 'Echo an exact value', inputSchema: { type: 'object', properties: { value: { type: 'string', maxLength: 20 } }, required: ['value'], additionalProperties: false } };
+  let calls = 0;
+  const context = { document: { modelContext: { getTools: async () => [registered], executeTool: async (_tool, input) => { calls++; return input.value; } } }, location: { href: 'https://example.test/', origin: 'https://example.test' }, AbortController, setTimeout, clearTimeout, addEventListener() {}, removeEventListener() {} };
+  const operation = vm.runInNewContext(`(${nativeWebMcpOperation.toString()})`, context);
+  const listed = await operation({ operation: 'discover', url: context.location.href });
+  const serialized = JSON.parse(JSON.stringify(listed.tools[0], (_key, value) => value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, value[key]])) : value));
+  assert.notEqual(JSON.stringify(serialized), JSON.stringify(listed.tools[0]));
+  const result = await operation({ operation: 'execute', url: context.location.href, tool: serialized, input: { value: 'exact-value' } });
+  assert.equal(result.result, 'exact-value');
+  assert.equal(calls, 1);
+  registered.inputSchema.properties.value.maxLength = 30;
+  await assert.rejects(operation({ operation: 'execute', url: context.location.href, tool: serialized, input: { value: 'do not repeat' } }), /WEBMCP_TOOL_CHANGED/);
+  assert.equal(calls, 1);
+});
 test('native WebMCP normalizes legacy JSON schemas and serializes input without retrying', async () => {
   const registered = { name: 'legacy.echo', inputSchema: JSON.stringify({ type: 'object', properties: { value: { type: 'string' } } }) };
   let calls = 0;

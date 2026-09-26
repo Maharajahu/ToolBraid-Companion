@@ -22,7 +22,12 @@ export async function nativeWebMcpOperation(request) {
     && (tool.origin ?? location.origin) === location.origin).slice(0, 100);
   if (request.operation === 'discover') return { available: true, tools: tools.map(describe) };
   if (request.operation !== 'execute') throw new Error('WEBMCP_OPERATION_INVALID');
-  const matching = tools.filter((tool) => JSON.stringify(describe(tool)) === JSON.stringify(request.tool));
+  // Browser extension serialization can reorder object keys, including schemas.
+  const identity = (value) => JSON.stringify(value, (_key, item) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return item;
+    return Object.fromEntries(Object.keys(item).sort().map((key) => [key, item[key]]));
+  });
+  const matching = tools.filter((tool) => identity(describe(tool)) === identity(request.tool));
   if (matching.length !== 1) throw new Error('WEBMCP_TOOL_CHANGED');
   const controller = new AbortController();
   const abort = () => controller.abort();
