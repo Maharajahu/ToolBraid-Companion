@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, realpath, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -38,7 +38,8 @@ test('portable companion installs, updates, configures only the selected client 
   assert.ok(existsSync(path.join(companion, 'runtime/node.exe')), 'Build the release companion first.');
   const before = [].concat(registrations());
   assert.equal(before.some((entry) => entry.key.endsWith('com.toolbraid.bridge')), false, 'An existing public installation must not be replaced by this test.');
-  const work = await mkdtemp(path.join(os.tmpdir(), 'toolbraid-install-test-'));
+  const tempRoot = await realpath(os.tmpdir());
+  const work = await mkdtemp(path.join(tempRoot, 'toolbraid-install-test-'));
   const installRoot = path.join(work, "companion's files");
   const configPath = path.join(work, 'client.toml');
   const initialConfig = 'model = "test-sentinel"\n\n[mcp_servers.unrelated]\ncommand = "keep-me"\n';
@@ -47,7 +48,7 @@ test('portable companion installs, updates, configures only the selected client 
   t.after(async () => {
     if (installed) run(['-File', path.join(installRoot, 'uninstall.ps1'), '-InstallRoot', installRoot]);
     assert.deepEqual([].concat(registrations()), before, 'Native-host registrations must be restored.');
-    assert.equal(path.dirname(work), os.tmpdir());
+    assert.equal(path.dirname(work), tempRoot);
     assert.ok(path.basename(work).startsWith('toolbraid-install-test-'));
     await rm(work, { recursive: true, force: true });
   });
