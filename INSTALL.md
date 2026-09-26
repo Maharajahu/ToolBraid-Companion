@@ -4,11 +4,11 @@
 
 Install the Windows companion from **[Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R)** on **Windows 11 x64**, then install the browser extension separately. [Follow the Store setup steps](#microsoft-store-companion).
 
-The numbered steps below cover the alternative **0.3.1 RC1 manual Windows ZIP**. It includes the companion, Node.js runtime and matching extension. Its launcher is unsigned. Checksums identify bytes, not a trusted publisher signature. Neither edition includes an AI model, subscription, Codex or FFmpeg. Do not disable Windows, browser or organization security controls.
+The numbered steps below cover the alternative **0.3.1 manual Windows ZIP**. It includes the companion, Node.js runtime and matching extension. Its launcher is unsigned. Checksums identify bytes, not a trusted publisher signature. Neither edition includes an AI model, subscription, Codex or FFmpeg. Do not disable Windows, browser or organization security controls.
 
 ## 1. Download and extract
 
-Download the [Windows package](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip) and [SHA256SUMS.txt](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/SHA256SUMS.txt) from the same release. Compare the ZIP hash with its exact filename entry:
+Download the [Windows package](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1/ToolBraid-0.3.1-windows-x64.zip) and [SHA256SUMS.txt](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1/SHA256SUMS.txt) from the same release. Compare the ZIP hash with its exact filename entry:
 
 ```powershell
 Get-FileHash -LiteralPath '.\ToolBraid-0.3.1-windows-x64.zip' -Algorithm SHA256
@@ -33,7 +33,7 @@ If you already use the Store edition, do not overwrite its browser registration 
 
 Basic page tools do not attach the debugger. Screenshots, browser accessibility inspection and file attachment use it when needed. Site access and ToolBraid's own control opt-in are still required.
 
-Use the ordinary [extension ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) if you already have the matching companion. **The `edge-extension.zip` asset is for publisher submission, not unpacked installation.** It omits the stable unpacked key and may receive a different extension identity.
+Use the ordinary [extension ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1/ToolBraid-0.3.1-extension.zip) if you already have the matching companion. **The `edge-extension.zip` asset is for publisher submission, not unpacked installation.** It omits the stable unpacked key and may receive a different extension identity.
 
 Organization-managed browsers may prohibit unpacked installation. See the [Chrome installation documentation](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked); do not bypass administrator policy.
 
@@ -148,7 +148,7 @@ Remove the extension separately in the browser. The uninstaller removes recorded
 **[Available on Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R): companion 0.3.3.0, Windows 11 build 22000 or later, x64.** The browser extension remains a separate installation.
 
 1. Install the companion from the link above. Open **ToolBraid Companion** from Start and choose **Connect browsers**.
-2. Download and extract the ordinary [extension ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) into a permanent folder. In `edge://extensions` or `chrome://extensions`, enable **Developer mode**, choose **Load unpacked** and select the folder containing `manifest.json`. Do not use the keyless Edge submission ZIP or install the ZIP edition's companion on top.
+2. Download and extract the ordinary [extension ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1/ToolBraid-0.3.1-extension.zip) into a permanent folder. In `edge://extensions` or `chrome://extensions`, enable **Developer mode**, choose **Load unpacked** and select the folder containing `manifest.json`. Do not use the keyless Edge submission ZIP or install the ZIP edition's companion on top.
 3. Open an ordinary public page, open ToolBraid, read the control disclosure and enable that site. Keep the tab open.
 4. Select **Check connection** in the companion. Expect **MCP — OK**, **Extension — CONNECTED** and **Selected page — READY**. A paused extension or unselected page is not a working connection.
 5. Choose [one AI route](#4-connect-your-ai). For external clients, use **Open MCP configuration** in the Store app and preserve other client settings. No AI account is needed for the companion's connection check.

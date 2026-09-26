@@ -1,14 +1,14 @@
 # Install ToolBraid on Windows
 
-These instructions cover the **0.3.1 release candidate**. The Edge Add-ons submission was completed on **13 September 2026**, with status **In review** confirmed in Partner Center. It is not approved or published yet. Chrome uses manual unpacked installation.
+These instructions cover the **0.3.1 manual release**. Chrome and Edge use the matching unpacked extension. The keyless Edge publisher ZIP is not for unpacked installation. The Windows ZIP launcher is unsigned; the Microsoft Store companion is a separate signed distribution.
 
 <a id="microsoft-store-companion--in-preparation"></a>
 
-## Microsoft Store companion — in certification
+## Microsoft Store companion
 
-ToolBraid Companion 0.3.1.0 was submitted on 13 September 2026 and Partner Center confirmed **In certification**, with free publication after approval. This is a separate route for the Windows companion, not an Edge Add-ons installation, and it is **not available from Microsoft Store yet**. The Store identity and actual Edge extension ID are assigned. Store-installed lifecycle testing is not claimed. An unsigned `local-validation` MSIX is a packaging check, not a trusted installer. The ZIP instructions below remain the manual route.
+ToolBraid Companion **0.3.3.0** is [available free on Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R) for Windows 11 x64. Microsoft signs and distributes that package. It does not install or certify the separate browser extension. The Store package is not updated by this manual release, and Store-delivered upgrade testing is not claimed. The ZIP instructions below remain the manual route.
 
-Once the final Store package is available: install the matching extension separately, open **ToolBraid Companion**, choose **Connect browsers**, and explicitly enable a test site in the extension. **Check connection** checks runtime/configuration, MCP initialize/ping and extension status. **NOT SELECTED** means the extension answered but no page is bound; **WAITING** means no working extension connection was established. It sends no browser action or model request, hides URLs/titles and credentials, and does not test AI sign-in. The ZIP edition does not include this window.
+For the Store edition: install the matching extension separately, open **ToolBraid Companion**, choose **Connect browsers**, and explicitly enable a test site in the extension. **Check connection** checks runtime/configuration, MCP initialize/ping and extension status. **NOT SELECTED** means the extension answered but no page is bound; **WAITING** means no working extension connection was established. It sends no browser action or model request, hides URLs/titles and credentials, and does not test AI sign-in. The ZIP edition does not include this window.
 
 For external clients, use **Open MCP configuration**, under `%LOCALAPPDATA%\ToolBraid\store`, instead of the ZIP edition's `public` path and helper scripts below. Merge only its `toolbraid` entry. Built-in chat remains optional and needs no separate MCP entry. Do not run the ZIP installer over the Store registration unless deliberately switching companions.
 

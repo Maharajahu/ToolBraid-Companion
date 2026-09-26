@@ -2,7 +2,7 @@
 
 [Overview](../README.md) · [Install](../INSTALL.md) · [Capabilities](capabilities.md)
 
-Availability updated **26 September 2026**. Store companion **0.3.3.0** and manual release **0.3.1 RC1** are separate distributions; the extension/runtime version remains **0.3.1**. [SHA256SUMS.txt](../SHA256SUMS.txt) identifies the manual release downloads.
+Availability updated **26 September 2026**. Store companion **0.3.3.0** and manual release **0.3.1** are separate distributions; the extension/runtime version remains **0.3.1**. [SHA256SUMS.txt](../SHA256SUMS.txt) identifies the manual runtime downloads; the release's checksum asset also covers its source ZIP.
 
 ## Browser and client compatibility
 
@@ -25,7 +25,7 @@ The unpacked Chrome/Edge extension identity is `gpjhdlbjfhlaeakphfognpijgmclecmn
 | Distribution | Availability and signing |
 | --- | --- |
 | [Microsoft Store companion](https://apps.microsoft.com/detail/9P7VF25K2X1R) | **0.3.3.0**, published for Windows 11 x64. Microsoft signs and distributes this package. |
-| Manual Windows ZIP | **0.3.1 RC1**, updated 19 September 2026. The launcher remains unsigned. |
+| Manual Windows ZIP | **0.3.1**, released 26 September 2026. The launcher remains unsigned. |
 | Browser extension | Installed separately in Chrome or Edge using the ordinary extension ZIP. Store approval of the companion is not approval of the Edge Add-ons extension. |
 
 The 19 September upload and reply fixes apply to the manual release and extension; the companion changes are not included in Store 0.3.3.0. Do not run the ZIP installer over a Store installation to apply those fixes. Follow the [edition-specific setup and update instructions](../INSTALL.md).
@@ -52,6 +52,10 @@ The public repository now runs source tests and the extension build in CI. Earli
 
 | Check | Recorded result | Boundary |
 | --- | --- | --- |
+| Public-source suite, 26 September | **592 passed, 7 opt-in skipped, 0 failed** | Native integration and installation are additionally exercised in dedicated jobs below. |
+| Windows ZIP lifecycle, 26 September | Clean install, upgrade from the published RC and uninstall passed in Edge and Chrome jobs | Validates the manual ZIP, not a Store-delivered upgrade. |
+| Packaged browser/MCP integration, 26 September | Opt-in, reads, form submission, restart and pause enforcement passed in Edge 153 and Chrome 153 | Isolated profiles, controlled pages and pregranted fixture permissions; X requests intercepted; no cloud-account chat. |
+| Native WebMCP pipeline, 26 September | Site discovery and execution through extension, companion and MCP client passed in both browsers | Native API enabled with an experimental browser flag; default browser availability is not implied. |
 | Public-source suite, 19 September | **587 passed, 5 opt-in skipped, 0 failed** | Includes upload regressions; not complete live-site coverage. |
 | Upload/reply fixes, 19 September | **51 targeted checks passed; live Edge reply draft and video attachment confirmed ready** | Overlaps the full suite; no live publication in this check. |
 | Public-source suite, 13 September | **580 passed, 4 opt-in skipped, 0 failed** | Historical suite with a different scope from the earlier total. |
@@ -60,7 +64,7 @@ The public repository now runs source tests and the extension build in CI. Earli
 | MCP server tests | **8/8 passed** | Configuration refresh, authenticated reconnect, concurrency and no replay of interrupted commands. Included in the total above. |
 | Browser integration | Chromium/Edge checks and required-debugger panel state | Clean-install native permission dialogs and all re-enablement paths still need manual checks. |
 | ChatGPT panel chat | Real account-backed read-only browser call and streamed result in Edge | Does not certify every account, model or provider combination. |
-| Native WebMCP | Real API discovery/execution on an isolated localhost page in Chromium 151 with its experimental flag | Not certification of the entire native extension-to-MCP pipeline or default Edge availability. |
+| Earlier native WebMCP check | Real API discovery/execution on an isolated localhost page in Chromium 151 with its experimental flag | Historical page-level check; the 26 September pipeline coverage is listed above. |
 | X | Live rendered-page reading and authorized replies confirmed by fresh page reads; fixture coverage for broader actions | Automatic account/postcondition matching did not independently confirm the latest replies. Media/article actions are not fully live-certified. |
 | Store companion | Diagnostic/launcher and isolated registration checks | Not proof of Store-installed lifecycle behavior or Microsoft approval. |
 

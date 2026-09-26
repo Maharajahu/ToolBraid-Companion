@@ -2,7 +2,30 @@
 
 [Overview](README.md) · [Downloads](https://github.com/Maharajahu/ToolBraid-Companion/releases) · [Update guide](INSTALL.md#update)
 
-Available editions: **Microsoft Store companion 0.3.3.0** and **manual release 0.3.1 RC1**. The extension/runtime version remains **0.3.1**. [Compatibility and signing](docs/compatibility.md#distribution-and-signing).
+Available editions: **Microsoft Store companion 0.3.3.0** and **manual release 0.3.1**. The extension/runtime version remains **0.3.1**. [Compatibility and signing](docs/compatibility.md#distribution-and-signing).
+
+## 0.3.1 — 26 September 2026
+
+The manual companion and browser extension leave release candidate under **v0.3.1**. The previous RC remains available as a historical release.
+
+### Fixed
+
+- Native WebMCP execution now accepts unchanged tool descriptions after the browser reorders JSON fields. Changed schemas, stale page bindings and ambiguous tools remain rejected; mutations are not automatically retried.
+
+### Validation
+
+- Source suite: **592 passed, 7 opt-in skipped, 0 failed**.
+- Clean Windows: install, upgrade from the published RC ZIP, preserve existing settings and uninstall passed in separate Edge and Chrome jobs.
+- Packaged extension → native companion → MCP client: opt-in, page reads, form submission, browser restart and pause enforcement passed in both browsers. Native WebMCP discovery and execution also passed with the browser's experimental flag enabled.
+- Browser tests use isolated profiles and controlled pages, with fixture permissions pregranted. X requests are intercepted, and cloud-account chat is not exercised by these CI runs. This is not a Store-upgrade test or exhaustive live-site certification.
+
+[Reproducible release checks](https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/release-e2e.yml) · [Coverage and requirements](docs/compatibility.md#recorded-validation).
+
+### Downloads and signing
+
+Download the matching Windows, browser-extension and source ZIPs from [v0.3.1](https://github.com/Maharajahu/ToolBraid-Companion/releases/tag/v0.3.1). The keyless Edge publisher ZIP is included for packaging, not unpacked installation. Verify assets against that release's `SHA256SUMS.txt`.
+
+The manual launcher remains **unsigned**. Microsoft Store companion **0.3.3.0** and existing store submissions are unchanged. Store signing does not extend to the independent ZIP. Reinstall the complete manual package, reload its matching extension and reconnect an already-running MCP client once.
 
 ## Microsoft Store availability — 26 September 2026
 

@@ -1,4 +1,14 @@
-# ToolBraid Companion 0.3.1 RC1
+# ToolBraid Companion 0.3.1
+
+## 0.3.1 release — 26 September 2026
+
+- Fixed native WebMCP execution when browser serialization changes JSON field order. Actual schema changes and stale bindings are still rejected; actions are not automatically replayed.
+- Verified the packaged manual companion in clean Windows on Edge and Chrome: installation, upgrade from the published RC, uninstall, opt-in, page reads, form submission, restart and pause enforcement.
+- Verified native WebMCP discovery and execution across the extension, companion and MCP client with the experimental browser flag enabled.
+
+Source suite: **592 passed, 7 opt-in skipped, 0 failed**. Browser integration uses controlled pages, isolated profiles and pregranted fixture permissions. It does not certify live X operations, cloud-account chat or Store-delivered upgrades.
+
+The manual launcher is **unsigned**. Microsoft Store companion **0.3.3.0** remains a separate Microsoft-signed distribution; this release does not update Store submissions. Download matching assets from [v0.3.1](https://github.com/Maharajahu/ToolBraid-Companion/releases/tag/v0.3.1) and verify its `SHA256SUMS.txt`.
 
 ## Media upload and reply fixes — 19 September 2026
 

@@ -56,8 +56,11 @@ const expected = [
   'ToolBraid-0.3.1-extension.zip',
   'ToolBraid-0.3.1-edge-extension.zip',
   'ToolBraid-0.3.1-windows-x64.zip',
-  'ToolBraid-Windows-real-demo-4K.mp4',
 ].sort();
+if (manifest.some(line => line.endsWith('  ToolBraid-Windows-real-demo-4K.mp4'))) {
+  expected.push('ToolBraid-Windows-real-demo-4K.mp4');
+  expected.sort();
+}
 // A source snapshot cannot contain its own archive hash. The release manifest
 // adds it after archiving the source commit; both forms validate the runtime ZIPs.
 if (manifest.some(line => line.endsWith('  ToolBraid-0.3.1-source.zip'))) {
@@ -72,6 +75,6 @@ assert.match(readme, /<h1 align="center">ToolBraid Companion<\/h1>/);
 assert.ok(readme.includes('https://apps.microsoft.com/detail/9P7VF25K2X1R'), 'Store download is available');
 assert.ok(readme.includes('Updated 26 September 2026'), 'Store availability has a dated update');
 assert.ok(readme.includes('https://x.com/ToolBraidComp'), 'Follow link uses the product account');
-assert.ok(readme.includes(`${canonical}/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip`));
+assert.ok(readme.includes(`${canonical}/releases/download/v0.3.1/ToolBraid-0.3.1-windows-x64.zip`));
 assert.ok(readme.includes('\nhttps://github.com/user-attachments/assets/5696a89b-59d6-4fd8-ad80-023f04fb16b7\n'), 'Keep the native video embed');
 console.log(`PASS: ${documents.size} documents, ${links} local links/anchors, image references and ${manifest.length} checksum-list entries.`);
