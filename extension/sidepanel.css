@@ -105,7 +105,7 @@ summary:focus-visible,
   outline-offset: 3px;
 }
 
-.app-shell { min-height: 100vh; padding-bottom: 90px; }
+.app-shell { min-height: 100vh; padding-bottom: 126px; }
 
 .project-footer {
   position: fixed;
@@ -120,6 +120,7 @@ summary:focus-visible,
 
 .project-footer-inner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -129,7 +130,8 @@ summary:focus-visible,
 
 .project-support-note { margin: 0; color: var(--soft); font-size: 11px; line-height: 1.5; }
 .project-support-note span { display: block; color: var(--muted); font-size: 10px; }
-.project-links { display: flex; flex: 0 0 auto; gap: 6px; }
+.project-links { display: flex; flex: 1 1 100%; gap: 6px; }
+.project-links .project-link { padding: 8px 9px; font-size: 11px; gap: 6px; }
 .project-link {
   display: inline-flex;
   align-items: center;
