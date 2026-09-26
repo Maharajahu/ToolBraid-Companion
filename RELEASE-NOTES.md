@@ -2,9 +2,20 @@
 
 [Overview](README.md) · [Downloads](https://github.com/Maharajahu/ToolBraid-Companion/releases) · [Update guide](INSTALL.md#update)
 
-Current release: **0.3.1 RC1**, a pre-release for manual installation. [Compatibility and signing](docs/compatibility.md#distribution-and-signing).
+Available editions: **Microsoft Store companion 0.3.3.0** and **manual release 0.3.1 RC1**. The extension/runtime version remains **0.3.1**. [Compatibility and signing](docs/compatibility.md#distribution-and-signing).
 
-## Latest update — 19 September 2026
+## Microsoft Store availability — 26 September 2026
+
+- The Windows companion is [available free on Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R) for Windows 11 build 22000 or later, x64. Microsoft signs and distributes the Store package.
+- Install the browser extension separately, enable the sites you choose, then connect your existing MCP client or optional panel chat. [Store setup](INSTALL.md#microsoft-store-companion).
+- The manual ZIP remains available under the existing release tag. Its launcher is unsigned; Store certification does not change the ZIP's signing status or certify the separate Edge Add-ons extension.
+- The 19 September upload and reply fixes below apply to the manual release and extension; the companion changes are not included in Store 0.3.3.0.
+
+This availability and documentation update does not change the downloadable packages or their version numbers.
+
+<a id="latest-update--19-september-2026"></a>
+
+## Manual release update — 19 September 2026
 
 Runtime **0.3.1** · Release **v0.3.1-rc.1**.
 
@@ -38,7 +49,7 @@ The named source ZIP corresponds to [889c19d](https://github.com/Maharajahu/Tool
 
 Runtime **0.3.1**, release **v0.3.1-rc.1**; no version bump.
 
-Historical source snapshot: [43446d5](https://github.com/Maharajahu/ToolBraid-Companion/tree/43446d5e137e7057cc53dc64fb9c1d49d7052e03). Current download provenance is listed in the latest update above.
+Historical source snapshot: [43446d5](https://github.com/Maharajahu/ToolBraid-Companion/tree/43446d5e137e7057cc53dc64fb9c1d49d7052e03). Current download provenance is listed in the manual release update above.
 
 - Published the public extension, companion, Store app source, regression tests and packaging scripts. Added a [build guide](docs/development.md), contribution instructions and source/build CI.
 - Added `ToolBraid-0.3.1-source.zip` alongside refreshed Windows, unpacked-extension and Edge submission ZIPs. The release's checksum file identifies the new bytes; the dedicated source ZIP is distinct from the historical tag's automatic GitHub archives.

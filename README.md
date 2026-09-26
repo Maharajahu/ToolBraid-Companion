@@ -5,7 +5,8 @@
 <p align="center">Your AI's connection to the browser, Windows and the work between them.</p>
 
 <p align="center">
-  <a href="https://github.com/Maharajahu/ToolBraid-Companion/releases/tag/v0.3.1-rc.1"><img src="https://img.shields.io/badge/release-0.3.1_RC1-ffd278" alt="Release 0.3.1 RC1"></a>
+  <a href="https://apps.microsoft.com/detail/9P7VF25K2X1R"><img src="https://img.shields.io/badge/Microsoft_Store-Available-77e7f4" alt="Available on Microsoft Store"></a>
+  <a href="https://github.com/Maharajahu/ToolBraid-Companion/releases/tag/v0.3.1-rc.1"><img src="https://img.shields.io/badge/manual_release-0.3.1_RC1-ffd278" alt="Manual release 0.3.1 RC1"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache_2.0-77e7f4" alt="Apache License 2.0"></a>
   <a href="https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/docs.yml"><img src="https://github.com/Maharajahu/ToolBraid-Companion/actions/workflows/docs.yml/badge.svg" alt="Source and documentation checks"></a>
 </p>
@@ -20,7 +21,7 @@
 </p>
 
 <p align="center">
-  <a href="https://x.com/dandumt23"><img src="https://img.shields.io/badge/Follow-%40dandumt23-111111?logo=x&amp;logoColor=white" alt="Follow @dandumt23 on X"></a>
+  <a href="https://x.com/ToolBraidComp"><img src="https://img.shields.io/badge/Follow-%40ToolBraidComp-111111?logo=x&amp;logoColor=white" alt="Follow @ToolBraidComp on X"></a>
   <a href="https://buymeacoffee.com/dumitrescup"><img src="https://img.shields.io/badge/Buy_me_a_coffee-FFDD00?logo=buymeacoffee&amp;logoColor=000000" alt="Buy me a coffee — optional support"></a>
 </p>
 
@@ -28,17 +29,17 @@ ToolBraid combines a **WebMCP-enabled browser extension** and a **local Windows 
 
 This is the official **source, releases and documentation repository** for the public edition. The browser extension, Windows companion, tests and packaging scripts are available under Apache 2.0.
 
-**Updated 19 September 2026:** more reliable file uploads and X replies. [What's new](RELEASE-NOTES.md#latest-update--19-september-2026) · [Token-efficiency video and measurement](#token-efficient-context).
+**Updated 26 September 2026:** the Windows companion is [available on Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R). [What's new](RELEASE-NOTES.md#microsoft-store-availability--26-september-2026) · [Token-efficiency video and measurement](#token-efficient-context).
 
 ## Get started
 
-**[Download for Windows](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip)** · [Extension only](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) · [Source ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip) · [Checksums](SHA256SUMS.txt)
+**[Get it from Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R)** · [Browser extension](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) · [Manual Windows ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip) · [Source ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-source.zip) · [Checksums](SHA256SUMS.txt)
 
-1. Extract the Windows package and run `Install.cmd` as your normal Windows user.
-2. In Chrome or Edge, enable **Developer mode → Load unpacked** and select its `extension` folder.
-3. Enable your chosen site in ToolBraid and [connect your AI](INSTALL.md#4-connect-your-ai).
+1. Install the companion from Microsoft Store on **Windows 11 x64**, open it from Start and choose **Connect browsers**.
+2. Download and extract the separate browser extension. In Chrome or Edge, enable **Developer mode → Load unpacked** and select the extracted folder containing `manifest.json`.
+3. Enable your chosen site in ToolBraid, use **Check connection** in the companion and [connect your AI](INSTALL.md#4-connect-your-ai).
 
-**Windows x64 · 0.3.1 RC1 · Free download.** The companion includes Node.js. This is a manual-install pre-release; the ZIP launcher is unsigned. See [compatibility and signing status](docs/compatibility.md) before installing.
+**Free · Store companion 0.3.3.0 · Extension 0.3.1.** The Store installs the Windows companion, not the browser extension. The separate **0.3.1 RC1 manual ZIP** remains available and unsigned. See [installation](INSTALL.md), [edition differences and signing](docs/compatibility.md#distribution-and-signing).
 
 <a id="what-is-toolbraid"></a>
 

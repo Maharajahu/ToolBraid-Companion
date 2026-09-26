@@ -2,13 +2,13 @@
 
 [Overview](../README.md) · [Install](../INSTALL.md) · [Capabilities](capabilities.md)
 
-Scope: **0.3.1 RC1, source/runtime refresh dated 13 September 2026**. The version number did not change; [SHA256SUMS.txt](../SHA256SUMS.txt) identifies the refreshed runtime packages, dedicated source archive and unchanged demo export.
+Availability updated **26 September 2026**. Store companion **0.3.3.0** and manual release **0.3.1 RC1** are separate distributions; the extension/runtime version remains **0.3.1**. [SHA256SUMS.txt](../SHA256SUMS.txt) identifies the manual release downloads.
 
 ## Browser and client compatibility
 
 | Component | Requirement / coverage |
 | --- | --- |
-| Companion | Windows x64. Node.js is bundled in the complete Windows ZIP. |
+| Companion | Store: Windows 11 build 22000 or later, x64. Manual ZIP: Windows x64. Both bundle Node.js. |
 | Extension | Manifest V3, Chrome or Edge; declared minimum Chromium 120. Manual unpacked installation. |
 | Ordinary page tools | Do not require experimental WebMCP flags or attach the debugger for basic actions. |
 | Native WebMCP | Requires a browser exposing the native consumer API and a site registering tools. Not guaranteed in every default Chrome/Edge version. |
@@ -22,11 +22,15 @@ The unpacked Chrome/Edge extension identity is `gpjhdlbjfhlaeakphfognpijgmclecmn
 
 ## Distribution and signing
 
-The public downloads are a **pre-release candidate**, not a stable or Microsoft-approved release. The Windows ZIP launcher is unsigned. A matching checksum confirms integrity, not publisher identity; do not disable security protections.
+| Distribution | Availability and signing |
+| --- | --- |
+| [Microsoft Store companion](https://apps.microsoft.com/detail/9P7VF25K2X1R) | **0.3.3.0**, published for Windows 11 x64. Microsoft signs and distributes this package. |
+| Manual Windows ZIP | **0.3.1 RC1**, updated 19 September 2026. The launcher remains unsigned. |
+| Browser extension | Installed separately in Chrome or Edge using the ordinary extension ZIP. Store approval of the companion is not approval of the Edge Add-ons extension. |
 
-Microsoft Store and Edge Add-ons downloads are not available here. Microsoft signing of a certified MSIX does not sign the independent ZIP/EXE.
+The 19 September upload and reply fixes apply to the manual release and extension; the companion changes are not included in Store 0.3.3.0. Do not run the ZIP installer over a Store installation to apply those fixes. Follow the [edition-specific setup and update instructions](../INSTALL.md).
 
-Store installation/update/removal is not fully validated. Chrome and unpacked Edge use manual ZIP installation and updates.
+A checksum confirms integrity, not publisher identity. Microsoft signing of the Store package does not sign the independent ZIP/EXE. Do not disable security protections. Installed-package Edge and Chrome tests covered connection and removal before submission; a Store-delivered upgrade to a newer version has not been verified.
 
 ## Permissions and data
 

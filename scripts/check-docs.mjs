@@ -69,6 +69,9 @@ assert.deepEqual(manifest.map(line => line.slice(66)).sort(), expected, 'Unexpec
 
 const readme = documents.get(path.join(root, 'README.md')).text;
 assert.match(readme, /<h1 align="center">ToolBraid Companion<\/h1>/);
+assert.ok(readme.includes('https://apps.microsoft.com/detail/9P7VF25K2X1R'), 'Store download is available');
+assert.ok(readme.includes('Updated 26 September 2026'), 'Store availability has a dated update');
+assert.ok(readme.includes('https://x.com/ToolBraidComp'), 'Follow link uses the product account');
 assert.ok(readme.includes(`${canonical}/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip`));
 assert.ok(readme.includes('\nhttps://github.com/user-attachments/assets/5696a89b-59d6-4fd8-ad80-023f04fb16b7\n'), 'Keep the native video embed');
 console.log(`PASS: ${documents.size} documents, ${links} local links/anchors, image references and ${manifest.length} checksum-list entries.`);

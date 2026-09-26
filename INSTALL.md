@@ -2,9 +2,9 @@
 
 [Overview](README.md) · [Full specs](docs/capabilities.md) · [Compatibility](docs/compatibility.md)
 
-This guide covers **Windows x64, Chrome or Edge, and 0.3.1 RC1**. The Windows package includes the companion, Node.js runtime and matching extension. It does not include an AI model, subscription, Codex or FFmpeg.
+Install the Windows companion from **[Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R)** on **Windows 11 x64**, then install the browser extension separately. [Follow the Store setup steps](#microsoft-store-companion).
 
-The ZIP launcher is unsigned. Checksums identify downloaded bytes, not a trusted publisher signature. Do not disable Windows, browser or organization security controls. [Store availability](#microsoft-store-companion) is a separate distribution route.
+The numbered steps below cover the alternative **0.3.1 RC1 manual Windows ZIP**. It includes the companion, Node.js runtime and matching extension. Its launcher is unsigned. Checksums identify bytes, not a trusted publisher signature. Neither edition includes an AI model, subscription, Codex or FFmpeg. Do not disable Windows, browser or organization security controls.
 
 ## 1. Download and extract
 
@@ -60,18 +60,18 @@ You do not need `Configure-Codex.cmd` or a separate MCP entry for panel chat. Re
 
 Keep the conversation, sign-in and model selection **in your existing client**. It must support local **stdio MCP servers**; a cloud-only chat cannot directly start the companion on your PC.
 
-1. Open the installer-generated `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json` locally.
+1. **Store:** choose **Open MCP configuration** in the companion (`%LOCALAPPDATA%\ToolBraid\store\mcp-client.json`). **Manual ZIP:** open `%LOCALAPPDATA%\ToolBraid\public\mcp-client.json`. Keep this generated configuration private.
 2. Merge only `mcpServers.toolbraid` into your client's configuration, preserving other servers and the generated executable/arguments. Use its documented equivalent if it does not use this JSON format.
 3. Reload the client's MCP connection once. Confirm ToolBraid exposes tools, then run the read-only check below.
 
-For **Codex**, the package's `Configure-Codex.cmd` helper backs up the existing configuration and updates only ToolBraid's entry. This configures your external Codex conversation, not panel chat. Do not publish the generated configuration or expose it as a public HTTP server.
+For **Codex with the manual ZIP**, `Configure-Codex.cmd` backs up the existing configuration and updates only ToolBraid's entry. For the Store edition, use **Open MCP configuration** and your client's supported configuration format instead. This configures your external conversation, not panel chat. Do not publish the configuration or expose it as a public HTTP server.
 
 #### Claude Code example
 
-Use Claude Code's [official authentication](https://code.claude.com/docs/en/authentication) with an eligible account. Check whether a `toolbraid` server already exists before adding it. For a new entry, run:
+Use Claude Code's [official authentication](https://code.claude.com/docs/en/authentication) with an eligible account. Check whether a `toolbraid` server already exists before adding it. This example uses the **Store edition**; use `public` instead of `store` in the path only for the manual ZIP edition:
 
 ```powershell
-$toolbraidClient = Get-Content -LiteralPath "$env:LOCALAPPDATA\ToolBraid\public\mcp-client.json" -Raw | ConvertFrom-Json
+$toolbraidClient = Get-Content -LiteralPath "$env:LOCALAPPDATA\ToolBraid\store\mcp-client.json" -Raw | ConvertFrom-Json
 $toolbraidServer = $toolbraidClient.mcpServers.toolbraid
 $toolbraidArguments = @('mcp', 'add', '--transport', 'stdio', '--scope', 'user', 'toolbraid', '--', $toolbraidServer.command) + @($toolbraidServer.args)
 claude @toolbraidArguments
@@ -122,13 +122,17 @@ For unresolved problems, use the [issue form](https://github.com/Maharajahu/Tool
 
 ## Update
 
-Updates are manual. Close the browser connection, extract the new full package and run its installer. Replace the files in the permanently loaded extension folder with the matching extension, then **Reload** it on the browser's extensions page. Preserve the supplied manifest key. Extracting a ZIP elsewhere does not replace a loaded extension or running connector.
+**Store edition:** use Microsoft Store for companion updates. Do not run the manual ZIP installer over it. The unpacked browser extension is separate and must be updated manually.
 
-The **13 September 2026 fixes refresh remains version 0.3.1**. Identify it by [SHA256SUMS.txt](SHA256SUMS.txt), not version alone. Restart an existing MCP connection once after updating. The installer preserves its existing token and local data.
+**Manual ZIP edition:** close the browser connection, extract the new full package and run its installer. Replace the files in the permanently loaded extension folder with the matching extension, then **Reload** it on the browser's extensions page. Preserve the supplied manifest key. Extracting a ZIP elsewhere does not replace a loaded extension or running connector.
+
+The **19 September 2026 manual-release refresh remains version 0.3.1**. Identify it by [SHA256SUMS.txt](SHA256SUMS.txt), not version alone. Its companion fixes are not included in Store 0.3.3.0. Restart an existing MCP connection once after updating. The manual installer preserves its existing token and local data.
 
 ## Uninstall
 
-Close the browser connection and run:
+**Store edition:** close the browser connection, choose **Disconnect browsers** in the companion, then uninstall it through Windows Settings. Remove the extension separately. Local data is retained.
+
+**Manual ZIP edition:** close the browser connection and run:
 
 ```powershell
 & "$env:LOCALAPPDATA\ToolBraid\public\uninstall.ps1"
@@ -141,7 +145,13 @@ Remove the extension separately in the browser. The uninstaller removes recorded
 
 ## Microsoft Store companion
 
-**Not available for Store installation yet.** Use the manual Windows package and matching unpacked extension. The separate Store edition's installation, update and removal lifecycle is not fully validated.
+**[Available on Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R): companion 0.3.3.0, Windows 11 build 22000 or later, x64.** The browser extension remains a separate installation.
+
+1. Install the companion from the link above. Open **ToolBraid Companion** from Start and choose **Connect browsers**.
+2. Download and extract the ordinary [extension ZIP](https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-extension.zip) into a permanent folder. In `edge://extensions` or `chrome://extensions`, enable **Developer mode**, choose **Load unpacked** and select the folder containing `manifest.json`. Do not use the keyless Edge submission ZIP or install the ZIP edition's companion on top.
+3. Open an ordinary public page, open ToolBraid, read the control disclosure and enable that site. Keep the tab open.
+4. Select **Check connection** in the companion. Expect **MCP — OK**, **Extension — CONNECTED** and **Selected page — READY**. A paused extension or unselected page is not a working connection.
+5. Choose [one AI route](#4-connect-your-ai). For external clients, use **Open MCP configuration** in the Store app and preserve other client settings. No AI account is needed for the companion's connection check.
 
 The Store edition has a native window with **Connect browsers**, **Disconnect browsers**, **Open MCP configuration** and **Check connection**. Its configuration lives under `%LOCALAPPDATA%\ToolBraid\store`, not the ZIP edition's `public` directory. The extension remains a separate installation.
 

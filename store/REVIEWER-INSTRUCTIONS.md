@@ -1,12 +1,14 @@
 # Microsoft Store reviewer instructions — ToolBraid Companion MSIX 0.3.3.0
 
+The companion described here is now [available on Microsoft Store](https://apps.microsoft.com/detail/9P7VF25K2X1R), verified 26 September 2026. These are the 0.3.3.0 review instructions, not evidence for a future package.
+
 This packet covers the MSIX companion, not the ZIP installer or Edge extension submission. The extension/runtime version remains 0.3.1. Record the new passing build ID, source commit and unsigned candidate SHA-256 with the submission; do not reuse the previous candidate's evidence. A `local-validation` package uses a test identity, disables Connect/Disconnect and live diagnostics, and must not be submitted for certification.
 
 ## Prerequisites
 
 Use an isolated Windows 11 account, build 22000 or later, and the submitted x64 MSIX. No publisher credentials or private source access are needed. Use the supported certification/test installation process without bypassing Windows protections or treating a self-signed certificate as publisher trust.
 
-Reserved Windows identity: `Maharajahu.ToolBraidCompanion`, publisher `CN=E4BF216F-08D0-430A-8F4D-729DDA573ADE`, display name `Maharajahu`, Store ID `9P7VF25K2X1R`. The matching Edge draft uses CRX ID `ailfkkdmjppafngmkobpiogoamidipcl` (Edge Store ID `0RDCKG19W71L`). Both are drafts, not live download links; supply reviewer-accessible artifacts before certification.
+Windows identity: `Maharajahu.ToolBraidCompanion`, publisher `CN=E4BF216F-08D0-430A-8F4D-729DDA573ADE`, display name `Maharajahu`, Store ID `9P7VF25K2X1R`. The separate Edge draft uses CRX ID `ailfkkdmjppafngmkobpiogoamidipcl` (Edge Store ID `0RDCKG19W71L`). Companion publication does not establish Edge Add-ons availability; supply reviewer-accessible extension artifacts when needed.
 
 Microsoft Store distributes the Windows companion; Edge Add-ons distributes the separate Edge extension. Chrome uses the official unpacked ZIP. This app does not install extensions, grant browser permissions or sign in to an AI provider.
 
