@@ -1,0 +1,114 @@
+name: Windows release end-to-end verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['test/release-e2e-*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Validate source and build the candidate once
+        shell: powershell
+        run: |
+          npm run validate
+          if ($LASTEXITCODE -ne 0) { throw 'Source validation failed.' }
+          ./scripts/build-release.ps1
+          if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-candidate
+          path: |
+            dist/release-*/*.zip
+            dist/release-*/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  installed-flow:
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [msedge, chrome]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-candidate
+          path: dist/validation-input
+      - name: Prepare exact candidate and published upgrade baseline
+        shell: powershell
+        env:
+          TEST_BROWSER: ${{ matrix.browser }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $package = Get-ChildItem dist/validation-input -Recurse -Filter "ToolBraid-$version-windows-x64.zip"
+          if (@($package).Count -ne 1) { throw 'Expected one candidate ZIP.' }
+          $checksums = Get-Content (Join-Path $package.DirectoryName 'SHA256SUMS.txt')
+          $expected = @($checksums | Where-Object { $_.EndsWith($package.Name) })
+          if ($expected.Count -ne 1 -or (Get-FileHash $package.FullName).Hash -ne ($expected[0] -split '\s+')[0]) { throw 'Candidate checksum mismatch.' }
+          $candidate = Join-Path $env:RUNNER_TEMP 'toolbraid-candidate'
+          Expand-Archive -LiteralPath $package.FullName -DestinationPath $candidate
+          $baselineZip = Join-Path $env:RUNNER_TEMP 'toolbraid-baseline.zip'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/Maharajahu/ToolBraid-Companion/releases/download/v0.3.1-rc.1/ToolBraid-0.3.1-windows-x64.zip' -OutFile $baselineZip
+          if ((Get-FileHash $baselineZip).Hash -ne 'cd7791bbb9ea7aaa6fe7a6ec4bd39e42165da5bebfa1c25067b2e8ac986c5e03') { throw 'Published baseline checksum changed; review before testing.' }
+          $baseline = Join-Path $env:RUNNER_TEMP 'toolbraid-baseline'
+          Expand-Archive -LiteralPath $baselineZip -DestinationPath $baseline
+          $deps = Join-Path $env:RUNNER_TEMP 'toolbraid-test-deps'
+          npm install --prefix $deps --no-save --ignore-scripts playwright-core@1.58.2
+          if ($LASTEXITCODE -ne 0) { throw 'Browser test dependency installation failed.' }
+          $browser = if ($env:TEST_BROWSER -eq 'msedge') { 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' } else { 'C:\Program Files\Google\Chrome\Application\chrome.exe' }
+          if (-not (Test-Path -LiteralPath $browser)) { throw 'Selected system browser is missing.' }
+          "TOOLBRAID_COMPANION_DIR=$candidate" >> $env:GITHUB_ENV
+          "TOOLBRAID_PREVIOUS_COMPANION_DIR=$baseline" >> $env:GITHUB_ENV
+          "E2E_EXTENSION_DIR=$candidate\extension" >> $env:GITHUB_ENV
+          "E2E_PLAYWRIGHT_MODULE=$deps\node_modules\playwright-core" >> $env:GITHUB_ENV
+          "E2E_CHROME_PATH=$browser" >> $env:GITHUB_ENV
+          New-Item -ItemType Directory dist/release-e2e-evidence -Force | Out-Null
+          @{ commit = $env:GITHUB_SHA; buildId = $env:GITHUB_RUN_ID; browser = $env:TEST_BROWSER; browserVersion = (Get-Item $browser).VersionInfo.ProductVersion; candidateSha256 = (Get-FileHash $package.FullName).Hash; baselineSha256 = (Get-FileHash $baselineZip).Hash; storeDelivered = $false } |
+            ConvertTo-Json | Set-Content dist/release-e2e-evidence/provenance.json
+      - name: Install, upgrade from the published ZIP and uninstall
+        shell: powershell
+        env:
+          TOOLBRAID_INSTALL_TEST: '1'
+        run: |
+          node --test tests/universal/companion-install.test.mjs 2>&1 | Tee-Object dist/release-e2e-evidence/lifecycle.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate lifecycle failed.' }
+      - name: Standard browser first-run, restart, form and pause
+        shell: powershell
+        run: |
+          node scripts/e2e-standard-browser.mjs 2>&1 | Tee-Object dist/release-e2e-evidence/standard.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Standard browser flow failed.' }
+      - name: Native WebMCP through extension and installed companion
+        shell: powershell
+        env:
+          TOOLBRAID_WEBMCP_NATIVE: '1'
+        run: |
+          node scripts/e2e-standard-browser.mjs 2>&1 | Tee-Object dist/release-e2e-evidence/native-webmcp.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Native WebMCP flow failed.' }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: release-e2e-${{ matrix.browser }}
+          path: dist/release-e2e-evidence/
+          if-no-files-found: warn
+          retention-days: 14

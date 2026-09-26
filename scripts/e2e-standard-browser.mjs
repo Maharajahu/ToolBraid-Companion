@@ -15,7 +15,11 @@ import {
 
 const playwright = resolvePlaywright();
 const executablePath = resolveChromePath(playwright);
-const build = await buildUniversalExtension({ edition: 'public' });
+const build = process.env.E2E_EXTENSION_DIR
+  ? { loadUnpackedDirectory: path.resolve(process.env.E2E_EXTENSION_DIR) }
+  : await buildUniversalExtension({ edition: 'public' });
+const requireNativeWebMcp = process.env.TOOLBRAID_WEBMCP_NATIVE === '1';
+const webmcpFlags = requireNativeWebMcp ? ['--enable-blink-features=WebMCP'] : [];
 const manifest = JSON.parse(await readFile(path.join(build.loadUnpackedDirectory, 'manifest.json'), 'utf8'));
 const fixture = await startUniversalFixtureServer({ port: 0 });
 // Native permission dialogs are not actionable in headless Chromium. Only the
@@ -161,7 +165,7 @@ try {
   for (let pass = 0; pass < 3; pass += 1) {
     context = await playwright.chromium.launchPersistentContext(profile, {
       executablePath, headless: true, ignoreDefaultArgs: ['--disable-extensions'],
-      args: ['--enable-unsafe-extension-debugging', '--no-first-run', '--no-default-browser-check'],
+      args: ['--enable-unsafe-extension-debugging', '--no-first-run', '--no-default-browser-check', ...webmcpFlags],
       viewport: { width: 1280, height: 900 },
     });
     const page = context.pages().find((candidate) => candidate.url() === 'about:blank') ?? await context.newPage();
@@ -223,7 +227,7 @@ try {
     }
     assert.equal(state.page?.tabId, tabId, 'The endpoint must bind the real fixture tab.');
     let read = tools.find((tool) => tool._meta?.['toolbraid/classification'] === 'read');
-    assert.ok(read, 'The unflagged browser must expose a page read tool.');
+    assert.ok(read, 'The browser must expose a page read tool.');
     const result = await client.request('tools/call', { name: read.name, arguments: {} });
     assert.equal(result.isError, false);
     assert.ok(JSON.stringify(result).includes('completed'), 'The page read must execute, not only list.');
@@ -267,9 +271,18 @@ try {
       const nativeSupport = await page.evaluate(async () => {
         const api = document.modelContext;
         if (!api?.getTools || !api?.executeTool) return false;
-        await api.registerTool({ name: 'toolbraid_native_fixture', description: 'Harmless native WebMCP echo fixture', inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] }, execute: async (input) => JSON.stringify({ echo: input.text }) });
+        const output = document.createElement('output');
+        output.id = 'toolbraid-native-result';
+        output.dataset.calls = '0';
+        document.body.append(output);
+        await api.registerTool({ name: 'toolbraid_native_fixture', description: 'Harmless native WebMCP echo fixture', inputSchema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'], additionalProperties: false }, execute: async (input) => {
+          output.textContent = input.text;
+          output.dataset.calls = String(Number(output.dataset.calls) + 1);
+          return JSON.stringify({ echo: input.text });
+        } });
         return true;
       });
+      if (requireNativeWebMcp) assert.equal(nativeSupport, true, 'The native WebMCP release gate must execute, not silently skip.');
       const nativeResult = (await client.request('tools/call', { name: 'toolbraid.webmcp.discover', arguments: {} })).structuredContent;
       assert.equal(nativeResult.available, nativeSupport, JSON.stringify(nativeResult));
       if (nativeSupport) {
@@ -278,6 +291,8 @@ try {
         const executed = await client.request('tools/call', { name: 'toolbraid.webmcp.execute', arguments: { handle: nativeTool.handle, input: { text: 'native echo' } } });
         assert.equal(executed.isError, false, JSON.stringify(executed));
         assert.match(JSON.stringify(executed), /native echo/);
+        assert.equal(await page.locator('#toolbraid-native-result').innerText(), 'native echo');
+        assert.equal(await page.locator('#toolbraid-native-result').getAttribute('data-calls'), '1');
       }
       results.push({ pass: 'assistant-native-round-trip', subscriptionOnlySettings: true, subscriptionConnected, nativeSiteToolsAvailable: nativeSupport, nativeSiteToolExecuted: nativeSupport });
       if (process.env.TOOLBRAID_SCREENSHOT_DIR) await panel.captureScreenshot(path.join(process.env.TOOLBRAID_SCREENSHOT_DIR, 'toolbraid-chat.png'), { fullPage: false, selector: '.assistant-panel' });
@@ -322,7 +337,7 @@ try {
     await context.close();
     context = null;
   }
-  process.stdout.write(`${JSON.stringify({ ok: true, executablePath, webmcpFlags: [], extensionDebugging: true, fixtureHostPregranted: hostPregranted, xNetworkFullyIntercepted: true, fixtureDebuggerPregranted: true, nativeCompanionTested: true, results }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ ok: true, executablePath, webmcpFlags, extensionDebugging: true, fixtureHostPregranted: hostPregranted, xNetworkFullyIntercepted: true, fixtureDebuggerPregranted: true, nativeCompanionTested: true, results }, null, 2)}\n`);
 } finally {
   await client?.close();
   await context?.close();

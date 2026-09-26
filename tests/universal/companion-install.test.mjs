@@ -4,12 +4,14 @@ import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const version = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8')).version;
 const companion = process.env.TOOLBRAID_COMPANION_DIR ?? path.join(root, `dist/release-${version}/companion`);
+const previousCompanion = process.env.TOOLBRAID_PREVIOUS_COMPANION_DIR ?? companion;
 const enabled = process.platform === 'win32' && process.env.TOOLBRAID_INSTALL_TEST === '1';
 const powershell = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32/WindowsPowerShell/v1.0/powershell.exe');
 
@@ -51,7 +53,9 @@ test('portable companion installs, updates, configures only the selected client 
   });
   const installScript = path.join(companion, 'scripts/install-mcp-bridge.ps1');
   const installArgs = ['-File', installScript, '-Edition', 'public', '-InstallRoot', installRoot, '-ChromeExtensionId', 'a'.repeat(32), '-EdgeExtensionId', 'b'.repeat(32)];
-  const first = JSON.parse(run([...installArgs, '-Client', 'None']));
+  const firstInstallArgs = [...installArgs];
+  firstInstallArgs[1] = path.join(previousCompanion, 'scripts/install-mcp-bridge.ps1');
+  const first = JSON.parse(run([...firstInstallArgs, '-Client', 'None']));
   installed = true;
   assert.equal(first.installed, true);
   assert.equal(first.codexConfigured, false);
@@ -67,6 +71,9 @@ test('portable companion installs, updates, configures only the selected client 
   assert.equal([].concat(registrations()).filter((entry) => entry.key.endsWith('com.toolbraid.bridge')).length, 2);
 
   run([...installArgs, '-Client', 'Codex', '-CodexConfigPath', configPath]);
+  const hash = async (file) => createHash('sha256').update(await readFile(file)).digest('hex');
+  assert.equal(await hash(path.join(installRoot, 'native-host/ToolBraidNativeHost.exe')),
+    await hash(path.join(companion, 'bridge/ToolBraidNativeHost.exe')), 'The update must install the candidate launcher.');
   const updated = JSON.parse(await readFile(path.join(installRoot, 'bridge-config.json'), 'utf8'));
   assert.equal(updated.token, config.token, 'An update must preserve the existing token.');
   const configured = await readFile(configPath, 'utf8');
